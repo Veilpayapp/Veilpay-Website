@@ -22,8 +22,12 @@ const Coin3D: React.FC<Coin3DProps> = ({
   const meshRef = useRef<THREE.Mesh>(null);
   const logoDataUri = useMemo(() => getNextCryptoLogo(), []);
   
-  const texture = useTexture(logoDataUri);
-  texture.colorSpace = THREE.SRGBColorSpace;
+  const texture = useTexture(logoDataUri, (loaded) => {
+    const applyColorSpace = (t: THREE.Texture) => {
+      t.colorSpace = THREE.SRGBColorSpace;
+    };
+    Array.isArray(loaded) ? loaded.forEach(applyColorSpace) : applyColorSpace(loaded);
+  });
   
   useFrame((state) => {
     if (!meshRef.current) return;
