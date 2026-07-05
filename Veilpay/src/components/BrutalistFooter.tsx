@@ -115,7 +115,6 @@ const BrutalistFooter: React.FC = () => {
               fontSize: '24vw', // Edge to edge on all screens
               lineHeight: 0.8,
               filter: 'drop-shadow(0px 10px 20px rgba(0,0,0,0.5))',
-              willChange: 'filter'
             }}
           >
             VEILPAY

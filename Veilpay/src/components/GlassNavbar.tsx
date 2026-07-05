@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
 import { getLenisInstance } from '@/lib/utils';
 
+// Smooth quartic ease-out for the cinematic scroll — pure, so hoisted to module scope
+// instead of being re-created on every render.
+const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
+
 export default function GlassNavbar() {
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, target: string | number) => {
     e.preventDefault();
@@ -30,7 +34,7 @@ export default function GlassNavbar() {
       // 4 second duration for a super elegant, slow cinematic scroll
       lenis.scrollTo(scrollTarget, { 
         duration: 4, 
-        easing: (t: number) => 1 - Math.pow(1 - t, 4) // smooth quartic ease-out
+        easing: easeOutQuart
       });
     } else {
       window.scrollTo({ top: typeof scrollTarget === 'number' ? scrollTarget : 0, behavior: 'smooth' });

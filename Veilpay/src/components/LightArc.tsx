@@ -5,7 +5,7 @@ const LightArc: React.FC = () => {
   return (
     <div 
       className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none mt-[20vh] md:mt-[15vh]"
-      style={{ transform: 'translateZ(0)', willChange: 'transform' }}
+      style={{ transform: 'translateZ(0)' }}
     >
       <motion.svg
         viewBox="0 -400 1200 800"

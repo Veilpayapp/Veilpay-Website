@@ -44,7 +44,7 @@ const ScrollSequence: React.FC = () => {
     const screenLogo = phone?.querySelector('.screen-logo');
 
     if (!container || !bg || !mesh || !phone || !coins || !glow || !cards || !title || !introTitle || !titleB) return;
-    let ctx = gsap.context(() => {
+    const ctx = gsap.context(() => {
       // ── Initial states before GSAP takes over ──
       gsap.set(bg, { opacity: 1 });
       gsap.set(mesh, { opacity: 0 });
@@ -117,7 +117,6 @@ const ScrollSequence: React.FC = () => {
     <div
       ref={containerRef}
       className="relative h-screen w-full overflow-hidden bg-black"
-      style={{ willChange: 'transform' }}
     >
       {/* Stage 0: Pure OLED Black Background Layer */}
       <div

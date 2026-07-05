@@ -26,7 +26,11 @@ const Coin3D: React.FC<Coin3DProps> = ({
     const applyColorSpace = (t: THREE.Texture) => {
       t.colorSpace = THREE.SRGBColorSpace;
     };
-    Array.isArray(loaded) ? loaded.forEach(applyColorSpace) : applyColorSpace(loaded);
+    if (Array.isArray(loaded)) {
+      loaded.forEach(applyColorSpace);
+    } else {
+      applyColorSpace(loaded);
+    }
   });
   
   useFrame((state) => {
