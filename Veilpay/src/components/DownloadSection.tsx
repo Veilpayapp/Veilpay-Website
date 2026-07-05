@@ -273,7 +273,18 @@ const DownloadSection: React.FC = () => {
                 onMouseEnter={() => setIsFollowHovered(true)}
                 onMouseLeave={() => setIsFollowHovered(false)}
                 onClick={() => {
-                  setTimeout(() => setHasFollowed(true), 1500);
+                  const clickTime = Date.now();
+                  const handleFocus = () => {
+                    const timeAway = Date.now() - clickTime;
+                    // If they were away for more than 3 seconds (3000ms), assume they followed
+                    if (timeAway > 3000) {
+                      setHasFollowed(true);
+                    } else {
+                      alert("Please actually click Follow on X to join the waitlist! It seems you came back too fast.");
+                    }
+                    window.removeEventListener('focus', handleFocus);
+                  };
+                  window.addEventListener('focus', handleFocus);
                 }}
                 className={`w-full flex items-center justify-center gap-3 h-14 px-8 text-white font-bold rounded-full transition-all transform hover:scale-[1.02] cursor-pointer ${isFollowHovered ? 'hover:text-[#F2C572] hover:border-[#F2C572]/50 glass-panel' : 'bg-black border border-white/20'}`}
                 style={isFollowHovered ? glassStyle : {}}

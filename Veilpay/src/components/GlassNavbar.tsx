@@ -87,7 +87,7 @@ export default function GlassNavbar() {
             onClick={(e) => handleScroll(e, '#download')}
             className="text-[12px] font-bold text-black bg-white hover:bg-gray-200 transition-colors tracking-wide uppercase px-4 py-2 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)] preserve-color"
           >
-            DOWNLOAD
+            WAITLIST
           </button>
         </div>
       </motion.nav>

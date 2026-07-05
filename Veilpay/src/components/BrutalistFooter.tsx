@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 import { ArrowUpRight } from 'lucide-react';
@@ -35,6 +35,55 @@ const FOOTER_DATA = [
 ];
 
 const BrutalistFooter: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleSubmitBeta = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setStatus('loading');
+    
+    try {
+      const BETA_WEBHOOK_URL = import.meta.env.VITE_BETA_WEBHOOK_URL;
+      
+      if (!BETA_WEBHOOK_URL) {
+        console.error("Missing Beta Webhook URL! Add VITE_BETA_WEBHOOK_URL to your .env");
+        setStatus('error');
+        return;
+      }
+
+      const response = await fetch(BETA_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          embeds: [
+            {
+              title: "🧪 New Beta Tester Signup!",
+              description: `A user has requested beta access.\n\n**Email:** \`${email}\``,
+              color: 3066993, // Green
+              timestamp: new Date().toISOString()
+            }
+          ]
+        })
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        setEmail('');
+      } else {
+        const err = await response.text();
+        console.error("Webhook error:", err);
+        setStatus('error');
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      setStatus('error');
+    }
+  };
+
   return (
     <footer className="relative w-full min-h-screen flex flex-col justify-between bg-black text-white overflow-hidden pt-20 border-t border-white/10">
       {/* Background Sparkles */}
@@ -69,16 +118,29 @@ const BrutalistFooter: React.FC = () => {
               <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
               Join the beta
             </div>
-            <div className="flex w-full max-w-md items-center border border-white/20 rounded-full bg-white/5 p-1.5 backdrop-blur-md focus-within:border-amber-500/50 transition-colors">
-              <input 
-                type="email" 
-                placeholder="Enter your email for beta access" 
-                className="w-full bg-transparent border-none outline-none text-white placeholder-white/40 font-medium px-5 py-2"
-              />
-              <button className="flex items-center justify-center p-3 bg-white text-black rounded-full hover:bg-neutral-200 hover:-rotate-12 transition-all">
-                <ArrowUpRight className="w-5 h-5" />
-              </button>
-            </div>
+            <form onSubmit={handleSubmitBeta} className="flex flex-col gap-2 w-full max-w-md relative z-20">
+              <div className="flex w-full items-center border border-white/20 rounded-full bg-white/5 p-1.5 backdrop-blur-md focus-within:border-amber-500/50 transition-colors relative z-20">
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={status === 'loading' || status === 'success'}
+                  placeholder="Enter your email for beta access" 
+                  required
+                  className="w-full bg-transparent border-none outline-none text-white placeholder-white/40 font-medium px-5 py-2 disabled:opacity-50"
+                />
+                <button 
+                  type="submit"
+                  disabled={status === 'loading' || status === 'success'}
+                  className="flex items-center justify-center p-3 bg-white text-black rounded-full hover:bg-neutral-200 hover:rotate-45 transition-all disabled:opacity-50 relative z-30"
+                >
+                  <ArrowUpRight className="w-5 h-5" />
+                </button>
+              </div>
+              {status === 'success' && <p className="text-green-400 text-sm pl-4">Added to beta waitlist!</p>}
+              {status === 'error' && <p className="text-red-400 text-sm pl-4">Error submitting. Try again.</p>}
+              {status === 'loading' && <p className="text-amber-400 text-sm pl-4">Joining...</p>}
+            </form>
           </div>
         </div>
 
