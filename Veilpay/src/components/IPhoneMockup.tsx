@@ -4,6 +4,19 @@ const IPhoneMockup: React.FC = () => {
   return (
     <div className="relative z-20 flex justify-center">
       <div className="relative w-[1200px] md:w-[1800px] flex justify-center items-center">
+        {/* Subtle Aura Effect behind the phone */}
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
+        >
+          <div 
+            className="w-[600px] h-[600px] md:w-[900px] md:h-[900px] rounded-full"
+            style={{
+              background: 'radial-gradient(circle at center, rgba(242, 197, 114, 0.5) 0%, rgba(242, 197, 114, 0.15) 50%, transparent 70%)',
+              filter: 'blur(100px)',
+            }}
+          />
+        </div>
+        
         <img 
           src="/MOCKUP2.png" 
           alt="iPhone Mockup" 

@@ -16,7 +16,7 @@ const MassiveTextScroll: React.FC = () => {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top top',
-          end: '+=600%', // 6x height to make the scroll animation much slower and smoother
+          end: '+=250%', // Reduced from 600% to eliminate the huge gap
           pin: true,
           scrub: 2, // Slower smoothing
         },

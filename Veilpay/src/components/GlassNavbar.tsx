@@ -3,15 +3,28 @@ import { motion } from 'framer-motion';
 export default function GlassNavbar() {
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, target: string | number) => {
     e.preventDefault();
+    
+    let scrollTarget = target;
+    if (target === '#download') {
+      const downloadSection = document.getElementById('download');
+      if (downloadSection) {
+        // The DownloadSection pins and scales up for 150% of the viewport height.
+        // Scroll perfectly to the end of the pin where the box is fully scaled.
+        const rect = downloadSection.getBoundingClientRect();
+        const absoluteTop = rect.top + window.scrollY;
+        scrollTarget = absoluteTop + (window.innerHeight * 1.5);
+      }
+    }
+
     const lenis = (window as any).lenis;
     if (lenis) {
       // 4 second duration for a super elegant, slow cinematic scroll
-      lenis.scrollTo(target, { 
+      lenis.scrollTo(scrollTarget, { 
         duration: 4, 
         easing: (t: number) => 1 - Math.pow(1 - t, 4) // smooth quartic ease-out
       });
     } else {
-      window.scrollTo({ top: typeof target === 'number' ? target : 0, behavior: 'smooth' });
+      window.scrollTo({ top: typeof scrollTarget === 'number' ? scrollTarget : 0, behavior: 'smooth' });
     }
   };
 

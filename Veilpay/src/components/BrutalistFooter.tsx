@@ -27,6 +27,7 @@ const FOOTER_DATA = [
     links: [
       { label: 'Discord', href: 'https://discord.gg/aeNy2nMAp' },
       { label: 'X (Twitter)', href: 'https://x.com/Veilpayapp' },
+      { label: 'Telegram', href: 'https://t.me/veilpayapp' },
       { label: 'Instagram', href: 'https://www.instagram.com/N2loeWMwZjQ1NWJw' },
       { label: 'LinkedIn', href: 'https://www.linkedin.com/company/veilpay/' },
     ],
@@ -128,7 +129,7 @@ const BrutalistFooter: React.FC = () => {
             style={{
               fontSize: '24vw', // Edge to edge on all screens
               lineHeight: 0.8,
-              filter: 'drop-shadow(0px 0px 150px rgba(0,0,0,1)) drop-shadow(0px 50px 80px rgba(0,0,0,1)) drop-shadow(0px 20px 40px rgba(0,0,0,0.9))',
+              filter: 'drop-shadow(0px 10px 20px rgba(0,0,0,0.5))',
               willChange: 'filter'
             }}
           >

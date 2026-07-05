@@ -33,7 +33,7 @@ html, body, #root {
 .v-loader .node {
   width: 18px;
   height: 18px;
-  background: #666;
+  background: #1a1103;
   border-radius: 4px;
   animation: v-glow 1.5s ease-in-out infinite;
 }
@@ -47,8 +47,8 @@ html, body, #root {
 @keyframes v-glow {
   0%, 100% {
     transform: scale(1);
-    background: #E0E0E0;
-    box-shadow: 0 0 0 transparent;
+    background: #F2C572;
+    box-shadow: 0 0 15px rgba(242, 197, 114, 0.4);
   }
   50% {
     transform: scale(1.3);

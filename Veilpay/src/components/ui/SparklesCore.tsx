@@ -90,8 +90,8 @@ export const SparklesCore = ({
       m.x += (m.targetX - m.x) * 0.05;
       m.y += (m.targetY - m.y) * 0.05;
 
-      rotation += 0.0006;
-      pulseRadius += 1.4;                       // the travelling ring
+      rotation += 0.0002;
+      pulseRadius += 0.6;                       // the travelling ring
       if (pulseRadius > maxRadius + 80) pulseRadius = -80;
 
       ctx!.clearRect(0, 0, SIZE, SIZE);
