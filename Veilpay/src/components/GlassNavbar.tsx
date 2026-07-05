@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { getLenisInstance } from '@/lib/utils';
 
 export default function GlassNavbar() {
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, target: string | number) => {
@@ -24,7 +25,7 @@ export default function GlassNavbar() {
       scrollTarget = document.documentElement.scrollHeight;
     }
 
-    const lenis = (window as any).lenis;
+    const lenis = getLenisInstance();
     if (lenis) {
       // 4 second duration for a super elegant, slow cinematic scroll
       lenis.scrollTo(scrollTarget, { 
@@ -80,7 +81,7 @@ export default function GlassNavbar() {
           
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-10">
-            <a href="#" className="text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Home</a>
+            <a href="#" onClick={(e) => handleScroll(e, 0)} className="text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Home</a>
             <a href="#features" onClick={(e) => handleScroll(e, '#features')} className="text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Features</a>
             <a href="#download" onClick={(e) => handleScroll(e, '#download')} className="text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Contact</a>
           </div>
@@ -89,12 +90,14 @@ export default function GlassNavbar() {
         {/* Right Section (Action Buttons) */}
         <div className="flex items-center gap-3 relative z-10">
           <button 
+            type="button"
             onClick={(e) => handleScroll(e, '#footer')}
             className="text-[12px] font-bold text-white hover:text-amber-400 transition-colors tracking-wide uppercase px-4 py-2 rounded-full border border-white/20 hover:border-amber-400/50 bg-white/5"
           >
             DOCS
           </button>
           <button 
+            type="button"
             onClick={(e) => handleScroll(e, '#download')}
             className="text-[12px] font-bold text-black bg-white hover:bg-gray-200 transition-colors tracking-wide uppercase px-4 py-2 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)] preserve-color"
           >

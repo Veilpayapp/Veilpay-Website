@@ -20,6 +20,8 @@ const ThemeToggle: React.FC = () => {
 
   return (
     <button
+      type="button"
+      aria-label="Toggle light and dark mode"
       onClick={() => setIsLightMode(!isLightMode)}
       className="fixed top-6 right-8 z-[100] flex items-center justify-center w-[56px] h-[56px] rounded-full transition-transform hover:scale-110 active:scale-95 glass-panel"
       style={{
