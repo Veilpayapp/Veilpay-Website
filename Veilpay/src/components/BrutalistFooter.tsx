@@ -23,11 +23,12 @@ const FOOTER_DATA = [
     ],
   },
   {
-    title: 'Developers',
+    title: 'Community',
     links: [
-      { label: 'API Documentation', href: '#' },
-      { label: 'GitHub', href: '#' },
-      { label: 'Contact Devs', href: '#' },
+      { label: 'Discord', href: 'https://discord.gg/aeNy2nMAp' },
+      { label: 'X (Twitter)', href: 'https://x.com/Veilpayapp' },
+      { label: 'Instagram', href: 'https://www.instagram.com/N2loeWMwZjQ1NWJw' },
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/company/veilpay/' },
     ],
   },
 ];
@@ -56,8 +57,10 @@ const BrutalistFooter: React.FC = () => {
         className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 gap-16 px-6 py-24 lg:grid-cols-2 md:px-12"
       >
         <div className="flex flex-col justify-start gap-12">
-          <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tighter text-white">
-            Privacy is the new standard.
+          <h2 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tighter leading-[0.9]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-300 to-gray-600 drop-shadow-[0_20px_30px_rgba(255,255,255,0.1)] drop-shadow-[0_5px_10px_rgba(0,0,0,1)] block mb-1">
+              Privacy is the new standard.
+            </span>
           </h2>
           
           <div className="flex flex-col gap-5">
