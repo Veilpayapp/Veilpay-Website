@@ -5,6 +5,35 @@ import { getLenisInstance } from '@/lib/utils';
 // instead of being re-created on every render.
 const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
 
+// Static style objects — hoisted so they aren't re-allocated on every render.
+const navPanelStyle: React.CSSProperties = {
+  width: 'max-content',
+  minWidth: '550px',
+  height: '56px',
+  borderRadius: '40px',
+  /* Clean frosted glass without distortion or noise */
+  backdropFilter: 'saturate(180%) blur(16px)',
+  WebkitBackdropFilter: 'saturate(180%) blur(16px)',
+  boxShadow: `
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.6),
+    inset -1px 0 2px rgba(255, 255, 255, 0.1),
+    0 15px 30px rgba(0, 0, 0, 0.4)
+  `,
+};
+
+const logoStyle: React.CSSProperties = {
+  width: '40px',
+  height: '40px',
+  backgroundImage: 'url(/image.png)',
+  backgroundColor: 'transparent',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  borderRadius: '50%',
+  boxShadow: 'none',
+};
+
 // Uses only its arguments + module-scope helpers (no component state/props), so it lives
 // at module scope to avoid being rebuilt every render and to keep memoized children stable.
 const handleScroll = (
@@ -53,21 +82,7 @@ export default function GlassNavbar() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
         className="fixed top-6 left-0 right-0 mx-auto z-50 flex items-center gap-12 px-8 glass-panel"
-        style={{
-          width: 'max-content',
-          minWidth: '550px',
-          height: '56px',
-          borderRadius: '40px',
-          /* Clean frosted glass without distortion or noise */
-          backdropFilter: 'saturate(180%) blur(16px)',
-          WebkitBackdropFilter: 'saturate(180%) blur(16px)',
-          boxShadow: `
-            inset 0 1px 1px rgba(255, 255, 255, 0.4),
-            inset 0 -1px 2px rgba(0, 0, 0, 0.6),
-            inset -1px 0 2px rgba(255, 255, 255, 0.1),
-            0 15px 30px rgba(0, 0, 0, 0.4)
-          `
-        }}
+        style={navPanelStyle}
       >
 
         {/* Left Section (Logo + Links) */}
@@ -75,17 +90,7 @@ export default function GlassNavbar() {
           {/* Logo */}
           <div 
             className="preserve-color"
-            style={{
-              width: '40px',
-              height: '40px',
-              backgroundImage: 'url(/image.png)',
-              backgroundColor: 'transparent',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              borderRadius: '50%',
-              boxShadow: 'none'
-            }}
+            style={logoStyle}
           />
           
           {/* Nav Links */}
