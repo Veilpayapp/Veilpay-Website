@@ -1,8 +1,8 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { BentoGrid as MagicGrid, BentoCard } from '@/components/ui/bento-grid';
 import { ShieldCheck, ArrowDownCircle, Globe } from 'lucide-react';
 
-const BentoGrid = forwardRef<HTMLDivElement>((_, ref) => {
+const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
   return (
     <div
       ref={ref}
@@ -61,7 +61,7 @@ const BentoGrid = forwardRef<HTMLDivElement>((_, ref) => {
       </MagicGrid>
     </div>
   );
-});
+};
 
 BentoGrid.displayName = 'BentoGrid';
 

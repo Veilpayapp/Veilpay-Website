@@ -5,42 +5,47 @@ import { getLenisInstance } from '@/lib/utils';
 // instead of being re-created on every render.
 const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
 
+// Uses only its arguments + module-scope helpers (no component state/props), so it lives
+// at module scope to avoid being rebuilt every render and to keep memoized children stable.
+const handleScroll = (
+  e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+  target: string | number,
+) => {
+  e.preventDefault();
+
+  let scrollTarget: string | number = target;
+  if (target === '#download') {
+    const downloadSection = document.getElementById('download');
+    if (downloadSection) {
+      // The DownloadSection pins and scales up for 150% of the viewport height.
+      // Scroll perfectly to the end of the pin where the box is fully scaled.
+      const rect = downloadSection.getBoundingClientRect();
+      const absoluteTop = rect.top + window.scrollY;
+      scrollTarget = absoluteTop + (window.innerHeight * 1.5);
+    }
+  } else if (target === '#features') {
+    // The Bento Grid is deep inside a GSAP ScrollSequence pinned for 12000 pixels.
+    // It appears at the very end of that timeline. 11000 pixels down perfectly centers it.
+    scrollTarget = 11000;
+  } else if (target === '#footer') {
+    // The footer is heavily affected by GSAP pins above it.
+    // To reach it, we must scroll to the absolute maximum height of the document.
+    scrollTarget = document.documentElement.scrollHeight;
+  }
+
+  const lenis = getLenisInstance();
+  if (lenis) {
+    // 4 second duration for a super elegant, slow cinematic scroll
+    lenis.scrollTo(scrollTarget, {
+      duration: 4,
+      easing: easeOutQuart,
+    });
+  } else {
+    window.scrollTo({ top: typeof scrollTarget === 'number' ? scrollTarget : 0, behavior: 'smooth' });
+  }
+};
+
 export default function GlassNavbar() {
-  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, target: string | number) => {
-    e.preventDefault();
-    
-    let scrollTarget: string | number = target;
-    if (target === '#download') {
-      const downloadSection = document.getElementById('download');
-      if (downloadSection) {
-        // The DownloadSection pins and scales up for 150% of the viewport height.
-        // Scroll perfectly to the end of the pin where the box is fully scaled.
-        const rect = downloadSection.getBoundingClientRect();
-        const absoluteTop = rect.top + window.scrollY;
-        scrollTarget = absoluteTop + (window.innerHeight * 1.5);
-      }
-    } else if (target === '#features') {
-      // The Bento Grid is deep inside a GSAP ScrollSequence pinned for 12000 pixels.
-      // It appears at the very end of that timeline. 11000 pixels down perfectly centers it.
-      scrollTarget = 11000;
-    } else if (target === '#footer') {
-      // The footer is heavily affected by GSAP pins above it.
-      // To reach it, we must scroll to the absolute maximum height of the document.
-      scrollTarget = document.documentElement.scrollHeight;
-    }
-
-    const lenis = getLenisInstance();
-    if (lenis) {
-      // 4 second duration for a super elegant, slow cinematic scroll
-      lenis.scrollTo(scrollTarget, { 
-        duration: 4, 
-        easing: easeOutQuart
-      });
-    } else {
-      window.scrollTo({ top: typeof scrollTarget === 'number' ? scrollTarget : 0, behavior: 'smooth' });
-    }
-  };
-
   return (
     <>
       <motion.nav
