@@ -1,6 +1,7 @@
-import React, { useRef, useLayoutEffect, useState } from 'react';
+import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { NeatGradient } from "@firecms/neat";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,6 +12,143 @@ const DownloadSection: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [hasFollowed, setHasFollowed] = useState(false);
   const [isFollowHovered, setIsFollowHovered] = useState(false);
+  const gradientRef = useRef<HTMLCanvasElement>(null);
+  const gradientInstance = useRef<any>(null);
+
+  useEffect(() => {
+    if (!gradientRef.current) return;
+
+    const config = {
+      colors: [
+        { color: '#010101', enabled: true },
+        { color: '#F4A515', enabled: true },
+        { color: '#AA6306', enabled: true },
+        { color: '#D48008', enabled: true },
+        { color: '#513209', enabled: true },
+        { color: '#FF9A9E', enabled: false },
+      ],
+      speed: 1,
+      horizontalPressure: 7,
+      verticalPressure: 3,
+      waveFrequencyX: 0,
+      waveFrequencyY: 0,
+      waveAmplitude: 0,
+      shadows: 4,
+      highlights: 0,
+      colorBrightness: 1.95,
+      colorSaturation: -3,
+      wireframe: false,
+      colorBlending: 9,
+      backgroundColor: '#000000',
+      backgroundAlpha: 1,
+      grainScale: 6,
+      grainSparsity: 0,
+      grainIntensity: 0,
+      grainSpeed: 0,
+      resolution: 2,
+      yOffset: 0,
+      yOffsetWaveMultiplier: 18.4,
+      yOffsetColorMultiplier: 20,
+      yOffsetFlowMultiplier: 20,
+      flowDistortionA: 1.5,
+      flowDistortionB: 10,
+      flowScale: 3.3,
+      flowEase: 0.37,
+      flowEnabled: true,
+      enableProceduralTexture: false,
+      transparentTextureVoid: false,
+      textureVoidLikelihood: 0.06,
+      textureVoidWidthMin: 10,
+      textureVoidWidthMax: 500,
+      textureBandDensity: 0.8,
+      textureColorBlending: 0.06,
+      textureSeed: 333,
+      textureEase: 0.38,
+      proceduralBackgroundColor: '#003FFF',
+      textureShapeTriangles: 20,
+      textureShapeCircles: 15,
+      textureShapeBars: 15,
+      textureShapeSquiggles: 10,
+      domainWarpEnabled: false,
+      domainWarpIntensity: 0,
+      domainWarpScale: 3,
+      vignetteIntensity: 0.95,
+      vignetteRadius: 0.8,
+      fresnelEnabled: false,
+      fresnelPower: 0.5,
+      fresnelIntensity: 0.5,
+      fresnelColor: '#FFFFFF',
+      iridescenceEnabled: false,
+      iridescenceIntensity: 0.5,
+      iridescenceSpeed: 1,
+      bloomIntensity: 0,
+      bloomThreshold: 0.7,
+      chromaticAberration: 2.5,
+      shapeType: 'ribbon' as const,
+      shapeRotationX: 0,
+      shapeRotationY: 0,
+      shapeRotationZ: 0,
+      shapeAutoRotateSpeedX: 0,
+      shapeAutoRotateSpeedY: 0,
+      sphereRadius: 15,
+      torusRadius: 15,
+      torusTube: 5,
+      cylinderRadius: 10,
+      cylinderHeight: 40,
+      planeBend: -0.3,
+      planeTwist: 5,
+      silhouetteFade: 0.57,
+      cylinderFade: 0.08,
+      ribbonFade: 0,
+      flatShading: false,
+      cameraLock: false,
+      cameraX: 15,
+      cameraY: 0.5,
+      cameraZ: 0,
+      cameraRotationX: 0.28700000000000003,
+      cameraRotationY: -8.197,
+      cameraRotationZ: 0,
+      cameraZoom: 1.7500000000000002,
+    };
+
+    gradientInstance.current = new NeatGradient({
+      ref: gradientRef.current,
+      ...config
+    });
+
+    const handleScroll = () => {
+      if (gradientInstance.current) {
+        gradientInstance.current.yOffset = window.scrollY;
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (gradientInstance.current) {
+        // Normalize mouse coordinates to -1 to 1
+        const x = (e.clientX / window.innerWidth) * 2 - 1;
+        const y = -(e.clientY / window.innerHeight) * 2 + 1;
+        
+        // Base config rotations
+        const baseRotX = 0.287;
+        const baseRotY = -8.197;
+
+        // Apply slight rotation based on mouse hover
+        gradientInstance.current.cameraRotationX = baseRotX + (y * 0.15);
+        gradientInstance.current.cameraRotationY = baseRotY + (x * 0.15);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (gradientInstance.current && typeof gradientInstance.current.destroy === 'function') {
+        gradientInstance.current.destroy();
+      }
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -47,13 +185,18 @@ const DownloadSection: React.FC = () => {
       // SECURE: Webhook URL must be stored in .env file, not hardcoded!
       const DISCORD_WEBHOOK_URL = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
       
+      if (!DISCORD_WEBHOOK_URL) {
+        console.error("Missing Discord Webhook URL! Ensure VITE_DISCORD_WEBHOOK_URL is set in your .env file or Vercel Environment Variables.");
+        setStatus('error');
+        return;
+      }
+
       const response = await fetch(DISCORD_WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: null,
           embeds: [
             {
               title: "🚀 New Waitlist Signup!",
@@ -69,10 +212,12 @@ const DownloadSection: React.FC = () => {
         setStatus('success');
         setEmail('');
       } else {
+        const errorText = await response.text();
+        console.error("Discord Webhook Error Details:", response.status, errorText);
         setStatus('error');
       }
     } catch (error) {
-      console.error(error);
+      console.error("Fetch/Network Error (Check Adblockers or CORS):", error);
       setStatus('error');
     }
   };
@@ -94,9 +239,9 @@ const DownloadSection: React.FC = () => {
       {/* Rounded Box Container */}
       <div ref={boxRef} className="relative w-full max-w-[1600px] h-[750px] bg-[#050505] border border-white/[0.08] rounded-[2.5rem] md:rounded-[4rem] flex flex-col items-center justify-center overflow-hidden py-10 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
         
-        {/* Static Background Image */}
-        <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
-          <img src="/Background.png" alt="Golden Fluid Background" className="w-full h-full object-cover" />
+        {/* Neat Gradient Interactive Background */}
+        <div className="absolute inset-0 z-0 opacity-60">
+          <canvas ref={gradientRef} style={{ width: '100%', height: '100%' }}></canvas>
         </div>
 
       <div className="z-10 text-center px-4 w-full max-w-4xl flex flex-col items-center justify-center flex-shrink-0">
