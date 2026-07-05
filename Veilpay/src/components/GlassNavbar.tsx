@@ -4,7 +4,7 @@ export default function GlassNavbar() {
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, target: string | number) => {
     e.preventDefault();
     
-    let scrollTarget = target;
+    let scrollTarget: string | number = target;
     if (target === '#download') {
       const downloadSection = document.getElementById('download');
       if (downloadSection) {
@@ -14,6 +14,14 @@ export default function GlassNavbar() {
         const absoluteTop = rect.top + window.scrollY;
         scrollTarget = absoluteTop + (window.innerHeight * 1.5);
       }
+    } else if (target === '#features') {
+      // The Bento Grid is deep inside a GSAP ScrollSequence pinned for 12000 pixels.
+      // It appears at the very end of that timeline. 11000 pixels down perfectly centers it.
+      scrollTarget = 11000;
+    } else if (target === '#footer') {
+      // The footer is heavily affected by GSAP pins above it.
+      // To reach it, we must scroll to the absolute maximum height of the document.
+      scrollTarget = document.documentElement.scrollHeight;
     }
 
     const lenis = (window as any).lenis;
@@ -73,14 +81,17 @@ export default function GlassNavbar() {
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-10">
             <a href="#" className="text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Home</a>
-            <a href="#features" onClick={(e) => handleScroll(e, '#features')} className="text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Privacy</a>
+            <a href="#features" onClick={(e) => handleScroll(e, '#features')} className="text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Features</a>
             <a href="#download" onClick={(e) => handleScroll(e, '#download')} className="text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Contact</a>
           </div>
         </div>
 
         {/* Right Section (Action Buttons) */}
         <div className="flex items-center gap-3 relative z-10">
-          <button className="text-[12px] font-bold text-white hover:text-amber-400 transition-colors tracking-wide uppercase px-4 py-2 rounded-full border border-white/20 hover:border-amber-400/50 bg-white/5">
+          <button 
+            onClick={(e) => handleScroll(e, '#footer')}
+            className="text-[12px] font-bold text-white hover:text-amber-400 transition-colors tracking-wide uppercase px-4 py-2 rounded-full border border-white/20 hover:border-amber-400/50 bg-white/5"
+          >
             DOCS
           </button>
           <button 

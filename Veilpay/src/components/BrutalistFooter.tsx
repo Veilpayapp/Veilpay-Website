@@ -37,7 +37,7 @@ const FOOTER_DATA = [
 const BrutalistFooter: React.FC = () => {
 
   return (
-    <footer className="relative w-full min-h-screen flex flex-col justify-between bg-black text-white overflow-hidden pt-20 border-t border-white/10">
+    <footer id="footer" className="relative w-full min-h-screen flex flex-col justify-between bg-black text-white overflow-hidden pt-20 border-t border-white/10">
       {/* Background Sparkles */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-auto">
         <SparklesCore

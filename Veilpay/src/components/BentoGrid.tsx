@@ -6,6 +6,7 @@ const BentoGrid = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div
       ref={ref}
+      id="features"
       className="pointer-events-auto absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-16 lg:px-24 mt-[4vh]"
     >
       <MagicGrid className="w-full max-w-5xl auto-rows-[320px] grid-cols-1 md:grid-cols-2 gap-6">
