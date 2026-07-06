@@ -19,7 +19,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
         {/* Main Wide Card - ZK Proofs */}
         <BentoCard
           name="ZK Proofs"
-          className="col-span-1 md:col-span-2 md:row-span-1 bento-card border border-amber-500/20 bg-[#111]/80 backdrop-blur-xl shadow-2xl rounded-3xl"
+          className="col-span-1 md:col-span-2 md:row-span-1 bento-card border border-amber-500/20 bg-[#111]/95 md:bg-[#111]/80 md:backdrop-blur-xl shadow-2xl rounded-3xl"
           Icon={ShieldCheck}
           description="Prove a payment is valid without revealing sender, receiver, or amount. Zero-knowledge proofs keep every transaction cryptographically private."
           onClick={() => setShowZkPopup(true)}
@@ -34,7 +34,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
         {/* Square Card - Stealth Address */}
         <BentoCard
           name="Stealth Addresses"
-          className="col-span-1 md:col-span-1 md:row-span-1 bento-card border border-amber-500/20 bg-[#141414]/80 backdrop-blur-xl shadow-xl rounded-3xl"
+          className="col-span-1 md:col-span-1 md:row-span-1 bento-card border border-amber-500/20 bg-[#141414]/95 md:bg-[#141414]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
           Icon={ArrowDownCircle}
           description="EIP-5564 dual-key stealth addresses generate a fresh one-time address per transaction, breaking on-chain linkability across Stellar, EVM, Solana and Aptos."
           onClick={() => setShowStealthPopup(true)}
@@ -50,7 +50,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
         {/* Square Card - Privacy Tokens */}
         <BentoCard
           name="Privacy Tokens"
-          className="col-span-1 md:col-span-1 md:row-span-1 bento-card border border-amber-500/20 bg-[#111111]/80 backdrop-blur-xl shadow-xl rounded-3xl"
+          className="col-span-1 md:col-span-1 md:row-span-1 bento-card border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
           Icon={Globe}
           description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, Polygon and Aptos — one vault, full privacy."
           onClick={() => setShowTokensPopup(true)}

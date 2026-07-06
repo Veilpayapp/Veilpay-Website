@@ -5,7 +5,7 @@ import GlassNavbar from './components/GlassNavbar';
 import ScrollSequence from './components/ScrollSequence';
 import SmoothScroll from './components/SmoothScroll';
 import NoiseOverlay from './components/NoiseOverlay';
-import { isLowEnd } from './lib/deviceCapability';
+import { isLowEnd, isMobileDevice } from './lib/deviceCapability';
 import './App.css';
 
 // Below-the-fold sections are code-split so their heavy deps
@@ -18,7 +18,12 @@ const BrutalistFooter = lazy(() => import('./components/BrutalistFooter'));
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const lowEnd = isLowEnd();
+  // The noise overlay is a full-viewport SVG-filter layer composited with
+  // mix-blend-screen — a constant per-frame GPU blend cost. It's a barely
+  // visible texture, so skip it on ALL phones (not just low-end): mid-range
+  // Androids score "medium" but still can't afford a full-screen blend on
+  // every scroll frame.
+  const skipNoise = isLowEnd() || isMobileDevice();
 
   const handlePreloaderComplete = useCallback(() => {
     setIsLoading(false);
@@ -27,9 +32,9 @@ function App() {
   return (
     <div className="min-h-screen bg-black text-white">
       <GlassNavbar />
-      {/* Skip the noise overlay SVG filter on low-end devices — it's a
-          constant GPU paint cost for a barely-visible texture. */}
-      {!lowEnd && <NoiseOverlay />}
+      {/* Skip the noise overlay SVG filter on low-end AND all mobile devices —
+          it's a constant GPU paint cost for a barely-visible texture. */}
+      {!skipNoise && <NoiseOverlay />}
       <AnimatePresence mode="wait">
         {isLoading ? (
           <Preloader key="preloader" onComplete={handlePreloaderComplete} />

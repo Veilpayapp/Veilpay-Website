@@ -67,6 +67,16 @@ export function getDeviceTier(): DeviceTier {
   else if (score >= 4) cachedTier = 'medium';
   else cachedTier = 'low';
 
+  // ── Mobile cap ──
+  // Even flagship phones (8+ cores, 8GB RAM, high-DPI) score into 'high', but a
+  // phone GPU cannot sustain the full desktop experience — the 800-particle
+  // sparkle canvas and other 'high'-only effects tank the framerate. Cap any
+  // touch/mobile device at 'medium' so it never opts into desktop-only work.
+  const isMobile =
+    typeof navigator !== 'undefined' &&
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if (isMobile && cachedTier === 'high') cachedTier = 'medium';
+
   return cachedTier;
 }
 

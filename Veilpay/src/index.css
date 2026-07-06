@@ -155,6 +155,26 @@ html.light-mode .glass-panel {
     0 10px 25px rgba(212, 160, 66, 0.25);
 }
 
+/*
+ * Touch devices (all Android/iOS phones report `pointer: coarse`) drop the SVG
+ * displacement-map from backdrop-filter. That filter forces the GPU to re-run a
+ * fractal-noise distortion over the whole captured backdrop EVERY scroll frame —
+ * the single biggest cause of scroll jank on Android Chrome, since the navbar is
+ * position:fixed and repaints against everything scrolling behind it. Plain blur
+ * composites cheaply and is visually near-identical behind the gradient sheen, so
+ * the frosted-glass look is preserved while the per-frame cost collapses.
+ */
+@media (pointer: coarse) {
+  .ios-glass {
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(180%);
+  }
+  .ios-glass-gold {
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(180%);
+  }
+}
+
 /* Rendered markdown for the legal / about pages — matches the dark theme. */
 .legal-prose {
   color: #cfcfcf;
