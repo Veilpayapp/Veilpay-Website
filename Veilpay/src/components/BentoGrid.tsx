@@ -27,20 +27,6 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
       id="features"
       className="pointer-events-auto absolute inset-0 z-20 flex flex-col justify-center items-center md:items-start px-4 md:px-16 lg:px-24 mt-[4vh]"
     >
-      {/*
-        Flex auto-layout (Figma-style) instead of CSS Grid.
-
-        Outer  : a vertical flex column — the wide card stacks above the pair row.
-        Pair   : a flex row where both cards are `flex-1 basis-0`, so they always
-                 split the available width EQUALLY and shrink together as the
-                 viewport narrows — no fixed track sizes, no col/row-span. Below
-                 md the pair row switches to `flex-col` so the cards stack.
-        Sizing : each card fills its row via `flex-1` + a fluid clamp() height,
-                 and `min-w-0` lets flex children actually shrink (prevents the
-                 text from forcing overflow). Width is capped to the left half on
-                 desktop so the block never slides under the phone mockup.
-        gap    : fluid so spacing scales with the layout too.
-      */}
       <div className="flex flex-col w-full max-w-2xl md:max-w-[min(64rem,58vw)] gap-[clamp(0.5rem,1.5vw,1.5rem)]">
 
         {/* Wide Card - ZK Proofs (full width of the column) */}

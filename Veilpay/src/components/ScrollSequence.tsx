@@ -230,7 +230,7 @@ const ScrollSequence: React.FC = () => {
           Opacity-only animation: no vertical translation to avoid stacking mockups. */}
       <div
         ref={image2Ref}
-        className="absolute left-[1%] w-full inset-y-0 z-[21] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
+        className="absolute inset-0 z-[21] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
           <div className="relative w-[1200px] md:w-[min(1800px,92vw)] flex justify-center items-center">
@@ -259,7 +259,7 @@ const ScrollSequence: React.FC = () => {
           Opacity-only animation: no vertical translation. */}
       <div
         ref={image3Ref}
-        className="absolute left-[1%] w-full inset-y-0 z-[22] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
+        className="absolute inset-0 z-[22] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
           <div className="relative w-[1200px] md:w-[min(1800px,92vw)] flex justify-center items-center">
@@ -295,7 +295,7 @@ const ScrollSequence: React.FC = () => {
           items-center) at every width, instead of being bottom-anchored and
           "settling" lower as the viewport shrinks. GSAP still drives the intro
           rise via its y offsets (y:95vh → y:18vh), now measured from center. */}
-      <div ref={phoneRef} className="absolute left-[1%] w-full inset-y-0 z-20 flex items-center justify-center pointer-events-none preserve-color">
+      <div ref={phoneRef} className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none preserve-color">
         <IPhoneMockup />
       </div>
 

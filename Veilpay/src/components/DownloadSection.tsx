@@ -162,16 +162,45 @@ const DownloadSection: React.FC = () => {
                 onMouseLeave={() => setIsFollowHovered(false)}
                 onClick={() => {
                   const clickTime = Date.now();
-                  const handleFocus = () => {
+
+                  // Use visibilitychange (reliable on Android/iOS) instead of
+                  // window 'focus' which doesn't fire on many mobile browsers.
+                  const handleReturn = () => {
+                    if (document.visibilityState !== 'visible') return;
                     const timeAway = Date.now() - clickTime;
-                    // If they were away for more than 2 seconds (2000ms), assume they followed
+                    cleanup();
                     if (timeAway > 2000) {
                       setHasFollowed(true);
                     } else {
                       setShowErrorPopup(true);
                     }
-                    window.removeEventListener('focus', handleFocus);
                   };
+
+                  // Also listen for window focus as a secondary signal (desktop)
+                  const handleFocus = () => {
+                    const timeAway = Date.now() - clickTime;
+                    cleanup();
+                    if (timeAway > 2000) {
+                      setHasFollowed(true);
+                    } else {
+                      setShowErrorPopup(true);
+                    }
+                  };
+
+                  // Fallback: if neither event fires after 8s (some Android
+                  // in-app browsers swallow both events), just unlock anyway.
+                  const fallbackTimer = window.setTimeout(() => {
+                    cleanup();
+                    setHasFollowed(true);
+                  }, 8000);
+
+                  const cleanup = () => {
+                    document.removeEventListener('visibilitychange', handleReturn);
+                    window.removeEventListener('focus', handleFocus);
+                    clearTimeout(fallbackTimer);
+                  };
+
+                  document.addEventListener('visibilitychange', handleReturn);
                   window.addEventListener('focus', handleFocus);
                 }}
                 className={`w-full flex items-center justify-center gap-3 h-14 px-8 text-white font-bold rounded-full transition-all transform hover:scale-[1.02] cursor-pointer ${isFollowHovered ? 'hover:text-[#F2C572] hover:border-[#F2C572]/50 glass-panel' : 'bg-black border border-white/20'}`}
