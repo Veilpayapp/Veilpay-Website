@@ -8,18 +8,23 @@ const IPhoneMockup: React.FC = () => {
         <div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
         >
-          <div 
+          <div
             className="w-[600px] h-[600px] md:w-[900px] md:h-[900px] rounded-full"
             style={{
-              background: 'radial-gradient(circle at center, rgba(242, 197, 114, 0.5) 0%, rgba(242, 197, 114, 0.15) 50%, transparent 70%)',
-              filter: 'blur(100px)',
+              // Softness baked into the gradient stops instead of a runtime
+              // filter: blur(100px), which was a very expensive paint on mobile.
+              background:
+                'radial-gradient(circle at center, rgba(242, 197, 114, 0.32) 0%, rgba(242, 197, 114, 0.14) 38%, rgba(242, 197, 114, 0.04) 58%, transparent 72%)',
             }}
           />
         </div>
         
-        <img 
-          src="/MOCKUP2.png" 
-          alt="iPhone Mockup" 
+        <img
+          src="/MOCKUP2.webp"
+          alt="iPhone Mockup"
+          width={1527}
+          height={1024}
+          fetchPriority="high"
           className="w-full h-auto object-contain relative z-10"
         />
         {/* Screen Content - logo appears via GSAP */}
@@ -28,7 +33,7 @@ const IPhoneMockup: React.FC = () => {
             style={{
               width: '180px',
               height: '180px',
-              backgroundImage: 'url(/image.png)',
+              backgroundImage: 'url(/logo.webp)',
               backgroundColor: 'transparent',
               backgroundSize: 'cover',
               backgroundPosition: 'center',

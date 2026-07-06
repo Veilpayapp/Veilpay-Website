@@ -83,7 +83,7 @@ const Coin3D: React.FC<Coin3DProps> = ({
       material={coinMaterial}
     >
       {/* 3D Coin geometry with raised rim */}
-      <latheGeometry args={[coinProfile, 128]} />
+      <latheGeometry args={[coinProfile, 48]} />
       
       {/* Front Face Logo */}
       <Decal

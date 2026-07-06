@@ -56,7 +56,7 @@ const MassiveTextScroll: React.FC = () => {
         <h1 
           ref={text1Ref} 
           className="absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] via-[#F9D423] to-[#5E3B09] uppercase preserve-color"
-          style={{ fontSize: '18vw', lineHeight: 1, filter: 'drop-shadow(0 0 60px rgba(242, 197, 114, 0.3))' }}
+          style={{ fontSize: '18vw', lineHeight: 1 }}
         >
           SECURE
         </h1>
@@ -72,7 +72,7 @@ const MassiveTextScroll: React.FC = () => {
         <h1 
           ref={text3Ref} 
           className="absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] via-[#F9D423] to-[#5E3B09] uppercase preserve-color"
-          style={{ fontSize: '16vw', lineHeight: 1, filter: 'drop-shadow(0 0 60px rgba(242, 197, 114, 0.3))' }}
+          style={{ fontSize: '16vw', lineHeight: 1 }}
         >
           PRIVATE
         </h1>

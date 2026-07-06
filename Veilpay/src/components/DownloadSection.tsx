@@ -1,7 +1,8 @@
-import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import React, { useRef, useLayoutEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { NeatGradient } from "@firecms/neat";
+import GoldenWaves from './GoldenWaves';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,143 +13,8 @@ const DownloadSection: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [hasFollowed, setHasFollowed] = useState(false);
   const [isFollowHovered, setIsFollowHovered] = useState(false);
-  const gradientRef = useRef<HTMLCanvasElement>(null);
-  const gradientInstance = useRef<NeatGradient | null>(null);
-
-  useEffect(() => {
-    if (!gradientRef.current) return;
-
-    const config = {
-      colors: [
-        { color: '#010101', enabled: true },
-        { color: '#F4A515', enabled: true },
-        { color: '#AA6306', enabled: true },
-        { color: '#D48008', enabled: true },
-        { color: '#513209', enabled: true },
-        { color: '#FF9A9E', enabled: false },
-      ],
-      speed: 1,
-      horizontalPressure: 7,
-      verticalPressure: 3,
-      waveFrequencyX: 0,
-      waveFrequencyY: 0,
-      waveAmplitude: 0,
-      shadows: 4,
-      highlights: 0,
-      colorBrightness: 1.95,
-      colorSaturation: -3,
-      wireframe: false,
-      colorBlending: 9,
-      backgroundColor: '#000000',
-      backgroundAlpha: 1,
-      grainScale: 6,
-      grainSparsity: 0,
-      grainIntensity: 0,
-      grainSpeed: 0,
-      resolution: 2,
-      yOffset: 0,
-      yOffsetWaveMultiplier: 18.4,
-      yOffsetColorMultiplier: 20,
-      yOffsetFlowMultiplier: 20,
-      flowDistortionA: 1.5,
-      flowDistortionB: 10,
-      flowScale: 3.3,
-      flowEase: 0.37,
-      flowEnabled: true,
-      enableProceduralTexture: false,
-      transparentTextureVoid: false,
-      textureVoidLikelihood: 0.06,
-      textureVoidWidthMin: 10,
-      textureVoidWidthMax: 500,
-      textureBandDensity: 0.8,
-      textureColorBlending: 0.06,
-      textureSeed: 333,
-      textureEase: 0.38,
-      proceduralBackgroundColor: '#003FFF',
-      textureShapeTriangles: 20,
-      textureShapeCircles: 15,
-      textureShapeBars: 15,
-      textureShapeSquiggles: 10,
-      domainWarpEnabled: false,
-      domainWarpIntensity: 0,
-      domainWarpScale: 3,
-      vignetteIntensity: 0.95,
-      vignetteRadius: 0.8,
-      fresnelEnabled: false,
-      fresnelPower: 0.5,
-      fresnelIntensity: 0.5,
-      fresnelColor: '#FFFFFF',
-      iridescenceEnabled: false,
-      iridescenceIntensity: 0.5,
-      iridescenceSpeed: 1,
-      bloomIntensity: 0,
-      bloomThreshold: 0.7,
-      chromaticAberration: 2.5,
-      shapeType: 'ribbon' as const,
-      shapeRotationX: 0,
-      shapeRotationY: 0,
-      shapeRotationZ: 0,
-      shapeAutoRotateSpeedX: 0,
-      shapeAutoRotateSpeedY: 0,
-      sphereRadius: 15,
-      torusRadius: 15,
-      torusTube: 5,
-      cylinderRadius: 10,
-      cylinderHeight: 40,
-      planeBend: -0.3,
-      planeTwist: 5,
-      silhouetteFade: 0.57,
-      cylinderFade: 0.08,
-      ribbonFade: 0,
-      flatShading: false,
-      cameraLock: false,
-      cameraX: 15,
-      cameraY: 0.5,
-      cameraZ: 0,
-      cameraRotationX: 0.28700000000000003,
-      cameraRotationY: -8.197,
-      cameraRotationZ: 0,
-      cameraZoom: 1.7500000000000002,
-    };
-
-    gradientInstance.current = new NeatGradient({
-      ref: gradientRef.current,
-      ...config
-    });
-
-    const handleScroll = () => {
-      if (gradientInstance.current) {
-        gradientInstance.current.yOffset = window.scrollY;
-      }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (gradientInstance.current) {
-        // Normalize mouse coordinates to -1 to 1
-        const x = (e.clientX / window.innerWidth) * 2 - 1;
-        const y = -(e.clientY / window.innerHeight) * 2 + 1;
-        
-        // Base config rotations
-        const baseRotX = 0.287;
-        const baseRotY = -8.197;
-
-        // Apply slight rotation based on mouse hover
-        gradientInstance.current.cameraRotationX = baseRotX + (y * 0.15);
-        gradientInstance.current.cameraRotationY = baseRotY + (x * 0.15);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("mousemove", handleMouseMove);
-      if (gradientInstance.current && typeof gradientInstance.current.destroy === 'function') {
-        gradientInstance.current.destroy();
-      }
-    };
-  }, []);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [showInvalidEmailPopup, setShowInvalidEmailPopup] = useState(false);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -177,6 +43,19 @@ const DownloadSection: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+
+    // Strict allowlist for official emails only (blocks temp emails)
+    const allowedDomains = [
+      'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 
+      'icloud.com', 'email.com', 'msn.com', 'live.com', 
+      'me.com', 'mac.com', 'protonmail.com', 'proton.me', 'aol.com'
+    ];
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    
+    if (!emailDomain || !allowedDomains.includes(emailDomain)) {
+      setShowInvalidEmailPopup(true);
+      return;
+    }
     
     setStatus('loading');
     
@@ -238,13 +117,14 @@ const DownloadSection: React.FC = () => {
       
       {/* Rounded Box Container */}
       <div ref={boxRef} className="relative w-full max-w-[1600px] h-[750px] bg-[#050505] border border-white/[0.08] rounded-[2.5rem] md:rounded-[4rem] flex flex-col items-center justify-center overflow-hidden py-10 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-        
-        {/* Neat Gradient Interactive Background */}
-        <div className="absolute inset-0 z-0 opacity-60">
-          <canvas ref={gradientRef} style={{ width: '100%', height: '100%' }}></canvas>
+
+        {/* Full-bleed interactive golden-waves wallpaper (2D canvas, DPR-capped,
+            pauses off-screen). Sits behind the content, reacts to pointer/touch. */}
+        <div className="absolute inset-0 z-0 pointer-events-auto opacity-70">
+          <GoldenWaves />
         </div>
 
-      <div className="z-10 text-center px-4 w-full max-w-4xl flex flex-col items-center justify-center flex-shrink-0">
+      <div className="relative z-10 text-center px-4 w-full max-w-4xl flex flex-col items-center justify-center flex-shrink-0">
         <h2 className="text-5xl md:text-[5rem] lg:text-[7rem] font-extrabold tracking-tighter mb-4 leading-[0.9] text-center w-full">
           <span 
             className="text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-300 to-gray-600 drop-shadow-[0_20px_30px_rgba(255,255,255,0.1)] drop-shadow-[0_5px_10px_rgba(0,0,0,1)] block mb-2"
@@ -257,6 +137,7 @@ const DownloadSection: React.FC = () => {
             Financial Privacy.
           </span>
         </h2>
+
         <p className="mt-6 text-lg text-gray-400 max-w-xl mx-auto font-light text-center">
           Join the waitlist today to experience the fastest, most secure crypto vault on the planet.
         </p>
@@ -276,11 +157,11 @@ const DownloadSection: React.FC = () => {
                   const clickTime = Date.now();
                   const handleFocus = () => {
                     const timeAway = Date.now() - clickTime;
-                    // If they were away for more than 3 seconds (3000ms), assume they followed
-                    if (timeAway > 3000) {
+                    // If they were away for more than 2 seconds (2000ms), assume they followed
+                    if (timeAway > 2000) {
                       setHasFollowed(true);
                     } else {
-                      alert("Please actually click Follow on X to join the waitlist! It seems you came back too fast.");
+                      setShowErrorPopup(true);
                     }
                     window.removeEventListener('focus', handleFocus);
                   };
@@ -354,7 +235,7 @@ const DownloadSection: React.FC = () => {
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.87 4.326-2.962-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
             </svg>
           </a>
-          <a href="https://www.instagram.com/N2loeWMwZjQ1NWJw" target="_blank" rel="noopener noreferrer" aria-label="Follow VeilPay on Instagram" className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-gray-400 hover:text-[#F2C572] transition-all transform hover:scale-110 glass-panel" style={glassStyle}>
+          <a href="https://instagram.com/veilpayapp" target="_blank" rel="noopener noreferrer" aria-label="Follow VeilPay on Instagram" className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-gray-400 hover:text-[#F2C572] transition-all transform hover:scale-110 glass-panel" style={glassStyle}>
             <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
               <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
             </svg>
@@ -367,6 +248,80 @@ const DownloadSection: React.FC = () => {
         </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showErrorPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowErrorPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="ios-glass p-8 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-4 border border-white/20 rounded-[32px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E8B84B] to-[#B8791F] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(232,184,75,0.4)]">
+                <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white tracking-tight">Too fast!</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Please actually click Follow on X to join the waitlist! It seems you came back a bit too quickly.
+              </p>
+              <button
+                onClick={() => setShowErrorPopup(false)}
+                className="mt-2 ios-glass-gold px-6 py-2.5 rounded-full text-black font-bold text-sm uppercase tracking-wide w-full hover:brightness-110 transition-all"
+              >
+                Got it
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showInvalidEmailPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowInvalidEmailPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="ios-glass p-8 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-4 border border-white/20 rounded-[32px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E8B84B] to-[#B8791F] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(232,184,75,0.4)]">
+                <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white tracking-tight">Invalid Email</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Please enter an official email ID (e.g. @gmail.com, @yahoo.com). Temp or custom domains are not allowed.
+              </p>
+              <button
+                onClick={() => setShowInvalidEmailPopup(false)}
+                className="mt-2 ios-glass-gold px-6 py-2.5 rounded-full text-black font-bold text-sm uppercase tracking-wide w-full hover:brightness-110 transition-all"
+              >
+                Got it
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

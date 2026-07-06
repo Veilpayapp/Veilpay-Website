@@ -32,18 +32,27 @@ export const SparklesCore = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // IntersectionObserver to prevent scroll lag
-    const observer = new IntersectionObserver(
-      (entries) => {
-        isVisible.current = entries[0].isIntersecting;
-      },
-      { threshold: 0 }
-    );
-    observer.observe(canvas);
+    // The footer is position:fixed (always technically "in viewport"), so an
+    // IntersectionObserver reports it visible even while it's hidden behind the
+    // page. Instead, gate the animation on real scroll proximity to the bottom
+    // of the document — this keeps the particle loop completely idle during the
+    // initial load (it was costing ~1.8s of main-thread time at startup).
+    isVisible.current = false;
+    const updateActive = () => {
+      const doc = document.documentElement;
+      const nearBottom =
+        window.scrollY + window.innerHeight > doc.scrollHeight - window.innerHeight * 1.5;
+      isVisible.current = nearBottom;
+    };
+    updateActive();
+    window.addEventListener('scroll', updateActive, { passive: true });
+    window.addEventListener('resize', updateActive, { passive: true });
 
-    const DPR = window.devicePixelRatio || 1;
+    // Cap DPR — the backing store is 1400², so DPR 3 would allocate a ~4200²
+    // canvas and make every clear/redraw enormous. 1.5 is plenty behind a mask.
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
     const SIZE = 1400;
-    
+
     canvas.width = SIZE * DPR;
     canvas.height = SIZE * DPR;
     canvas.style.width = `${SIZE}px`;
@@ -128,7 +137,8 @@ export const SparklesCore = ({
     draw();
     return () => {
       cancelAnimationFrame(raf);
-      observer.disconnect();
+      window.removeEventListener('scroll', updateActive);
+      window.removeEventListener('resize', updateActive);
       window.removeEventListener("mousemove", handleMouseMove);
     };
   }, [background, particleDensity]);

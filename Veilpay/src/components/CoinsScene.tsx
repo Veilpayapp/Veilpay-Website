@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import { Environment, PerspectiveCamera } from '@react-three/drei';
@@ -9,9 +9,31 @@ interface CoinsSceneProps {
 }
 
 const CoinsScene: React.FC<CoinsSceneProps> = ({ className = '' }) => {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  // Only render the WebGL scene while the hero is on screen. The coins live in a
+  // pinned hero that GSAP translates away on scroll, so pausing the render loop
+  // when it leaves the viewport frees the main thread for the rest of the page.
+  const [active, setActive] = useState(true);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => setActive(entries.some((e) => e.isIntersecting)),
+      { rootMargin: '0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <div className={`absolute inset-0 z-10 pointer-events-none ${className}`}>
-      <Canvas dpr={[1, 1.5]} performance={{ min: 0.5 }}>
+    <div ref={wrapRef} className={`absolute inset-0 z-10 pointer-events-none ${className}`}>
+      <Canvas
+        dpr={1}
+        frameloop={active ? 'always' : 'never'}
+        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        performance={{ min: 0.5 }}
+      >
         <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
         {/* Adjusted studio lighting for charcoal background and amber arc */}
         <directionalLight position={[10, 10, 10]} intensity={2.5} color="#ffffff" />
@@ -20,7 +42,7 @@ const CoinsScene: React.FC<CoinsSceneProps> = ({ className = '' }) => {
         
         <React.Suspense fallback={null}>
           {/* High-contrast Studio Environment for realistic silver reflections */}
-          <Environment resolution={256}>
+          <Environment resolution={32}>
             <group rotation={[-Math.PI / 4, 0, 0]}>
               <mesh position={[0, 10, -5]}>
                 <planeGeometry args={[20, 20]} />

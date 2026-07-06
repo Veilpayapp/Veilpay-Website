@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 import { SparklesCore } from './ui/SparklesCore';
+import { isHighEnd } from '@/lib/deviceCapability';
 
 const FOOTER_DATA = [
   {
@@ -9,16 +11,15 @@ const FOOTER_DATA = [
     links: [
       { label: 'Privacy', href: '#features' },
       { label: 'Stealth Addresses', href: '#' },
-      { label: 'Download APK', href: '#download' },
-      { label: 'Waitlist', href: '#waitlist' },
+      { label: 'Waitlist', href: '#download' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About Us', href: '#' },
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Terms of Service', href: '#' },
+      { label: 'About Us', href: '/about' },
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Terms of Service', href: '/terms' },
     ],
   },
   {
@@ -27,7 +28,7 @@ const FOOTER_DATA = [
       { label: 'Discord', href: 'https://discord.gg/aeNy2nMAp' },
       { label: 'X (Twitter)', href: 'https://x.com/Veilpayapp' },
       { label: 'Telegram', href: 'https://t.me/veilpayapp' },
-      { label: 'Instagram', href: 'https://www.instagram.com/N2loeWMwZjQ1NWJw' },
+      { label: 'Instagram', href: 'https://instagram.com/veilpayapp' },
       { label: 'LinkedIn', href: 'https://www.linkedin.com/company/veilpay/' },
     ],
   },
@@ -37,7 +38,8 @@ const BrutalistFooter: React.FC = () => {
 
   return (
     <footer id="footer" className="relative w-full min-h-screen flex flex-col justify-between bg-black text-white overflow-hidden pt-20 border-t border-white/10">
-      {/* Background Sparkles */}
+      {/* Background Sparkles — only on high-end devices (expensive 800-particle loop) */}
+      {isHighEnd() && (
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-auto">
         <SparklesCore
           id="footer-sparkles"
@@ -49,6 +51,7 @@ const BrutalistFooter: React.FC = () => {
           particleColor="#F2C572" 
         />
       </div>
+      )}
 
       <motion.div 
         initial={{ opacity: 0, y: 50 }}
@@ -83,12 +86,21 @@ const BrutalistFooter: React.FC = () => {
               <ul className="flex flex-col gap-4">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm font-medium text-neutral-400 hover:text-white transition-colors duration-200"
-                    >
-                      {link.label}
-                    </a>
+                    {link.href.startsWith('/') ? (
+                      <Link
+                        to={link.href}
+                        className="text-sm font-medium text-neutral-400 hover:text-white transition-colors duration-200"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="text-sm font-medium text-neutral-400 hover:text-white transition-colors duration-200"
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -127,12 +139,12 @@ const BrutalistFooter: React.FC = () => {
           &copy; 2026 VeilPay. All rights reserved.
         </span>
         <div className="flex items-center gap-6">
-          <a href="#" className="text-xs font-medium text-neutral-500 hover:text-amber-400 transition-colors">
+          <Link to="/terms" className="text-xs font-medium text-neutral-500 hover:text-amber-400 transition-colors">
             Terms of Service
-          </a>
-          <a href="#" className="text-xs font-medium text-neutral-500 hover:text-amber-400 transition-colors">
+          </Link>
+          <Link to="/privacy" className="text-xs font-medium text-neutral-500 hover:text-amber-400 transition-colors">
             Privacy Policy
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

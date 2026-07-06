@@ -7,7 +7,7 @@ const HeroTitle: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+        transition={{ duration: 0.55, ease: 'easeOut' }}
         className="mb-8 w-full flex flex-col items-center"
       >
         <div 

@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BentoGrid as MagicGrid, BentoCard } from '@/components/ui/bento-grid';
 import { ShieldCheck, ArrowDownCircle, Globe } from 'lucide-react';
 
 const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
+  const [showZkPopup, setShowZkPopup] = useState(false);
+  const [showStealthPopup, setShowStealthPopup] = useState(false);
+  const [showTokensPopup, setShowTokensPopup] = useState(false);
+
   return (
     <div
       ref={ref}
       id="features"
-      className="pointer-events-auto absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-16 lg:px-24 mt-[4vh]"
+      className="pointer-events-auto absolute inset-0 z-20 flex flex-col justify-center items-center md:items-start px-4 md:px-16 lg:px-24 mt-[4vh]"
     >
-      <MagicGrid className="w-full max-w-5xl auto-rows-[320px] grid-cols-1 md:grid-cols-2 gap-6">
+      <MagicGrid className="w-full max-w-5xl auto-rows-[180px] md:auto-rows-[320px] grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
         
         {/* Main Wide Card - ZK Proofs */}
         <BentoCard
@@ -17,7 +22,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
           className="col-span-1 md:col-span-2 md:row-span-1 bento-card border border-amber-500/20 bg-[#111]/80 backdrop-blur-xl shadow-2xl rounded-3xl"
           Icon={ShieldCheck}
           description="Prove a payment is valid without revealing sender, receiver, or amount. Zero-knowledge proofs keep every transaction cryptographically private."
-          href="#security"
+          onClick={() => setShowZkPopup(true)}
           cta="Learn more"
           background={
             <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
@@ -32,7 +37,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
           className="col-span-1 md:col-span-1 md:row-span-1 bento-card border border-amber-500/20 bg-[#141414]/80 backdrop-blur-xl shadow-xl rounded-3xl"
           Icon={ArrowDownCircle}
           description="EIP-5564 dual-key stealth addresses generate a fresh one-time address per transaction, breaking on-chain linkability across Stellar, EVM, Solana and Aptos."
-          href="#stealth"
+          onClick={() => setShowStealthPopup(true)}
           cta="Explore privacy"
           background={
             <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
@@ -48,7 +53,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
           className="col-span-1 md:col-span-1 md:row-span-1 bento-card border border-amber-500/20 bg-[#111111]/80 backdrop-blur-xl shadow-xl rounded-3xl"
           Icon={Globe}
           description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, Polygon and Aptos — one vault, full privacy."
-          href="#ecosystem"
+          onClick={() => setShowTokensPopup(true)}
           cta="See supported assets"
           background={
             <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
@@ -59,6 +64,108 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
         />
 
       </MagicGrid>
+
+      {/* Popups */}
+      <AnimatePresence>
+        {showZkPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowZkPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="ios-glass p-8 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-4 border border-white/20 rounded-[32px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E8B84B] to-[#B8791F] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(232,184,75,0.4)]">
+                <ShieldCheck className="w-6 h-6 text-black" />
+              </div>
+              <h3 className="text-xl font-bold text-white tracking-tight">Zero-Knowledge Proofs</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Zero-knowledge proofs allow us to mathematically prove a payment is valid without ever revealing the sender, receiver, or amount to the public ledger. Your transactions remain cryptographically private from end to end.
+              </p>
+              <button
+                onClick={() => setShowZkPopup(false)}
+                className="mt-2 ios-glass-gold px-6 py-2.5 rounded-full text-black font-bold text-sm uppercase tracking-wide w-full hover:brightness-110 transition-all"
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showStealthPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowStealthPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="ios-glass p-8 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-4 border border-white/20 rounded-[32px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E8B84B] to-[#B8791F] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(232,184,75,0.4)]">
+                <ArrowDownCircle className="w-6 h-6 text-black" />
+              </div>
+              <h3 className="text-xl font-bold text-white tracking-tight">Stealth Addressing</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                We implement EIP-5564 dual-key stealth addresses to generate a fresh, one-time address for every incoming transaction. This breaks on-chain linkability, ensuring your public financial history remains private on transparent networks.
+              </p>
+              <button
+                onClick={() => setShowStealthPopup(false)}
+                className="mt-2 ios-glass-gold px-6 py-2.5 rounded-full text-black font-bold text-sm uppercase tracking-wide w-full hover:brightness-110 transition-all"
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showTokensPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowTokensPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="ios-glass p-8 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-4 border border-white/20 rounded-[32px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E8B84B] to-[#B8791F] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(232,184,75,0.4)]">
+                <Globe className="w-6 h-6 text-black" />
+              </div>
+              <h3 className="text-xl font-bold text-white tracking-tight">Privacy Assets</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                VeilPay supports fully native privacy assets like Monero, Zcash, and Midnight, alongside transparent chains like Ethereum, Solana, and Base. Choose the level of privacy that fits your needs in a single unified interface.
+              </p>
+              <button
+                onClick={() => setShowTokensPopup(false)}
+                className="mt-2 ios-glass-gold px-6 py-2.5 rounded-full text-black font-bold text-sm uppercase tracking-wide w-full hover:brightness-110 transition-all"
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

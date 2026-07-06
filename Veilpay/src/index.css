@@ -92,6 +92,17 @@ html.light-mode .preserve-color {
   filter: invert(1) hue-rotate(180deg);
 }
 
+/* Image Swapping based on Theme */
+.white-image {
+  display: none !important;
+}
+html.light-mode .white-image {
+  display: block !important;
+}
+html.light-mode .dark-image {
+  display: none !important;
+}
+
 /* Glassmorphism that looks like white glass in BOTH Dark and Light modes */
 .glass-panel {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.01) 100%);
@@ -101,6 +112,99 @@ html.light-mode .glass-panel {
   /* Provide dark glass, which math mathematically inverts to white glass */
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0.01) 100%);
   border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/*
+ * iOS "liquid glass" — one shared recipe for the navbar and all glass buttons.
+ * A single backdrop-filter (blur + saturation) does the refraction; the layered
+ * inset shadows give the specular top-edge highlight and the thin dark bottom
+ * lip, and the top radial sheen reads as light bending through the surface.
+ * Kept to ONE blur layer per element so it stays cheap to composite.
+ */
+.ios-glass {
+  /* Top layer = specular sheen, bottom layer = faint glass tint. Both are
+   * backgrounds so they sit beneath text/icons. The actual refraction of the
+   * scene behind comes from the SVG displacement filter in backdrop-filter. */
+  background:
+    radial-gradient(130% 90% at 50% -25%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%);
+  /* Safari / fallback first (frost). Chrome then overrides with the SVG
+   * displacement refraction if it supports url() in backdrop-filter; if not,
+   * this frost declaration remains in effect. */
+  -webkit-backdrop-filter: blur(14px) saturate(185%);
+  backdrop-filter: url(#liquid-glass) blur(3px) saturate(185%) brightness(1.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+    inset -1px 0 2px rgba(255, 255, 255, 0.12),
+    0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* Golden-tinted variant for the primary CTA — warmer, more opaque glass. */
+.ios-glass-gold {
+  background:
+    radial-gradient(130% 90% at 50% -25%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(135deg, rgba(249, 212, 131, 0.92) 0%, rgba(212, 160, 66, 0.78) 100%);
+  -webkit-backdrop-filter: blur(14px) saturate(185%);
+  backdrop-filter: url(#liquid-glass) blur(3px) saturate(185%);
+  border: 1px solid rgba(255, 240, 210, 0.55);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -1px 2px rgba(120, 70, 10, 0.5),
+    0 10px 25px rgba(212, 160, 66, 0.25);
+}
+
+/* Rendered markdown for the legal / about pages — matches the dark theme. */
+.legal-prose {
+  color: #cfcfcf;
+  line-height: 1.75;
+  font-size: 0.975rem;
+}
+.legal-prose h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0 0 1.25rem;
+  background: linear-gradient(180deg, #ffffff 0%, #d4a042 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.legal-prose h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f2c572;
+  margin: 2.25rem 0 0.85rem;
+}
+.legal-prose h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 1.75rem 0 0.6rem;
+}
+.legal-prose p { margin: 0 0 1rem; }
+.legal-prose a { color: #f2c572; text-decoration: underline; text-underline-offset: 2px; }
+.legal-prose a:hover { color: #ffe0a3; }
+.legal-prose strong { color: #ffffff; font-weight: 600; }
+.legal-prose ul, .legal-prose ol { margin: 0 0 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.legal-prose ul { list-style: disc; }
+.legal-prose ol { list-style: decimal; }
+.legal-prose li { padding-left: 0.25rem; }
+.legal-prose hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 2rem 0; }
+.legal-prose em { color: #9a9a9a; }
+.legal-prose blockquote {
+  border-left: 3px solid rgba(242, 197, 114, 0.5);
+  padding-left: 1rem;
+  color: #b8b8b8;
+  margin: 0 0 1rem;
+}
+.legal-prose code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.85em;
 }
 
 /*

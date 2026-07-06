@@ -1,19 +1,24 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Preloader from './components/Preloader';
 import GlassNavbar from './components/GlassNavbar';
 import ScrollSequence from './components/ScrollSequence';
-import MassiveTextScroll from './components/MassiveTextScroll';
-import DownloadSection from './components/DownloadSection';
-import SqueezeFooterReveal from './components/SqueezeFooterReveal';
-import BrutalistFooter from './components/BrutalistFooter';
-import ThemeToggle from './components/ThemeToggle';
 import SmoothScroll from './components/SmoothScroll';
 import NoiseOverlay from './components/NoiseOverlay';
+import { isLowEnd } from './lib/deviceCapability';
 import './App.css';
+
+// Below-the-fold sections are code-split so their heavy deps
+// (@firecms/neat WebGL shader, SparklesCore, extra gsap timelines) leave the
+// initial bundle and load only once the app is past the preloader.
+const MassiveTextScroll = lazy(() => import('./components/MassiveTextScroll'));
+const DownloadSection = lazy(() => import('./components/DownloadSection'));
+const SqueezeFooterReveal = lazy(() => import('./components/SqueezeFooterReveal'));
+const BrutalistFooter = lazy(() => import('./components/BrutalistFooter'));
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const lowEnd = isLowEnd();
 
   const handlePreloaderComplete = useCallback(() => {
     setIsLoading(false);
@@ -22,22 +27,22 @@ function App() {
   return (
     <div className="min-h-screen bg-black text-white">
       <GlassNavbar />
-      <NoiseOverlay />
+      {/* Skip the noise overlay SVG filter on low-end devices — it's a
+          constant GPU paint cost for a barely-visible texture. */}
+      {!lowEnd && <NoiseOverlay />}
       <AnimatePresence mode="wait">
         {isLoading ? (
           <Preloader key="preloader" onComplete={handlePreloaderComplete} />
         ) : (
-          <>
+          <Suspense fallback={null}>
             <SmoothScroll>
               <SqueezeFooterReveal footer={<BrutalistFooter />}>
-                <GlassNavbar />
-                <ThemeToggle />
                 <ScrollSequence />
                 <MassiveTextScroll />
                 <DownloadSection />
               </SqueezeFooterReveal>
             </SmoothScroll>
-          </>
+          </Suspense>
         )}
       </AnimatePresence>
     </div>
