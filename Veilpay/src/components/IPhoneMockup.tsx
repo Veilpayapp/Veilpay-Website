@@ -3,13 +3,18 @@ import React from 'react';
 const IPhoneMockup: React.FC = () => {
   return (
     <div className="relative z-20 flex justify-center">
-      <div className="relative w-[1200px] md:w-[1800px] flex justify-center items-center">
+      {/* Desktop width is viewport-relative so the mockup scales continuously as
+          the window resizes (Figma-style auto-layout) instead of staying a rigid
+          1800px and colliding with the text layers on narrower windows. min()
+          caps it at the original 1800px so large screens look unchanged. Mobile
+          keeps its intentional oversized-and-clipped hero size. */}
+      <div className="relative w-[1200px] md:w-[min(1800px,92vw)] flex justify-center items-center">
         {/* Subtle Aura Effect behind the phone */}
         <div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
         >
           <div
-            className="w-[600px] h-[600px] md:w-[900px] md:h-[900px] rounded-full"
+            className="w-[600px] h-[600px] md:w-[min(900px,70vw)] md:h-[min(900px,70vw)] rounded-full"
             style={{
               // Softness baked into the gradient stops instead of a runtime
               // filter: blur(100px), which was a very expensive paint on mobile.

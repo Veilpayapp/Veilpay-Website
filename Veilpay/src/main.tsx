@@ -2,7 +2,13 @@ import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.tsx'
+import { configureScrollTriggers } from './lib/scrollConfig'
 import './index.css'
+
+// Make every pinned ScrollTrigger resilient to mobile URL-bar resizes and
+// re-frame itself on real orientation/width changes. Safe to call before the
+// timelines are created — it only sets global config + a resize listener.
+configureScrollTriggers()
 
 // Legal pages (+ the markdown renderer) are code-split so they never load on
 // the home path — keeps the home bundle lean for Core Web Vitals.

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BentoGrid as MagicGrid, BentoCard } from '@/components/ui/bento-grid';
+import { BentoCard } from '@/components/ui/bento-grid';
 import { ShieldCheck, ArrowDownCircle, Globe } from 'lucide-react';
 
 const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
@@ -8,18 +8,45 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
   const [showStealthPopup, setShowStealthPopup] = useState(false);
   const [showTokensPopup, setShowTokensPopup] = useState(false);
 
+  useEffect(() => {
+    const handlePrivacy = () => setShowStealthPopup(true);
+    const handleTokens = () => setShowTokensPopup(true);
+
+    window.addEventListener('openPrivacyPopup', handlePrivacy);
+    window.addEventListener('openTokensPopup', handleTokens);
+
+    return () => {
+      window.removeEventListener('openPrivacyPopup', handlePrivacy);
+      window.removeEventListener('openTokensPopup', handleTokens);
+    };
+  }, []);
+
   return (
     <div
       ref={ref}
       id="features"
       className="pointer-events-auto absolute inset-0 z-20 flex flex-col justify-center items-center md:items-start px-4 md:px-16 lg:px-24 mt-[4vh]"
     >
-      <MagicGrid className="w-full max-w-5xl auto-rows-[180px] md:auto-rows-[320px] grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
-        
-        {/* Main Wide Card - ZK Proofs */}
+      {/*
+        Flex auto-layout (Figma-style) instead of CSS Grid.
+
+        Outer  : a vertical flex column — the wide card stacks above the pair row.
+        Pair   : a flex row where both cards are `flex-1 basis-0`, so they always
+                 split the available width EQUALLY and shrink together as the
+                 viewport narrows — no fixed track sizes, no col/row-span. Below
+                 md the pair row switches to `flex-col` so the cards stack.
+        Sizing : each card fills its row via `flex-1` + a fluid clamp() height,
+                 and `min-w-0` lets flex children actually shrink (prevents the
+                 text from forcing overflow). Width is capped to the left half on
+                 desktop so the block never slides under the phone mockup.
+        gap    : fluid so spacing scales with the layout too.
+      */}
+      <div className="flex flex-col w-full max-w-2xl md:max-w-[min(64rem,58vw)] gap-[clamp(0.5rem,1.5vw,1.5rem)]">
+
+        {/* Wide Card - ZK Proofs (full width of the column) */}
         <BentoCard
           name="ZK Proofs"
-          className="col-span-1 md:col-span-2 md:row-span-1 bento-card border border-amber-500/20 bg-[#111]/95 md:bg-[#111]/80 md:backdrop-blur-xl shadow-2xl rounded-3xl"
+          className="bento-card w-full min-w-0 flex-1 h-[clamp(150px,21vh,200px)] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111]/95 md:bg-[#111]/80 md:backdrop-blur-xl shadow-2xl rounded-3xl"
           Icon={ShieldCheck}
           description="Prove a payment is valid without revealing sender, receiver, or amount. Zero-knowledge proofs keep every transaction cryptographically private."
           onClick={() => setShowZkPopup(true)}
@@ -31,39 +58,42 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
           }
         />
 
-        {/* Square Card - Stealth Address */}
-        <BentoCard
-          name="Stealth Addresses"
-          className="col-span-1 md:col-span-1 md:row-span-1 bento-card border border-amber-500/20 bg-[#141414]/95 md:bg-[#141414]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
-          Icon={ArrowDownCircle}
-          description="EIP-5564 dual-key stealth addresses generate a fresh one-time address per transaction, breaking on-chain linkability across Stellar, EVM, Solana and Aptos."
-          onClick={() => setShowStealthPopup(true)}
-          cta="Explore privacy"
-          background={
-            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-white/5" />
-              <div className="absolute -bottom-24 -right-24 h-80 w-80 bg-white/5 blur-[90px] rounded-full group-hover:bg-white/10 transition-colors duration-500" />
-            </div>
-          }
-        />
+        {/* Pair row — two equal, together-shrinking cards */}
+        <div className="flex flex-col md:flex-row gap-[clamp(0.5rem,1.5vw,1.5rem)]">
+          {/* Square Card - Stealth Address */}
+          <BentoCard
+            name="Stealth Addresses"
+            className="bento-card flex-1 basis-0 min-w-0 h-[clamp(150px,21vh,200px)] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#141414]/95 md:bg-[#141414]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
+            Icon={ArrowDownCircle}
+            description="EIP-5564 dual-key stealth addresses generate a fresh one-time address per transaction, breaking on-chain linkability across Stellar, EVM, Solana and Aptos."
+            onClick={() => setShowStealthPopup(true)}
+            cta="Explore privacy"
+            background={
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-white/5" />
+                <div className="absolute -bottom-24 -right-24 h-80 w-80 bg-white/5 blur-[90px] rounded-full group-hover:bg-white/10 transition-colors duration-500" />
+              </div>
+            }
+          />
 
-        {/* Square Card - Privacy Tokens */}
-        <BentoCard
-          name="Privacy Tokens"
-          className="col-span-1 md:col-span-1 md:row-span-1 bento-card border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
-          Icon={Globe}
-          description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, Polygon and Aptos — one vault, full privacy."
-          onClick={() => setShowTokensPopup(true)}
-          cta="See supported assets"
-          background={
-            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-              <div className="absolute inset-0 bg-gradient-to-tl from-transparent to-white/5" />
-              <div className="absolute -bottom-24 -left-24 h-80 w-80 bg-white/5 blur-[90px] rounded-full group-hover:bg-white/10 transition-colors duration-500" />
-            </div>
-          }
-        />
+          {/* Square Card - Privacy Tokens */}
+          <BentoCard
+            name="Privacy Tokens"
+            className="bento-card flex-1 basis-0 min-w-0 h-[clamp(150px,21vh,200px)] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
+            Icon={Globe}
+            description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, Polygon and Aptos — one vault, full privacy."
+            onClick={() => setShowTokensPopup(true)}
+            cta="See supported assets"
+            background={
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                <div className="absolute inset-0 bg-gradient-to-tl from-transparent to-white/5" />
+                <div className="absolute -bottom-24 -left-24 h-80 w-80 bg-white/5 blur-[90px] rounded-full group-hover:bg-white/10 transition-colors duration-500" />
+              </div>
+            }
+          />
+        </div>
 
-      </MagicGrid>
+      </div>
 
       {/* Popups */}
       <AnimatePresence>
@@ -154,7 +184,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
               </div>
               <h3 className="text-xl font-bold text-white tracking-tight">Privacy Assets</h3>
               <p className="text-sm text-white/70 leading-relaxed">
-                VeilPay supports fully native privacy assets like Monero, Zcash, and Midnight, alongside transparent chains like Ethereum, Solana, and Base. Choose the level of privacy that fits your needs in a single unified interface.
+                VeilPay supports fully native privacy assets like Stellar, Monero, Zcash, and Midnight, alongside transparent chains like Ethereum, Solana, and Base. Choose the level of privacy that fits your needs in a single unified interface.
               </p>
               <button
                 onClick={() => setShowTokensPopup(false)}

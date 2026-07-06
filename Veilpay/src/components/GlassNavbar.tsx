@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { getLenisInstance } from '@/lib/utils';
 import { isLowEnd } from '@/lib/deviceCapability';
+import { FEATURES_SCROLL_TARGET } from '@/lib/scrollConfig';
 import ThemeToggle from './ThemeToggle';
+
+// GSAP drives the phone scroll tween (see handleScroll) so it stays in lockstep
+// with the pinned ScrollTriggers instead of racing the browser's own smoothing.
+gsap.registerPlugin(ScrollToPlugin);
 
 // Smooth quartic ease-out for the cinematic scroll — pure, so hoisted to module scope
 // instead of being re-created on every render.
@@ -42,9 +49,10 @@ const handleScroll = (
       scrollTarget = absoluteTop + (window.innerHeight * 1.5);
     }
   } else if (target === '#features') {
-    // The Bento Grid is deep inside a GSAP ScrollSequence pinned for 12000 pixels.
-    // It appears at the very end of that timeline. 11000 pixels down perfectly centers it.
-    scrollTarget = 11000;
+    // The Bento Grid is deep inside a GSAP ScrollSequence pinned timeline. It
+    // settles near the end of that timeline; FEATURES_SCROLL_TARGET tracks the
+    // right offset for the current device (shorter on phones, 11000 on desktop).
+    scrollTarget = FEATURES_SCROLL_TARGET;
   } else if (target === '#footer') {
     // The footer is heavily affected by GSAP pins above it.
     // To reach it, we must scroll to the absolute maximum height of the document.
@@ -53,13 +61,25 @@ const handleScroll = (
 
   const lenis = getLenisInstance();
   if (lenis) {
-    // 4 second duration for a super elegant, slow cinematic scroll
+    // Desktop: Lenis owns the scroll loop. 4 second super-elegant cinematic scroll.
     lenis.scrollTo(scrollTarget, {
       duration: 4,
       easing: easeOutQuart,
     });
   } else {
-    window.scrollTo({ top: typeof scrollTarget === 'number' ? scrollTarget : 0, behavior: 'smooth' });
+    // Phones (no Lenis): drive the scroll with GSAP instead of the browser's
+    // native `behavior:'smooth'`. Native smoothing runs its OWN easing loop that
+    // fights every pinned `scrub` timeline chasing the same moving target — the
+    // result is the stutter you feel jumping to a section. A GSAP ScrollToPlugin
+    // tween updates ScrollTrigger in lockstep, so the pins scrub cleanly.
+    // autoKill stops the tween the instant the user touches the screen.
+    const y = typeof scrollTarget === 'number' ? scrollTarget : 0;
+    gsap.to(window, {
+      duration: 1.6,
+      scrollTo: { y, autoKill: true },
+      ease: 'power2.inOut',
+      overwrite: true,
+    });
   }
 };
 

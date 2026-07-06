@@ -24,7 +24,7 @@ const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
   return (
     <div
       className={cn(
-        "grid w-full auto-rows-[22rem] grid-cols-3 gap-4",
+        "flex w-full flex-col gap-4",
         className
       )}
       {...props}
@@ -57,13 +57,16 @@ const BentoCard = ({
     {...props}
   >
     <div>{background}</div>
-    <div className="p-4">
-      <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
-        <Icon className="h-6 w-6 md:h-12 md:w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75" />
-        <h3 className="text-base md:text-2xl font-semibold text-neutral-700 dark:text-neutral-300">
+    {/* Fluid padding + fluid type: icon, heading and body all scale continuously
+        with the viewport via clamp() instead of snapping at one breakpoint, so
+        the card contents auto-frame to whatever size the card is rendered at. */}
+    <div className="p-[clamp(0.75rem,2vw,1.25rem)]">
+      <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-5">
+        <Icon className="h-[clamp(1.5rem,4vw,3rem)] w-[clamp(1.5rem,4vw,3rem)] origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75" />
+        <h3 className="text-[clamp(1rem,2.5vw,1.5rem)] font-semibold text-neutral-700 dark:text-neutral-300">
           {name}
         </h3>
-        <p className="max-w-lg text-neutral-400 text-[10px] md:text-[1.05rem] leading-tight md:leading-relaxed">{description}</p>
+        <p className="max-w-lg text-neutral-400 text-[clamp(0.625rem,1.6vw,1.05rem)] leading-tight md:leading-relaxed">{description}</p>
       </div>
 
       <div

@@ -8,6 +8,7 @@ import BentoGrid from './BentoGrid';
 import HeroTitle from './HeroTitle';
 import IntroTitle from './IntroTitle';
 import { getDeviceTier, isMobileDevice } from '@/lib/deviceCapability';
+import { TOUCH, SEQUENCE_SCROLL_END } from '@/lib/scrollConfig';
 
 // The 3D coins pull in the entire Three.js runtime (~940KB). They are purely
 // decorative and fade in via GSAP, so we lazy-load them to keep Three.js off
@@ -97,26 +98,42 @@ const ScrollSequence: React.FC = () => {
       gsap.set(introTitle, { opacity: 0, y: 0 });
       gsap.set(titleB, { opacity: 0, y: 0 });
       // New mockup images: start hidden, pre-positioned to match the phone's
-      // settled transform (y: 18vh, scale: 0.78).
-      if (img2) gsap.set(img2, { opacity: 0, y: '18vh', scale: 0.78, x: 0, transformOrigin: 'center center' });
+      // settled transform (y: 8vh, scale: 0.78).
+      if (img2) gsap.set(img2, { opacity: 0, y: '8vh', scale: 0.78, x: 0, transformOrigin: 'center center' });
       // img3 fades in later when the phone is already shifted, so we initialize it with the shifted position
-      if (img3) gsap.set(img3, { opacity: 0, y: '18vh', scale: 0.78, x: window.innerWidth > 768 ? '25vw' : '10vw', transformOrigin: 'center center' });
+      if (img3) gsap.set(img3, { opacity: 0, y: '8vh', scale: 0.78, x: () => (window.innerWidth > 768 ? '25vw' : '10vw'), transformOrigin: 'center center' });
+
+      // Derive the horizontal phone shift from the LIVE viewport width. Wrapped
+      // in a function + invalidateOnRefresh so a rotation/resize recomputes it
+      // instead of keeping the value captured at first mount.
+      const getPhoneShift = () => (window.innerWidth > 768 ? '25vw' : '10vw');
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          end: '+=12000', // Dramatically increased to make the story pass slowly
-          scrub: 1.5,
+          // Desktop: the original long cinematic distance. Phones: a shorter
+          // timeline (same choreography, fewer scrub/paint frames, less scroll).
+          end: `+=${SEQUENCE_SCROLL_END}`,
+          // Phones use a much lower scrub so the pins stop trailing almost
+          // immediately after the finger lifts (snappier, less idle rAF work);
+          // desktop keeps its silky 1.5s catch-up.
+          scrub: TOUCH ? 0.6 : 1.5,
           pin: true,
           anticipatePin: 1,
+          // Snap smoothing to the end target on a fast phone flick so it doesn't
+          // over-run the pinned section. No-op on desktop's mouse-wheel scroll.
+          fastScrollEnd: TOUCH,
+          // Re-derive every function-based value below on refresh (rotation,
+          // width change) so the choreography re-frames for the new resolution.
+          invalidateOnRefresh: true,
         },
       });
       stRef.current = tl.scrollTrigger as ScrollTrigger;
 
       // STAGE 1: Phone rises and shrinks, Text levitates instantly, Coins levitate slightly later
       tl.to(mesh, { opacity: 0.6, duration: 0.4, ease: 'power1.inOut' }, 0);
-      tl.to(phone, { y: '18vh', scale: 0.78, opacity: 1, duration: 0.4, ease: 'power2.out' }, 0);
+      tl.to(phone, { y: '8vh', scale: 0.78, opacity: 1, duration: 0.4, ease: 'power2.out' }, 0);
       tl.to(title, { y: '-100vh', opacity: 0, duration: 0.4, ease: 'power2.out' }, 0);
       tl.fromTo(coins, { y: '0vh', opacity: 1 }, { y: '-100vh', opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.3);
 
@@ -135,11 +152,11 @@ const ScrollSequence: React.FC = () => {
         tl.to(img2, { opacity: 1, duration: 0.4, ease: 'power2.inOut' }, 1.4);
       }
 
-      // STAGE 4 (2.0s): Phone (and image2) shifts right, "One Wallet" comes in
-      const phoneShift = window.innerWidth > 768 ? '25vw' : '10vw';
-      tl.to(phone, { x: phoneShift, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+      // STAGE 4 (2.0s): Phone (and image2) shifts right, "One Wallet" comes in.
+      // Functional value → re-evaluated on invalidateOnRefresh for the live width.
+      tl.to(phone, { x: getPhoneShift, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       if (img2) {
-        tl.to(img2, { x: phoneShift, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+        tl.to(img2, { x: getPhoneShift, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       }
       tl.fromTo(titleB, { y: '30vh', opacity: 0 }, { y: '4vh', opacity: 1, duration: 0.8, ease: 'power3.out' }, 2.2);
 
@@ -213,10 +230,10 @@ const ScrollSequence: React.FC = () => {
           Opacity-only animation: no vertical translation to avoid stacking mockups. */}
       <div
         ref={image2Ref}
-        className="absolute left-[1%] w-full bottom-0 z-[21] flex items-end justify-center pointer-events-none translate-y-[20%] opacity-0 preserve-color"
+        className="absolute left-[1%] w-full inset-y-0 z-[21] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
-          <div className="relative w-[1200px] md:w-[1800px] flex justify-center items-center">
+          <div className="relative w-[1200px] md:w-[min(1800px,92vw)] flex justify-center items-center">
             <img
               src="/image2.webp"
               alt="VeilPay wallet screen (Dark)"
@@ -242,10 +259,10 @@ const ScrollSequence: React.FC = () => {
           Opacity-only animation: no vertical translation. */}
       <div
         ref={image3Ref}
-        className="absolute left-[1%] w-full bottom-0 z-[22] flex items-end justify-center pointer-events-none translate-y-[20%] opacity-0 preserve-color"
+        className="absolute left-[1%] w-full inset-y-0 z-[22] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
-          <div className="relative w-[1200px] md:w-[1800px] flex justify-center items-center">
+          <div className="relative w-[1200px] md:w-[min(1800px,92vw)] flex justify-center items-center">
             <img
               src="/image3.webp"
               alt="VeilPay payment screen (Dark)"
@@ -273,8 +290,12 @@ const ScrollSequence: React.FC = () => {
         </div>
       </div>
 
-      {/* iPhone Mockup Layer (anchored to bottom fold, then moves right) */}
-      <div ref={phoneRef} className="absolute left-[1%] w-full bottom-0 z-20 flex items-end justify-center pointer-events-none translate-y-[20%] preserve-color">
+      {/* iPhone Mockup Layer — vertically CENTERED (items-center + inset-y-0) so
+          it holds its position in line with the bento cards (which are also
+          items-center) at every width, instead of being bottom-anchored and
+          "settling" lower as the viewport shrinks. GSAP still drives the intro
+          rise via its y offsets (y:95vh → y:18vh), now measured from center. */}
+      <div ref={phoneRef} className="absolute left-[1%] w-full inset-y-0 z-20 flex items-center justify-center pointer-events-none preserve-color">
         <IPhoneMockup />
       </div>
 
@@ -291,8 +312,11 @@ const ScrollSequence: React.FC = () => {
 
       {/* Feature Title Layer B (left side on desktop, top-center on mobile, appears after IntroTitle) */}
       <div ref={titleBRef} className="absolute inset-0 z-50 pointer-events-none flex flex-col justify-start pt-[12vh] md:pt-0 md:justify-center items-center md:items-start px-8 md:px-16 lg:px-24">
-        <div className="max-w-3xl flex flex-col items-center md:items-start text-center md:text-left">
-          <h2 className="text-5xl md:text-8xl lg:text-[9rem] font-extrabold tracking-tighter leading-[1.0] mb-6 preserve-color">
+        {/* On desktop the phone occupies the right half, so cap this block to
+            ~half the viewport and let the heading scale fluidly — this stops the
+            fixed 6-9rem text from sliding under the phone at mid widths. */}
+        <div className="max-w-3xl md:max-w-[48vw] flex flex-col items-center md:items-start text-center md:text-left">
+          <h2 className="font-extrabold tracking-tighter leading-[1.0] mb-6 preserve-color text-[clamp(2.5rem,7vw,9rem)]">
             <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#FDF3DC] to-[#E8B84B]">PRIVATE PAYMENTS</span> <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8B84B] via-[#D4A042] to-[#B8791F]">FULLY YOURS.</span>
           </h2>

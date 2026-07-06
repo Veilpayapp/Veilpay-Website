@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import GoldenWaves from './GoldenWaves';
+import { TOUCH } from '@/lib/scrollConfig';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,6 +28,9 @@ const DownloadSection: React.FC = () => {
           pin: true,
           scrub: true,
           anticipatePin: 1,
+          // Settle the pin cleanly on a fast phone flick; no-op on desktop.
+          fastScrollEnd: TOUCH,
+          invalidateOnRefresh: true, // re-derive vh offsets on rotation/resize
         }
       });
 
@@ -116,7 +120,10 @@ const DownloadSection: React.FC = () => {
     <section id="download" ref={sectionRef} className="relative w-full min-h-screen bg-black py-10 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-white/5 flex items-center justify-center">
       
       {/* Rounded Box Container */}
-      <div ref={boxRef} className="relative w-full max-w-[1600px] h-[750px] bg-[#050505] border border-white/[0.08] rounded-[2.5rem] md:rounded-[4rem] flex flex-col items-center justify-center overflow-hidden py-10 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+      {/* Fluid height: min-height keeps the box tall on normal screens but lets
+          it grow if content needs more room, instead of a rigid 750px that
+          overflows/clips on short or narrow windows. */}
+      <div ref={boxRef} className="relative w-full max-w-[1600px] min-h-[600px] h-[min(750px,85vh)] bg-[#050505] border border-white/[0.08] rounded-[2.5rem] md:rounded-[4rem] flex flex-col items-center justify-center overflow-hidden py-10 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
 
         {/* Full-bleed interactive golden-waves wallpaper (2D canvas, DPR-capped,
             pauses off-screen). Sits behind the content, reacts to pointer/touch. */}
