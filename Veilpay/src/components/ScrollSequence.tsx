@@ -1,6 +1,5 @@
-import React, { useRef, useLayoutEffect, useState, useEffect, lazy, Suspense } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { useRef, useEffect, useState, lazy, Suspense } from 'react';
+import type { ScrollTrigger as ScrollTriggerInstance } from 'gsap/ScrollTrigger';
 import MeshGrid from './MeshGrid';
 import IPhoneMockup from './IPhoneMockup';
 import LightArc from './LightArc';
@@ -15,7 +14,12 @@ import { TOUCH, SEQUENCE_SCROLL_END } from '@/lib/scrollConfig';
 // the initial critical path — the hero paints first, coins mount right after.
 const CoinsScene = lazy(() => import('./CoinsScene'));
 
-gsap.registerPlugin(ScrollTrigger);
+// GSAP itself (~116KB + a heavy pin/timeline setup that forces a layout reflow)
+// is loaded dynamically inside the effect below rather than statically imported.
+// This keeps GSAP off the first-paint critical path so the hero text/mockup can
+// paint immediately; the scroll timeline wires up one frame later. Every
+// element's pre-scroll resting state is mirrored in CSS (see INITIAL_* styles in
+// the JSX) so there is zero visual flash before GSAP takes over.
 
 const ScrollSequence: React.FC = () => {
   const tier = getDeviceTier();
@@ -68,9 +72,9 @@ const ScrollSequence: React.FC = () => {
   const image3Ref = useRef<HTMLDivElement>(null);
 
   // Track refs to avoid re-runs without cleanup
-  const stRef = useRef<ScrollTrigger | null>(null);
+  const stRef = useRef<ScrollTriggerInstance | null>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const container = containerRef.current;
     const bg = bgOverlayRef.current;
     const mesh = meshGridRef.current;
@@ -87,7 +91,24 @@ const ScrollSequence: React.FC = () => {
     const screenLogo = phone?.querySelector('.screen-logo');
 
     if (!container || !bg || !mesh || !phone || !coins || !glow || !cards || !title || !introTitle || !titleB) return;
-    const ctx = gsap.context(() => {
+
+    // Cancellation guard + cleanup holder — GSAP is imported asynchronously, so
+    // the component may unmount before it resolves.
+    let cancelled = false;
+    let ctx: gsap.Context | null = null;
+
+    // Load GSAP + ScrollTrigger off the critical path, then build the exact same
+    // timeline as before. The pre-scroll resting state is already applied via
+    // CSS in the JSX, so there is no flash while this resolves.
+    (async () => {
+      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger'),
+      ]);
+      if (cancelled) return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      ctx = gsap.context(() => {
       // ── Initial states before GSAP takes over ──
       gsap.set(bg, { opacity: 1 });
       gsap.set(mesh, { opacity: 0 });
@@ -100,33 +121,36 @@ const ScrollSequence: React.FC = () => {
       // New mockup images: start hidden, pre-positioned to match the phone's
       // settled transform (y: 8vh, scale: 0.78).
       if (img2) gsap.set(img2, { opacity: 0, y: '8vh', scale: 0.78, x: 0, transformOrigin: 'center center' });
-      // img3 fades in later when the phone is already shifted, so we initialize it with the shifted position
-      if (img3) gsap.set(img3, { opacity: 0, y: '8vh', scale: 0.78, x: () => (window.innerWidth > 768 ? '25vw' : '10vw'), transformOrigin: 'center center' });
+      // Derive the horizontal and vertical phone shifts from the LIVE viewport width. 
+      // Wrapped in a function + invalidateOnRefresh so a rotation/resize recomputes it.
+      const getPhoneShiftX = () => (window.innerWidth > 768 ? '25vw' : '0vw');
+      const getPhoneShiftY = () => (window.innerWidth > 768 ? '8vh' : '8vh');
 
-      // Derive the horizontal phone shift from the LIVE viewport width. Wrapped
-      // in a function + invalidateOnRefresh so a rotation/resize recomputes it
-      // instead of keeping the value captured at first mount.
-      const getPhoneShift = () => (window.innerWidth > 768 ? '25vw' : '10vw');
+      if (img3) gsap.set(img3, { opacity: 0, y: getPhoneShiftY, scale: 0.78, x: getPhoneShiftX, transformOrigin: 'center center' });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          // Desktop: the original long cinematic distance. Phones: a shorter
-          // timeline (same choreography, fewer scrub/paint frames, less scroll).
           end: `+=${SEQUENCE_SCROLL_END}`,
-          // Phones use a much lower scrub so the pins stop trailing almost
-          // immediately after the finger lifts (snappier, less idle rAF work);
-          // desktop keeps its silky 1.5s catch-up.
           scrub: TOUCH ? 0.6 : 1.5,
           pin: true,
+          pinSpacing: true,
           anticipatePin: 1,
-          // Snap smoothing to the end target on a fast phone flick so it doesn't
-          // over-run the pinned section. No-op on desktop's mouse-wheel scroll.
           fastScrollEnd: TOUCH,
-          // Re-derive every function-based value below on refresh (rotation,
-          // width change) so the choreography re-frames for the new resolution.
           invalidateOnRefresh: true,
+          // ── Stacked-pin ordering (critical) ──
+          // This is the FIRST of two pinned sections on the page, and its pin
+          // inserts a very tall spacer (SEQUENCE_SCROLL_END px). Because this
+          // trigger is created asynchronously (after the dynamic gsap import),
+          // it can be measured AFTER the MassiveTextScroll pin below it — which
+          // would leave that section (and everything after it, incl. the
+          // Download section) positioned as if this spacer didn't exist, so it
+          // scrolls in early / overlaps. A higher refreshPriority forces
+          // ScrollTrigger to measure THIS pin before the ones below on every
+          // refresh, regardless of creation order, so downstream sections land
+          // in the correct place.
+          refreshPriority: 2,
         },
       });
       stRef.current = tl.scrollTrigger as ScrollTrigger;
@@ -152,11 +176,11 @@ const ScrollSequence: React.FC = () => {
         tl.to(img2, { opacity: 1, duration: 0.4, ease: 'power2.inOut' }, 1.4);
       }
 
-      // STAGE 4 (2.0s): Phone (and image2) shifts right, "One Wallet" comes in.
+      // STAGE 4 (2.0s): Phone (and image2) shifts up on mobile, right on desktop. "One Wallet" comes in.
       // Functional value → re-evaluated on invalidateOnRefresh for the live width.
-      tl.to(phone, { x: getPhoneShift, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+      tl.to(phone, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       if (img2) {
-        tl.to(img2, { x: getPhoneShift, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+        tl.to(img2, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       }
       tl.fromTo(titleB, { y: '30vh', opacity: 0 }, { y: '4vh', opacity: 1, duration: 0.8, ease: 'power3.out' }, 2.2);
 
@@ -174,9 +198,9 @@ const ScrollSequence: React.FC = () => {
       const bentoCards = cards.querySelectorAll('.bento-card');
       tl.fromTo(
         bentoCards,
-        { opacity: 0, y: 50 },
+        { autoAlpha: 0, y: 50 },
         { 
-          opacity: 1, 
+          autoAlpha: 1, 
           y: 0, 
           duration: 0.8, 
           stagger: 0.15, 
@@ -185,8 +209,12 @@ const ScrollSequence: React.FC = () => {
         4.0,
       );
     }, container);
+    })();
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, []);
 
   return (
@@ -224,7 +252,7 @@ const ScrollSequence: React.FC = () => {
         </div>
       </div>
 
-      {/* image2.png — appears at Stage 4 when phone shifts right.
+      {/* image2.webp — appears at Stage 4 when phone shifts right.
           Same container structure as the phone mockup so size & position match exactly.
           GSAP sets initial y/scale to match the phone's settled position, then fades in.
           Opacity-only animation: no vertical translation to avoid stacking mockups. */}
@@ -233,18 +261,18 @@ const ScrollSequence: React.FC = () => {
         className="absolute inset-0 z-[21] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
-          <div className="relative w-[1200px] md:w-[min(1800px,92vw)] flex justify-center items-center">
+          <div className="relative w-[400px] md:w-[min(520px,50vw)] flex justify-center items-center">
             <img
               src="/image2.webp"
-              alt="VeilPay wallet screen (Dark)"
+              alt="Veilpay wallet screen (Dark)"
               width={1527}
               height={1024}
               className="w-full h-auto object-contain relative z-10 dark-image"
               loading="lazy"
             />
             <img
-              src="/image2.white.png"
-              alt="VeilPay wallet screen (Light)"
+              src="/image2.white.webp"
+              alt="Veilpay wallet screen (Light)"
               width={1527}
               height={1024}
               className="w-full h-auto object-contain relative z-10 white-image"
@@ -254,7 +282,7 @@ const ScrollSequence: React.FC = () => {
         </div>
       </div>
 
-      {/* image3.png — appears at Stage 6 alongside the bento grid.
+      {/* image3.webp — appears at Stage 6 alongside the bento grid.
           Same container structure as the phone mockup so size & position match exactly.
           Opacity-only animation: no vertical translation. */}
       <div
@@ -262,18 +290,18 @@ const ScrollSequence: React.FC = () => {
         className="absolute inset-0 z-[22] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
-          <div className="relative w-[1200px] md:w-[min(1800px,92vw)] flex justify-center items-center">
+          <div className="relative w-[400px] md:w-[min(520px,50vw)] flex justify-center items-center">
             <img
               src="/image3.webp"
-              alt="VeilPay payment screen (Dark)"
+              alt="Veilpay payment screen (Dark)"
               width={1527}
               height={1024}
               className="w-full h-auto object-contain relative z-10 dark-image"
               loading="lazy"
             />
             <img
-              src="/image3.white.png"
-              alt="VeilPay payment screen (Light)"
+              src="/image3.white.webp"
+              alt="Veilpay payment screen (Light)"
               width={1527}
               height={1024}
               className="w-full h-auto object-contain relative z-10 white-image"

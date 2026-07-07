@@ -19,11 +19,18 @@ const MassiveTextScroll: React.FC = () => {
           start: 'top top',
           end: '+=250%', // Reduced from 600% to eliminate the huge gap
           pin: true,
+          pinSpacing: true,
           // Phones: light scrub so the giant text stops chasing quickly after a
           // flick. Desktop keeps the slower, smoother 2s catch-up.
           scrub: TOUCH ? 0.6 : 2,
           fastScrollEnd: TOUCH,
           invalidateOnRefresh: true, // re-derive vh offsets on rotation/resize
+          // ── Stacked-pin ordering (critical) ──
+          // Lower than ScrollSequence (refreshPriority 2) so the tall pin above
+          // is always measured first. This guarantees this section starts only
+          // AFTER ScrollSequence has fully played "PRIVATE PAYMENTS FULLY YOURS"
+          // and released its pin, instead of racing in early and overlapping.
+          refreshPriority: 1,
         },
       });
 

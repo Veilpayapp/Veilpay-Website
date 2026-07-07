@@ -8,7 +8,7 @@ const IPhoneMockup: React.FC = () => {
           1800px and colliding with the text layers on narrower windows. min()
           caps it at the original 1800px so large screens look unchanged. Mobile
           keeps its intentional oversized-and-clipped hero size. */}
-      <div className="relative w-[1200px] md:w-[min(1800px,92vw)] flex justify-center items-center">
+      <div className="relative w-[400px] md:w-[min(520px,50vw)] flex justify-center items-center">
         {/* Subtle Aura Effect behind the phone */}
         <div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"

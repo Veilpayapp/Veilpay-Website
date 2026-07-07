@@ -15,8 +15,10 @@ const LightArc: React.FC = () => {
           alt=""
           aria-hidden="true"
           draggable={false}
+          width={1200}
+          height={800}
           className="w-[200%] md:w-[150%] max-w-[3000px] flex-shrink-0"
-          style={{ display: 'block' }}
+          style={{ display: 'block', height: 'auto' }}
         />
       </div>
     );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { BentoCard } from '@/components/ui/bento-grid';
 import { ShieldCheck, ArrowDownCircle, Globe } from 'lucide-react';
 
@@ -32,7 +32,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
         {/* Wide Card - ZK Proofs (full width of the column) */}
         <BentoCard
           name="ZK Proofs"
-          className="bento-card w-full min-w-0 flex-1 h-[clamp(150px,21vh,200px)] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111]/95 md:bg-[#111]/80 md:backdrop-blur-xl shadow-2xl rounded-3xl"
+          className="bento-card w-full min-w-0 flex-none md:flex-1 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111]/95 md:bg-[#111]/80 md:backdrop-blur-xl shadow-2xl rounded-3xl"
           Icon={ShieldCheck}
           description="Prove a payment is valid without revealing sender, receiver, or amount. Zero-knowledge proofs keep every transaction cryptographically private."
           onClick={() => setShowZkPopup(true)}
@@ -45,11 +45,11 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
         />
 
         {/* Pair row — two equal, together-shrinking cards */}
-        <div className="flex flex-col md:flex-row gap-[clamp(0.5rem,1.5vw,1.5rem)]">
+        <div className="flex flex-col md:flex-row gap-[clamp(0.5rem,1.5vw,1.5rem)] w-full">
           {/* Square Card - Stealth Address */}
           <BentoCard
             name="Stealth Addresses"
-            className="bento-card flex-1 basis-0 min-w-0 h-[clamp(150px,21vh,200px)] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#141414]/95 md:bg-[#141414]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
+            className="bento-card w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#141414]/95 md:bg-[#141414]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
             Icon={ArrowDownCircle}
             description="EIP-5564 dual-key stealth addresses generate a fresh one-time address per transaction, breaking on-chain linkability across Stellar, EVM, Solana and Aptos."
             onClick={() => setShowStealthPopup(true)}
@@ -65,7 +65,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
           {/* Square Card - Privacy Tokens */}
           <BentoCard
             name="Privacy Tokens"
-            className="bento-card flex-1 basis-0 min-w-0 h-[clamp(150px,21vh,200px)] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
+            className="bento-card w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
             Icon={Globe}
             description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, Polygon and Aptos — one vault, full privacy."
             onClick={() => setShowTokensPopup(true)}
@@ -107,6 +107,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
                 Zero-knowledge proofs allow us to mathematically prove a payment is valid without ever revealing the sender, receiver, or amount to the public ledger. Your transactions remain cryptographically private from end to end.
               </p>
               <button
+                type="button"
                 onClick={() => setShowZkPopup(false)}
                 className="mt-2 ios-glass-gold px-6 py-2.5 rounded-full text-black font-bold text-sm uppercase tracking-wide w-full hover:brightness-110 transition-all"
               >
@@ -170,7 +171,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
               </div>
               <h3 className="text-xl font-bold text-white tracking-tight">Privacy Assets</h3>
               <p className="text-sm text-white/70 leading-relaxed">
-                VeilPay supports fully native privacy assets like Stellar, Monero, Zcash, and Midnight, alongside transparent chains like Ethereum, Solana, and Base. Choose the level of privacy that fits your needs in a single unified interface.
+                Veilpay supports fully native privacy assets like Stellar, Monero, Zcash, and Midnight, alongside transparent chains like Ethereum, Solana, and Base. Choose the level of privacy that fits your needs in a single unified interface.
               </p>
               <button
                 onClick={() => setShowTokensPopup(false)}

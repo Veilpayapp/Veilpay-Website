@@ -12,19 +12,19 @@ type DocKey = 'about' | 'privacy' | 'terms';
 
 const DOCS: Record<DocKey, { title: string; description: string; source: string }> = {
   about: {
-    title: 'About Us — VeilPay',
+    title: 'About Us — Veilpay',
     description:
-      'VeilPay is a non-custodial, multi-chain payments app that makes private crypto payments practical for everyday use.',
+      'Veilpay is a non-custodial, multi-chain payments app that makes private crypto payments practical for everyday use.',
     source: aboutMd,
   },
   privacy: {
-    title: 'Privacy Policy — VeilPay',
-    description: 'How VeilPay collects, uses, and protects your information.',
+    title: 'Privacy Policy — Veilpay',
+    description: 'How Veilpay collects, uses, and protects your information.',
     source: privacyMd,
   },
   terms: {
-    title: 'Terms of Service — VeilPay',
-    description: 'The terms that govern your use of VeilPay.',
+    title: 'Terms of Service — Veilpay',
+    description: 'The terms that govern your use of Veilpay.',
     source: termsMd,
   },
 };
@@ -58,7 +58,7 @@ export default function LegalPage({ doc }: { doc: DocKey }) {
           <Link to="/about" className="hover:text-amber-400 transition-colors">About</Link>
           <Link to="/privacy" className="hover:text-amber-400 transition-colors">Privacy</Link>
           <Link to="/terms" className="hover:text-amber-400 transition-colors">Terms</Link>
-          <span className="text-neutral-600">© 2026 VeilPay</span>
+          <span className="text-neutral-600">© 2026 Veilpay</span>
         </nav>
       </main>
     </div>

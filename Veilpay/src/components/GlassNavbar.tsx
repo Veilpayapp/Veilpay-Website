@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import gsap from 'gsap';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { getLenisInstance } from '@/lib/utils';
 import { isLowEnd } from '@/lib/deviceCapability';
 import { FEATURES_SCROLL_TARGET } from '@/lib/scrollConfig';
 import ThemeToggle from './ThemeToggle';
 
-// GSAP drives the phone scroll tween (see handleScroll) so it stays in lockstep
-// with the pinned ScrollTriggers instead of racing the browser's own smoothing.
-gsap.registerPlugin(ScrollToPlugin);
+// GSAP (for the phone scroll tween in handleScroll) is imported lazily inside
+// the click handler rather than at module scope — otherwise the navbar, which
+// renders on first paint, would drag the whole GSAP runtime onto the critical
+// path even though the tween only ever runs on a user's nav click.
 
 // Smooth quartic ease-out for the cinematic scroll — pure, so hoisted to module scope
 // instead of being re-created on every render.
@@ -32,7 +31,7 @@ const logoStyle: React.CSSProperties = {
 
 // Uses only its arguments + module-scope helpers (no component state/props), so it lives
 // at module scope to avoid being rebuilt every render and to keep memoized children stable.
-const handleScroll = (
+const handleScroll = async (
   e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
   target: string | number,
 ) => {
@@ -61,9 +60,11 @@ const handleScroll = (
 
   const lenis = getLenisInstance();
   if (lenis) {
-    // Desktop: Lenis owns the scroll loop. 4 second super-elegant cinematic scroll.
+    // Lenis owns the scroll loop. 4 second super-elegant cinematic scroll on desktop,
+    // 1.6s snappy scroll on mobile so it doesn't feel sluggish.
+    const isMobile = window.innerWidth <= 768;
     lenis.scrollTo(scrollTarget, {
-      duration: 4,
+      duration: isMobile ? 1.6 : 4,
       easing: easeOutQuart,
     });
   } else {
@@ -74,6 +75,11 @@ const handleScroll = (
     // tween updates ScrollTrigger in lockstep, so the pins scrub cleanly.
     // autoKill stops the tween the instant the user touches the screen.
     const y = typeof scrollTarget === 'number' ? scrollTarget : 0;
+    const [{ default: gsap }, { ScrollToPlugin }] = await Promise.all([
+      import('gsap'),
+      import('gsap/ScrollToPlugin'),
+    ]);
+    gsap.registerPlugin(ScrollToPlugin);
     gsap.to(window, {
       duration: 1.6,
       scrollTo: { y, autoKill: true },
@@ -123,7 +129,7 @@ export default function GlassNavbar() {
         {/* Left Section (Logo + Links) */}
         <div className="flex items-center gap-2 md:gap-8 relative z-10">
           {/* Logo → home */}
-          <Link to="/" aria-label="VeilPay home" className="preserve-color block flex-shrink-0" style={logoStyle} />
+          <Link to="/" aria-label="Veilpay home" className="preserve-color block flex-shrink-0" style={logoStyle} />
 
           {/* Nav Links — visible on all screen sizes, smaller text on mobile */}
           <div className="flex items-center gap-2.5 md:gap-10">

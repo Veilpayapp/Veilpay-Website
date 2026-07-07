@@ -24,20 +24,10 @@ interface GoldenWavesProps {
 export default function GoldenWaves({ slim = false }: GoldenWavesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // ── Mobile: static SVG image, no JS animation at all ──
-  if (TOUCH) {
-    return (
-      <img
-        src="/golden-waves-static.svg"
-        alt=""
-        aria-hidden="true"
-        draggable={false}
-        style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
-      />
-    );
-  }
-
   useEffect(() => {
+    // If on mobile, do not run the canvas logic
+    if (TOUCH) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d', { alpha: true });
@@ -167,6 +157,18 @@ export default function GoldenWaves({ slim = false }: GoldenWavesProps) {
       window.removeEventListener('pointermove', onPointer);
     };
   }, [slim]);
+
+  if (TOUCH) {
+    return (
+      <img
+        src="/golden-waves-static.svg"
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
+      />
+    );
+  }
 
   return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />;
 }

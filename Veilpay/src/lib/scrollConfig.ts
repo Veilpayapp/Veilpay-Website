@@ -15,7 +15,11 @@
  *    change settles — combined with `invalidateOnRefresh` on each timeline the
  *    animations re-derive their target values for the new resolution.
  */
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+// NOTE: GSAP/ScrollTrigger is intentionally NOT imported at module scope here.
+// This module is pulled in by main.tsx for its pure constants (TOUCH,
+// SEQUENCE_SCROLL_END, …), which sit on the first-paint critical path. A static
+// `import { ScrollTrigger }` would drag the entire GSAP runtime onto that path.
+// configureScrollTriggers() imports it lazily instead, after the app has booted.
 
 /**
  * Is this a phone/tablet (coarse pointer or mobile UA)? Detected the SAME way
@@ -54,9 +58,14 @@ export const FEATURES_SCROLL_TARGET = TOUCH ? Math.round(SEQUENCE_SCROLL_END * 0
 
 let configured = false;
 
-export function configureScrollTriggers(): void {
+export async function configureScrollTriggers(): Promise<void> {
   if (configured || typeof window === 'undefined') return;
   configured = true;
+
+  // Lazy-load ScrollTrigger so this call (fired from main.tsx at startup) never
+  // forces GSAP onto the critical path — the config only needs to be in place
+  // before the user starts scrolling, which is well after first paint.
+  const { ScrollTrigger } = await import('gsap/ScrollTrigger');
 
   ScrollTrigger.config({
     // Height-only mobile resizes (URL-bar) no longer thrash the pins.
@@ -79,4 +88,26 @@ export function configureScrollTriggers(): void {
 
   window.addEventListener('resize', refresh, { passive: true });
   window.addEventListener('orientationchange', refresh, { passive: true });
+
+  // ── Authoritative geometry refresh after the page settles ──
+  // The pinned timelines are first measured the moment they mount (right after
+  // the preloader). At that instant web fonts may not be swapped in and the
+  // lazy mockup images may not have decoded — both can nudge layout heights
+  // slightly. A single ScrollTrigger.refresh() once everything has settled
+  // re-derives every pin's start/end against the FINAL layout, so the two
+  // stacked pins (ScrollSequence → MassiveTextScroll) and the Download section
+  // below them can never drift out of order. refresh() is a safe no-op if no
+  // triggers exist yet, so firing it here (possibly before the pins mount) is
+  // harmless — the pins also self-refresh on creation with their refreshPriority.
+  const settleRefresh = () => ScrollTrigger.refresh();
+  if (document.readyState === 'complete') {
+    settleRefresh();
+  } else {
+    window.addEventListener('load', settleRefresh, { once: true });
+  }
+  // Font swap (e.g. Playfair Display on the intro title) can change text metrics
+  // after first paint; refresh once the font set is ready.
+  if (typeof document !== 'undefined' && document.fonts?.ready) {
+    document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => {});
+  }
 }

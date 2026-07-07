@@ -43,10 +43,39 @@ async function run() {
     .jpeg({ quality: 80, mozjpeg: true })
     .toFile(p('og.jpg'));
 
-  // Phone mockup image — swap PNG for WebP (visually identical, ~3x smaller).
+  // These phone screenshots render at a CSS width of at most 520px
+  // (w-[400px] md:w-[min(520px,50vw)]). The source PNGs are ~2000–3960px wide,
+  // so the browser was downloading up to 8× more pixels than it can display —
+  // the single biggest LCP cost on mobile. Cap the longest edge at 1080px:
+  // that stays perfectly crisp at 520px CSS even on 2× DPR screens while
+  // cutting the largest asset (image2) from 416KB to a fraction. Pixels and
+  // aspect ratio are otherwise identical — the visual is unchanged.
+  const MAX_W = 1080;
+
+  // Phone mockup image (hero LCP candidate) — resize + WebP.
   await sharp(p('MOCKUP2.png'))
+    .resize({ width: MAX_W, withoutEnlargement: true })
     .webp({ quality: 90 })
     .toFile(p('MOCKUP2.webp'));
+
+  // Optimize GSAP sequence images
+  const sequenceImages = [
+    'image2.png',
+    'image3.png',
+    'image2.white.png',
+    'image3.white.png'
+  ];
+
+  for (const img of sequenceImages) {
+    if (statSync(p(img), { throwIfNoEntry: false })) {
+      const webpName = img.replace('.png', '.webp');
+      await sharp(p(img))
+        .resize({ width: MAX_W, withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toFile(p(webpName));
+      console.log(`  ${webpName}`, kb(p(webpName)));
+    }
+  }
 
   console.log('Generated:');
   console.log('  favicon.png ', kb(p('favicon.png')));
