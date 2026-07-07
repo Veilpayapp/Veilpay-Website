@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { TOUCH } from '@/lib/scrollConfig';
 
 interface GoldenWavesProps {
   /** Slim mode draws a few thin flowing golden lines (for a compact band)
@@ -16,9 +17,25 @@ interface GoldenWavesProps {
  *   - pauses when the tab is hidden,
  *   - renders a single static frame under prefers-reduced-motion,
  *   - reacts to the pointer for a subtle parallax.
+ *
+ * On mobile (TOUCH), renders a pre-baked static SVG instead of running
+ * a canvas animation loop — zero JS cost, zero rAF, zero GPU compositing.
  */
 export default function GoldenWaves({ slim = false }: GoldenWavesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // ── Mobile: static SVG image, no JS animation at all ──
+  if (TOUCH) {
+    return (
+      <img
+        src="/golden-waves-static.svg"
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
+      />
+    );
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -153,3 +170,4 @@ export default function GoldenWaves({ slim = false }: GoldenWavesProps) {
 
   return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />;
 }
+

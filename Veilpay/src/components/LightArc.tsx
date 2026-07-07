@@ -1,7 +1,27 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { TOUCH } from '@/lib/scrollConfig';
 
 const LightArc: React.FC = () => {
+  // ── Mobile: static SVG image — no Framer Motion, no Gaussian blur filters ──
+  if (TOUCH) {
+    return (
+      <div 
+        className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none mt-[20vh] md:mt-[15vh]"
+        style={{ transform: 'translateZ(0)' }}
+      >
+        <img
+          src="/light-arc-static.svg"
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="w-[200%] md:w-[150%] max-w-[3000px] flex-shrink-0"
+          style={{ display: 'block' }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div 
       className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none mt-[20vh] md:mt-[15vh]"
@@ -70,3 +90,4 @@ const LightArc: React.FC = () => {
 };
 
 export default React.memo(LightArc);
+
