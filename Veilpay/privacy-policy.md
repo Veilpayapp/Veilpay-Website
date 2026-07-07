@@ -1,7 +1,6 @@
 # Veilpay Privacy Policy
 
-> **Legal note:** This policy is a working draft based on Veilpay's described architecture. It is not legal advice and has not been reviewed by counsel. Because privacy-focused crypto payment products face jurisdiction-specific rules (data protection law, money-transmission/MSB regulation, AML/KYC, and sanctions screening), have this reviewed by a qualified attorney before publishing, and confirm every bracketed placeholder against your actual legal entity, practices, and vendors.
-
+> **Legal note:** This policy is a working draft based on Veilpay's described architecture. It is not legal advice and has not been reviewed by counsel. Because privacy-focused crypto payment products face jurisdiction-specific rules 
 ## Footer / concise version
 
 Veilpay is a non-custodial app, so we never hold your private keys or funds. We collect limited account, device, and diagnostic data to run the app, and we don't sell your personal data. If you use our fiat on/off-ramp feature, our partner Transak collects identity information directly from you under its own privacy policy. You can request access to, correction of, or deletion of your data at any time by contacting [PRIVACY CONTACT EMAIL]. See the full policy below for details on your rights under GDPR, CCPA, and India's DPDP Act.
@@ -16,7 +15,7 @@ Because Veilpay is a **non-custodial** application, we never collect or store yo
 
 We do collect the following categories of information:
 
-- **Account and identity data:** [PLACEHOLDER: e.g., email address, username] if you create an account.
+- **Account and identity data:** if you create an account.
 - **Wallet and payment metadata:** public wallet addresses, transaction identifiers, selected privacy tier, asset type, quote and fee data, and payment status. Note that for transparent-chain transactions, this information (excluding your identity) is generally also visible on the relevant public blockchain independent of Veilpay.
 - **Device and technical data:** device identifiers, operating system, app version, IP address, and crash/diagnostic logs.
 - **Usage data:** feature interactions, in-app navigation, and support requests, collected to improve reliability and user experience.
@@ -45,9 +44,8 @@ Our website and app may use cookies, mobile SDKs, or similar technologies to:
 
 - Remember preferences (e.g., selected privacy tier, currency display);
 - Maintain session state;
-- Understand aggregate usage patterns via analytics tools such as [PLACEHOLDER: e.g., a privacy-respecting analytics provider].
 
-You can control cookies through your browser or device settings. Disabling certain cookies may limit some app functionality. [PLACEHOLDER: link to cookie preference center, if applicable.]
+You can control cookies through your browser or device settings. Disabling certain cookies may limit some app functionality. 
 
 ### 4. Third-Party Services
 
@@ -66,8 +64,7 @@ We do not sell your personal data to third parties for their own marketing purpo
 
 We retain personal data only as long as necessary for the purposes described above, including:
 
-- Active account and app-functionality data, retained while your account is active plus [PLACEHOLDER: retention period, e.g., 90 days] after closure;
-- Support communications, retained for [PLACEHOLDER: retention period];
+- Active account and app-functionality data, retained while your account is active plus after closure;
 - Records we are legally required to retain (e.g., under applicable AML, tax, or recordkeeping law), retained for the legally mandated period.
 
 Identity verification data collected through Transak is retained by Transak under its own retention policy, which may be longer due to Transak's independent regulatory obligations.
@@ -106,21 +103,20 @@ We apply technical and organizational safeguards appropriate to a non-custodial 
 - Encryption of data in transit and at rest for backend-held data;
 - Biometric authentication gating for sensitive in-app actions;
 - Access controls and monitoring on backend infrastructure;
-- [PLACEHOLDER: reference to security audits, bug bounty program, or certifications, if applicable].
 
 No system is completely secure. Because Veilpay does not custody funds, Veilpay cannot recover lost private keys, seed phrases, or funds sent to an incorrect address — see the Terms of Service for details on your responsibilities as a non-custodial wallet holder.
 
 ### 8. Children's Privacy
 
-Veilpay is not directed to, and is not intended for use by, individuals under the age of [PLACEHOLDER: 18, or applicable minimum age]. We do not knowingly collect personal data from children. If you believe a child has provided us with personal data, contact us at [PRIVACY CONTACT EMAIL] so we can take appropriate action.
+Veilpay is not directed to, and is not intended for use by, individuals under the age of [ ex- 18, or applicable minimum age]. We do not knowingly collect personal data from children. If you believe a child has provided us with personal data, contact us at [veilpayapp.modulator774@passinbox.com] so we can take appropriate action.
 
 ### 9. International Data Transfers
 
-Your information may be processed or stored in countries other than your own, including [PLACEHOLDER: list countries/regions]. Where required, we rely on appropriate safeguards (such as Standard Contractual Clauses) for cross-border transfers of personal data.
+Your information may be processed or stored in countries other than your own. Where required, we rely on appropriate safeguards (such as Standard Contractual Clauses) for cross-border transfers of personal data.
 
 ### 10. Changes to This Policy
 
-We may update this Privacy Policy from time to time. Material changes will be notified via [PLACEHOLDER: in-app notice / email / website banner]. Continued use of Veilpay after changes take effect constitutes acceptance of the updated policy.
+We may update this Privacy Policy from time to time. Material changes will be notified via email (mentioned below). Continued use of Veilpay after changes take effect constitutes acceptance of the updated policy.
 
 ### 11. Contact Us
 

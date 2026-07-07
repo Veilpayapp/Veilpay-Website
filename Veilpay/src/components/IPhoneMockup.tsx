@@ -8,7 +8,10 @@ const IPhoneMockup: React.FC = () => {
           1800px and colliding with the text layers on narrower windows. min()
           caps it at the original 1800px so large screens look unchanged. Mobile
           keeps its intentional oversized-and-clipped hero size. */}
-      <div className="relative w-[400px] md:w-[min(520px,50vw)] flex justify-center items-center">
+      {/* Phone size bumped +5% (400→420 / 520→546) and nudged +2vw right.
+          image2/image3 in ScrollSequence use the SAME wrapper so all three
+          overlays stay pixel-aligned through the crossfades. */}
+      <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center translate-x-[2vw]">
         {/* Subtle Aura Effect behind the phone */}
         <div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
@@ -26,11 +29,19 @@ const IPhoneMockup: React.FC = () => {
         
         <img
           src="/MOCKUP2.webp"
-          alt="iPhone Mockup"
+          alt="iPhone Mockup (Dark)"
           width={1527}
           height={1024}
           fetchPriority="high"
-          className="w-full h-auto object-contain relative z-10"
+          className="w-full h-auto object-contain relative z-10 dark-image"
+        />
+        <img
+          src="/MOCKUP2.WHITE.webp"
+          alt="iPhone Mockup (Light)"
+          width={1527}
+          height={1024}
+          fetchPriority="high"
+          className="w-full h-auto object-contain relative z-10 white-image"
         />
         {/* Screen Content - logo appears via GSAP */}
         <div className="screen-logo absolute inset-0 flex items-center justify-center z-20 pointer-events-none -mt-[10%] opacity-0">

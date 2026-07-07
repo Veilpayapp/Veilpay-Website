@@ -43,34 +43,40 @@ async function run() {
     .jpeg({ quality: 80, mozjpeg: true })
     .toFile(p('og.jpg'));
 
-  // These phone screenshots render at a CSS width of at most 520px
-  // (w-[400px] md:w-[min(520px,50vw)]). The source PNGs are ~2000–3960px wide,
-  // so the browser was downloading up to 8× more pixels than it can display —
-  // the single biggest LCP cost on mobile. Cap the longest edge at 1080px:
-  // that stays perfectly crisp at 520px CSS even on 2× DPR screens while
-  // cutting the largest asset (image2) from 416KB to a fraction. Pixels and
-  // aspect ratio are otherwise identical — the visual is unchanged.
-  const MAX_W = 1080;
+  // ── Phone mockups & sequence screenshots ──
+  // Every source PNG contains the SAME phone, but on a differently-sized canvas
+  // with different padding (MOCKUP2 is 1980px wide, the whites are 1800px, and
+  // image2 is 2x). Matching only the OUTPUT canvas is NOT enough: the phone
+  // still ends up a different SIZE/position in each, so the dark/white overlays
+  // don't align and the whites look bigger. Instead we normalize the PHONE
+  // itself:
+  //   1. trim()  — crop the transparent margin down to the phone,
+  //   2. resize (fill) the phone to one common size (PHONE_W x PHONE_H),
+  //   3. extend  — re-pad to a shared CANVAS with the phone centered.
+  // => every variant has the phone at the IDENTICAL size + position, so theme
+  //    toggles and GSAP crossfades line up perfectly.
+  const PHONE_W = 955;
+  const PHONE_H = 1972;
+  // Centre the phone on a 1080x2007 canvas: 63+955+62 = 1080, 17+1972+18 = 2007.
+  const PAD = { top: 17, bottom: 18, left: 63, right: 62 };
+  const TRANSPARENT = { r: 0, g: 0, b: 0, alpha: 0 };
 
-  // Phone mockup image (hero LCP candidate) — resize + WebP.
-  await sharp(p('MOCKUP2.png'))
-    .resize({ width: MAX_W, withoutEnlargement: true })
-    .webp({ quality: 90 })
-    .toFile(p('MOCKUP2.webp'));
-
-  // Optimize GSAP sequence images
-  const sequenceImages = [
+  const phoneImages = [
+    'MOCKUP2.png',
+    'MOCKUP2.WHITE.png',
     'image2.png',
     'image3.png',
     'image2.white.png',
-    'image3.white.png'
+    'image3.white.png',
   ];
 
-  for (const img of sequenceImages) {
+  for (const img of phoneImages) {
     if (statSync(p(img), { throwIfNoEntry: false })) {
       const webpName = img.replace('.png', '.webp');
       await sharp(p(img))
-        .resize({ width: MAX_W, withoutEnlargement: true })
+        .trim()
+        .resize(PHONE_W, PHONE_H, { fit: 'fill' })
+        .extend({ ...PAD, background: TRANSPARENT })
         .webp({ quality: 85 })
         .toFile(p(webpName));
       console.log(`  ${webpName}`, kb(p(webpName)));
@@ -81,7 +87,6 @@ async function run() {
   console.log('  favicon.png ', kb(p('favicon.png')));
   console.log('  logo.webp   ', kb(p('logo.webp')));
   console.log('  og.jpg      ', kb(p('og.jpg')));
-  console.log('  MOCKUP2.webp', kb(p('MOCKUP2.webp')));
 }
 
 run().catch((err) => {

@@ -19,7 +19,33 @@ const DownloadSection: React.FC = () => {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Create a timeline for the pin and scale animation
+      if (TOUCH) {
+        // ── Mobile: lightweight one-shot reveal (perf fix) ──
+        // The desktop version PINS this section and SCRUBS a scale on the large
+        // rounded box on every scroll frame. On phones that forces a full-box
+        // repaint each frame (the "laggy" Download feel). Phones instead get a
+        // cheap, one-time fade + slide-in on enter: no pin, no scrub, no
+        // per-frame scale — just opacity + translateY (both GPU-composited),
+        // and it fires exactly once.
+        gsap.fromTo(
+          boxRef.current,
+          { y: 60, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            ease: 'power2.out',
+            duration: 0.7,
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 75%',
+              once: true,
+            },
+          },
+        );
+        return;
+      }
+
+      // ── Desktop: original cinematic pinned scale ──
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -28,8 +54,6 @@ const DownloadSection: React.FC = () => {
           pin: true,
           scrub: true,
           anticipatePin: 1,
-          // Settle the pin cleanly on a fast phone flick; no-op on desktop.
-          fastScrollEnd: TOUCH,
           invalidateOnRefresh: true, // re-derive vh offsets on rotation/resize
         }
       });

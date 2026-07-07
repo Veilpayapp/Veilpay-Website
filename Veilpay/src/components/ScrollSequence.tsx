@@ -261,7 +261,7 @@ const ScrollSequence: React.FC = () => {
         className="absolute inset-0 z-[21] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
-          <div className="relative w-[400px] md:w-[min(520px,50vw)] flex justify-center items-center">
+          <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center translate-x-[2vw]">
             <img
               src="/image2.webp"
               alt="Veilpay wallet screen (Dark)"
@@ -290,7 +290,7 @@ const ScrollSequence: React.FC = () => {
         className="absolute inset-0 z-[22] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
-          <div className="relative w-[400px] md:w-[min(520px,50vw)] flex justify-center items-center">
+          <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center translate-x-[2vw]">
             <img
               src="/image3.webp"
               alt="Veilpay payment screen (Dark)"
