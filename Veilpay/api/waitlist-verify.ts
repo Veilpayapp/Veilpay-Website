@@ -23,12 +23,13 @@ export default async function handler(req: ApiReq, res: ApiRes) {
     return res.status(400).json({ error: msg });
   }
 
-  // Verified: the user proved they control this inbox. Notify Discord with the
-  // verified email in a branded embed so signups are easy to read and collect.
+  // Verified: the user proved they control this inbox. Post the verified email
+  // (and IP) to Discord in a branded embed so signups are easy to read/collect.
   // A webhook failure must not fail the user's verification, so it's swallowed.
   const webhook = process.env.DISCORD_WEBHOOK_URL;
   if (webhook) {
-    const fwd = req.headers?.['x-forwarded-for'];
+    const headers = (req as { headers?: Record<string, string | string[] | undefined> }).headers;
+    const fwd = headers?.['x-forwarded-for'];
     const clientIp =
       (Array.isArray(fwd) ? fwd[0] : fwd)?.split(',')[0]?.trim() || 'unknown';
 
