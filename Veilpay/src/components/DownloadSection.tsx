@@ -16,6 +16,11 @@ const DownloadSection: React.FC = () => {
   const [isFollowHovered, setIsFollowHovered] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [showInvalidEmailPopup, setShowInvalidEmailPopup] = useState(false);
+  // Two-step waitlist: 'email' collects the address, 'code' verifies the 6-digit
+  // code emailed to it. `token` is the opaque HMAC-signed handle from the server.
+  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [code, setCode] = useState('');
+  const [token, setToken] = useState('');
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -68,19 +73,69 @@ const DownloadSection: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
+  // ── Disposable / temp email blocklist (client-side pre-check) ──
+  const DISPOSABLE_DOMAINS = new Set([
+    'tempmail.com', 'temp-mail.org', 'guerrillamail.com', 'guerrillamail.net',
+    'guerrillamailblock.com', 'sharklasers.com', 'guerrillamail.info',
+    'grr.la', 'guerrillamail.biz', 'guerrillamail.de',
+    'mailinator.com', 'mailinator2.com', 'maildrop.cc',
+    'throwaway.email', 'throwaway.cc', 'throwamail.com',
+    'yopmail.com', 'yopmail.fr', 'yopmail.net',
+    'trashmail.com', 'trashmail.me', 'trashmail.net',
+    'getairmail.com', 'mailnesia.com', 'tempail.com',
+    'dispostable.com', 'mintemail.com', 'tempr.email',
+    'discard.email', 'discardmail.com', 'discardmail.de',
+    'fakeinbox.com', 'mailcatch.com', 'mailscrap.com',
+    'mailnull.com', 'emailondeck.com', 'emailfake.com',
+    '10minutemail.com', '10minutemail.net', '10minutemail.co.za',
+    'mohmal.com', 'burnermail.io', 'inboxkitten.com',
+    'harakirimail.com', 'nada.email', 'tempinbox.com',
+    'mailsac.com', 'mytemp.email', 'tempmailaddress.com',
+    'tempmailo.com', 'getnada.com', 'emailna.co',
+    'crazymailing.com', 'tmail.ws', 'tmpmail.org', 'tmpmail.net',
+    'mailtemp.net', 'tempm.com', 'tempmail.ninja', 'spamgourmet.com',
+  ]);
+
+  // ── Allowed domains allowlist (must match backend) ──
+  const ALLOWED_DOMAINS = new Set([
+    'gmail.com', 'googlemail.com',
+    'outlook.com', 'hotmail.com', 'live.com', 'msn.com', 'outlook.in',
+    'yahoo.com', 'yahoo.co.in', 'yahoo.co.uk', 'yahoo.ca', 'yahoo.com.au',
+    'ymail.com', 'rocketmail.com',
+    'icloud.com', 'me.com', 'mac.com',
+    'protonmail.com', 'proton.me', 'pm.me',
+    'aol.com',
+    'zoho.com', 'zohomail.com', 'zohomail.in',
+    'email.com', 'mail.com', 'gmx.com', 'gmx.net',
+    'rediffmail.com',
+  ]);
+
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
 
-    // Strict allowlist for official emails only (blocks temp emails)
-    const allowedDomains = [
-      'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 
-      'icloud.com', 'email.com', 'msn.com', 'live.com', 
-      'me.com', 'mac.com', 'protonmail.com', 'proton.me', 'aol.com'
-    ];
-    const emailDomain = email.split('@')[1]?.toLowerCase();
-    
-    if (!emailDomain || !allowedDomains.includes(emailDomain)) {
+    const cleanEmail = email.trim().toLowerCase();
+    const emailDomain = cleanEmail.split('@')[1];
+
+    // 1) Basic format check
+    if (!emailDomain || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(cleanEmail)) {
+      setErrorMessage('Please enter a valid email address.');
+      setShowInvalidEmailPopup(true);
+      return;
+    }
+
+    // 2) Block disposable / temp emails
+    if (DISPOSABLE_DOMAINS.has(emailDomain)) {
+      setErrorMessage('Temporary or disposable emails are not allowed. Please use your real email (Gmail, Outlook, Yahoo, etc.).');
+      setShowInvalidEmailPopup(true);
+      return;
+    }
+
+    // 3) Check allowlist
+    if (!ALLOWED_DOMAINS.has(emailDomain)) {
+      setErrorMessage('Please use an email from a major provider (Gmail, Outlook, Yahoo, iCloud, ProtonMail, etc.). Custom or unknown domains are not accepted.');
       setShowInvalidEmailPopup(true);
       return;
     }
@@ -88,24 +143,81 @@ const DownloadSection: React.FC = () => {
     setStatus('loading');
     
     try {
-      // SECURE: POST to our own serverless API route — the Discord webhook URL
-      // lives in a private server-side env var (no VITE_ prefix) and is never
-      // shipped to the browser bundle.
-      const response = await fetch('/api/waitlist', {
+      // Step 1 of double opt-in: ask the server to email a 6-digit code to this
+      // address. The server re-validates (allowlist + live MX record), sends the
+      // code via Resend, and returns an opaque signed token. The code itself is
+      // never sent to the browser, so a typed-but-unowned address can't proceed.
+      const response = await fetch('/api/waitlist-start', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: cleanEmail }),
+      });
+
+      if (response.ok) {
+        const data = (await response.json().catch(() => ({}))) as { token?: string };
+        if (!data.token) {
+          setErrorMessage('Something went wrong sending your code. Please try again.');
+          setShowInvalidEmailPopup(true);
+          setStatus('error');
+          return;
+        }
+        setToken(data.token);
+        setCode('');
+        setStep('code');
+        setStatus('idle');
+      } else {
+        const errorJson = await response.json().catch(() => ({} as Record<string, string>));
+        console.error('Waitlist start error:', response.status, errorJson);
+
+        // Show the server's specific error to the user (e.g. "MX check failed").
+        if (errorJson.error) {
+          setErrorMessage(errorJson.error);
+          setShowInvalidEmailPopup(true);
+        }
+        setStatus('error');
+      }
+    } catch (error) {
+      console.error("Fetch/Network Error (Check Adblockers or CORS):", error);
+      setStatus('error');
+    }
+  };
+
+  // Step 2 of double opt-in: verify the typed code against the signed token.
+  // Only a correct, unexpired code flips the user to "success" and (server-side)
+  // pings Discord.
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanCode = code.trim();
+    if (!/^\d{6}$/.test(cleanCode)) {
+      setErrorMessage('Enter the 6-digit code from your email.');
+      setShowInvalidEmailPopup(true);
+      return;
+    }
+
+    setStatus('loading');
+
+    try {
+      const response = await fetch('/api/waitlist-verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), code: cleanCode, token }),
       });
 
       if (response.ok) {
         setStatus('success');
-        setEmail('');
       } else {
-        const errorJson = await response.json().catch(() => ({}));
-        console.error('Waitlist API Error:', response.status, errorJson);
-        setStatus('error');
+        const errorJson = await response.json().catch(() => ({} as Record<string, string>));
+        console.error('Waitlist verify error:', response.status, errorJson);
+        if (errorJson.error) {
+          setErrorMessage(errorJson.error);
+          setShowInvalidEmailPopup(true);
+        }
+        // Keep them on the code step so they can re-enter the code.
+        setStatus('idle');
       }
     } catch (error) {
       console.error("Fetch/Network Error (Check Adblockers or CORS):", error);
@@ -120,7 +232,13 @@ const DownloadSection: React.FC = () => {
       {/* Fluid height: min-height keeps the box tall on normal screens but lets
           it grow if content needs more room, instead of a rigid 750px that
           overflows/clips on short or narrow windows. */}
-      <div ref={boxRef} className="relative w-full max-w-[1600px] min-h-[600px] h-[min(750px,85vh)] bg-[#050505] border border-white/[0.08] rounded-[2.5rem] md:rounded-[4rem] flex flex-col items-center justify-center overflow-hidden py-10 shadow-2xl md:shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+      {/* Mobile perf: no big blur shadow (a 50px-blur box-shadow is expensive to
+          composite every scroll frame on phones, and it's invisible on a black
+          bg anyway), and [contain:paint] isolates the box's rounded/clipped
+          layer so scrolling it doesn't repaint the rest of the page. Desktop
+          keeps the ambient glow shadow and no containment (so the glow isn't
+          clipped). */}
+      <div ref={boxRef} className="relative w-full max-w-[1600px] min-h-[600px] h-[min(750px,85vh)] bg-[#050505] border border-white/[0.08] rounded-[2.5rem] md:rounded-[4rem] flex flex-col items-center justify-center overflow-hidden py-10 [contain:paint] md:[contain:none] md:shadow-[0_0_100px_rgba(0,0,0,0.5)]">
 
         {/* Full-bleed interactive golden-waves wallpaper (2D canvas, DPR-capped,
             pauses off-screen). Sits behind the content, reacts to pointer/touch. */}
@@ -221,6 +339,54 @@ const DownloadSection: React.FC = () => {
                 Follow @Veilpayapp
               </a>
             </div>
+          ) : status === 'success' ? (
+            <div className="relative z-10 w-full flex flex-col items-center gap-2 animate-fade-in text-center">
+              <div className="w-12 h-12 rounded-full bg-green-500/15 border border-green-400/40 flex items-center justify-center mb-1">
+                <svg className="w-6 h-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-green-400 text-sm font-semibold">You're on the waitlist!</p>
+              <p className="text-white/60 text-xs">Email verified. We'll be in touch soon.</p>
+            </div>
+          ) : step === 'code' ? (
+            <div className="relative z-10 w-full flex flex-col items-center gap-4 animate-fade-in">
+              <p className="text-[#F2C572] text-sm font-medium text-center">
+                Enter the 6-digit code sent to<br />
+                <span className="text-white/80 break-all">{email}</span>
+              </p>
+              <form onSubmit={handleVerify} className="w-full flex flex-col sm:flex-row gap-4 relative z-10 mx-auto justify-center items-center">
+                <div className="relative flex-1 w-full sm:w-auto">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="6-digit code"
+                    aria-label="Verification code"
+                    required
+                    disabled={status === 'loading'}
+                    className="w-full h-14 bg-[#111111] border border-[#F2C572]/20 rounded-full px-6 text-white placeholder-gray-500 text-center tracking-[0.4em] focus:outline-none focus:border-[#F2C572]/60 focus:bg-black/60 transition-all text-base"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={status === 'loading' || code.length !== 6}
+                  className="h-14 px-8 rounded-full bg-gradient-to-r from-[#F2C572] to-[#D4A042] text-black font-bold hover:brightness-110 transition-all shadow-[0_0_30px_rgba(242,197,114,0.1)] hover:shadow-[0_0_50px_rgba(242,197,114,0.3)] flex items-center justify-center min-w-[140px] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-105 w-full sm:w-auto"
+                >
+                  {status === 'loading' ? 'Verifying…' : 'Verify & Join'}
+                </button>
+              </form>
+              <button
+                type="button"
+                onClick={() => { setStep('email'); setCode(''); setStatus('idle'); }}
+                className="text-white/50 hover:text-white/80 text-xs underline underline-offset-4 transition-colors"
+              >
+                Use a different email
+              </button>
+            </div>
           ) : (
             <div className="relative z-10 w-full flex flex-col items-center gap-4 animate-fade-in">
               <p className="text-[#F2C572] text-sm font-medium">Enter your email to join</p>
@@ -233,29 +399,22 @@ const DownloadSection: React.FC = () => {
                     placeholder="Enter your email" 
                     aria-label="Email address"
                     required
-                    disabled={status === 'loading' || status === 'success'}
+                    disabled={status === 'loading'}
                     className="w-full h-14 bg-[#111111] border border-[#F2C572]/20 rounded-full px-6 text-white placeholder-gray-500 text-center sm:text-left focus:outline-none focus:border-[#F2C572]/60 focus:bg-black/60 transition-all text-sm"
                   />
                 </div>
                 <button 
                   type="submit"
-                  disabled={status === 'loading' || status === 'success'}
+                  disabled={status === 'loading'}
                   className="h-14 px-8 rounded-full bg-gradient-to-r from-[#F2C572] to-[#D4A042] text-black font-bold hover:brightness-110 transition-all shadow-[0_0_30px_rgba(242,197,114,0.1)] hover:shadow-[0_0_50px_rgba(242,197,114,0.3)] flex items-center justify-center min-w-[140px] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-105 w-full sm:w-auto"
                 >
-                  {status === 'idle' && 'Join Waitlist'}
-                  {status === 'loading' && 'Joining...'}
-                  {status === 'success' && 'Joined!'}
-                  {status === 'error' && 'Error'}
+                  {status === 'loading' ? 'Sending…' : 'Send code'}
                 </button>
               </form>
             </div>
           )}
 
-          {status === 'success' && (
-            <p className="text-green-400 text-sm mt-4 animate-fade-in relative z-10 font-medium text-center">
-              Thanks! We'll be in touch soon.
-            </p>
-          )}
+          {/* Success is rendered as a verified card in the form area above. */}
           {status === 'error' && (
             <p className="text-red-400 text-sm mt-4 animate-fade-in relative z-10 font-medium text-center">
               Something went wrong. Please try again.
@@ -355,7 +514,7 @@ const DownloadSection: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-white tracking-tight">Invalid Email</h3>
               <p className="text-sm text-white/70 leading-relaxed">
-                Please enter an official email ID (e.g. @gmail.com, @yahoo.com). Temp or custom domains are not allowed.
+                {errorMessage || 'Please enter an official email ID (e.g. @gmail.com, @yahoo.com). Temp or custom domains are not allowed.'}
               </p>
               <button
                 onClick={() => setShowInvalidEmailPopup(false)}
@@ -372,3 +531,4 @@ const DownloadSection: React.FC = () => {
 };
 
 export default DownloadSection;
+
