@@ -12,7 +12,7 @@ By using Veilpay, you agree to these Terms. Veilpay is a non-custodial app — w
 
 ### 1. Acceptance of Terms
 
-These Terms of Service ("**Terms**") govern your access to and use of the Veilpay application, website, and related services (collectively, the "**Service**"), provided by [COMPANY LEGAL NAME] ("**Veilpay**," "**we**," "**us**"). By downloading, accessing, or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.
+These Terms of Service ("**Terms**") govern your access to and use of the Veilpay application, website, and related services (collectively, the "**Service**"), provided by Veilpay ("**Veilpay**," "**we**," "**us**"). By downloading, accessing, or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.
 
 ### 2. Description of Service
 
@@ -30,7 +30,7 @@ Supported assets, chains, and privacy tiers may change over time as described in
 
 To use the Service, you must:
 
-- Be at least [PLACEHOLDER: 18] years old, or the age of legal majority in your jurisdiction;
+- Be at least 18 years old, or the age of legal majority in your jurisdiction;
 - Not be located in, or a resident of, any country or region subject to comprehensive sanctions under applicable law, and not be listed on any applicable government restricted-party or sanctions list (e.g., OFAC's SDN List);
 - Provide accurate information where an account or profile is required;
 - Comply with all applicable laws in connection with your use of the Service.
@@ -77,13 +77,13 @@ THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTIES OF ANY KI
 
 ### 9. Limitation of Liability
 
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, [COMPANY LEGAL NAME] AND ITS AFFILIATES, OFFICERS, EMPLOYEES, AND AGENTS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF FUNDS, PROFITS, OR DATA, ARISING FROM YOUR USE OF THE SERVICE, INCLUDING BUT NOT LIMITED TO: LOSS OF PRIVATE KEYS OR SEED PHRASES, TRANSACTIONS SENT TO AN INCORRECT ADDRESS, NETWORK CONGESTION OR FAILURE, THIRD-PARTY SERVICE FAILURES, OR UNAUTHORIZED ACCESS TO YOUR DEVICE. OUR TOTAL AGGREGATE LIABILITY FOR ANY CLAIM SHALL NOT EXCEED [PLACEHOLDER: e.g., the greater of USD 100 or fees paid to Veilpay in the preceding 12 months].
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, Veilpay AND ITS AFFILIATES, OFFICERS, EMPLOYEES, AND AGENTS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF FUNDS, PROFITS, OR DATA, ARISING FROM YOUR USE OF THE SERVICE, INCLUDING BUT NOT LIMITED TO: LOSS OF PRIVATE KEYS OR SEED PHRASES, TRANSACTIONS SENT TO AN INCORRECT ADDRESS, NETWORK CONGESTION OR FAILURE, THIRD-PARTY SERVICE FAILURES, OR UNAUTHORIZED ACCESS TO YOUR DEVICE. OUR TOTAL AGGREGATE LIABILITY FOR ANY CLAIM SHALL NOT EXCEED the greater of USD 100 or fees paid to Veilpay in the preceding 12 months.
 
 Some jurisdictions do not allow certain limitations of liability, so some of the above limitations may not apply to you.
 
 ### 10. Indemnification
 
-You agree to indemnify and hold harmless [COMPANY LEGAL NAME] from any claims, damages, liabilities, and expenses (including reasonable attorneys' fees) arising from your violation of these Terms or misuse of the Service.
+You agree to indemnify and hold harmless Veilpay from any claims, damages, liabilities, and expenses (including reasonable attorneys' fees) arising from your violation of these Terms or misuse of the Service.
 
 ### 11. Termination
 
@@ -91,14 +91,14 @@ We may suspend or terminate your access to the Service at any time, with or with
 
 ### 12. Changes to the Service and These Terms
 
-We may modify, suspend, or discontinue any part of the Service, including supported chains, assets, or privacy tiers, at any time. We may also update these Terms from time to time; material changes will be communicated via [PLACEHOLDER: in-app notice / email]. Continued use of the Service after changes take effect constitutes acceptance of the updated Terms.
+We may modify, suspend, or discontinue any part of the Service, including supported chains, assets, or privacy tiers, at any time. We may also update these Terms from time to time; material changes will be communicated via in-app notice and email. Continued use of the Service after changes take effect constitutes acceptance of the updated Terms.
 
 ### 13. Governing Law and Dispute Resolution
 
-These Terms are governed by the laws of [GOVERNING LAW JURISDICTION], without regard to conflict-of-law principles. [PLACEHOLDER: Insert arbitration clause, venue, and/or class-action waiver language as advised by counsel, consistent with applicable consumer-protection law in your target jurisdictions.]
+These Terms are governed by the laws of the applicable jurisdiction, without regard to conflict-of-law principles.
 
 ### 14. Contact Us
 
 Questions about these Terms can be directed to:
 
-- **Email:** [veilpayapp.modulator774@passinbox.com]
+- **Email:** veilpayapp.modulator774@passinbox.com

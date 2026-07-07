@@ -3,7 +3,7 @@
 > **Legal note:** This policy is a working draft based on Veilpay's described architecture. It is not legal advice and has not been reviewed by counsel. Because privacy-focused crypto payment products face jurisdiction-specific rules 
 ## Footer / concise version
 
-Veilpay is a non-custodial app, so we never hold your private keys or funds. We collect limited account, device, and diagnostic data to run the app, and we don't sell your personal data. If you use our fiat on/off-ramp feature, our partner Transak collects identity information directly from you under its own privacy policy. You can request access to, correction of, or deletion of your data at any time by contacting [PRIVACY CONTACT EMAIL]. See the full policy below for details on your rights under GDPR, CCPA, and India's DPDP Act.
+Veilpay is a non-custodial app, so we never hold your private keys or funds. Our providers collect limited account, device, and diagnostic data to run the app, and we don't sell your personal data. If you use our fiat on/off-ramp feature, our partner Transak collects identity information directly from you under its own privacy policy. You can request access to, correction of, or deletion of your data at any time by contacting veilpayapp.modulator774@passinbox.com. See the full policy below for details on your rights under GDPR, CCPA, and India's DPDP Act.
 
 ---
 
@@ -13,7 +13,7 @@ Veilpay is a non-custodial app, so we never hold your private keys or funds. We 
 
 Because Veilpay is a **non-custodial** application, we never collect or store your private keys, seed phrases, or spend-authority credentials. Those remain on your device at all times.
 
-We do collect the following categories of information:
+Our providers collect the following categories of information:
 
 - **Account and identity data:** if you create an account.
 - **Wallet and payment metadata:** public wallet addresses, transaction identifiers, selected privacy tier, asset type, quote and fee data, and payment status. Note that for transparent-chain transactions, this information (excluding your identity) is generally also visible on the relevant public blockchain independent of Veilpay.
@@ -22,11 +22,11 @@ We do collect the following categories of information:
 - **Fiat on/off-ramp data:** if you use the embedded on-ramp or off-ramp, our partner **Transak** collects identity verification information (such as government ID and proof of address) directly from you, under Transak's own privacy policy. Veilpay does not directly collect or store this identity-verification data.
 - **Communications:** information you provide when contacting support.
 
-We do **not** knowingly collect biometric templates — biometric authentication (e.g., Face ID/fingerprint) is processed locally on your device via your device's operating system and is never transmitted to Veilpay.
+Our providers do **not** knowingly collect biometric templates — biometric authentication (e.g., Face ID/fingerprint) is processed locally on your device via your device's operating system and is never transmitted to Veilpay.
 
 ### 2. How We Use It
 
-We use collected information to:
+Our providers use collected information to:
 
 - Operate, maintain, and secure the Veilpay application;
 - Process and display payment status, quotes, and transaction history;
@@ -36,7 +36,7 @@ We use collected information to:
 - Provide customer support and respond to inquiries;
 - Improve app performance, reliability, and features (using aggregated or de-identified data where feasible).
 
-We do not use your data for automated decision-making that produces legal or similarly significant effects about you without human involvement.
+Our providers do not use your data for automated decision-making that produces legal or similarly significant effects about you without human involvement.
 
 ### 3. Cookies and Similar Technologies
 
@@ -93,7 +93,7 @@ Depending on your location, you may have rights including:
 - Right to grievance redressal through our designated Grievance Officer;
 - Right to nominate another individual to exercise your rights in the event of death or incapacity.
 
-To exercise any of these rights, contact us at [PRIVACY CONTACT EMAIL]. We may need to verify your identity before completing certain requests. Some data (e.g., legally mandated records, or identity data held solely by Transak) may not be deletable on request.
+To exercise any of these rights, contact us at veilpayapp.modulator774@passinbox.com. We may need to verify your identity before completing certain requests. Some data (e.g., legally mandated records, or identity data held solely by Transak) may not be deletable on request.
 
 ### 7. Security
 
@@ -108,7 +108,7 @@ No system is completely secure. Because Veilpay does not custody funds, Veilpay 
 
 ### 8. Children's Privacy
 
-Veilpay is not directed to, and is not intended for use by, individuals under the age of [ ex- 18, or applicable minimum age]. We do not knowingly collect personal data from children. If you believe a child has provided us with personal data, contact us at [veilpayapp.modulator774@passinbox.com] so we can take appropriate action.
+Veilpay is not directed to, and is not intended for use by, individuals under the age of 18. Our providers do not knowingly collect personal data from children. If you believe a child has provided us with personal data, contact us at veilpayapp.modulator774@passinbox.com so we can take appropriate action.
 
 ### 9. International Data Transfers
 
@@ -122,4 +122,4 @@ We may update this Privacy Policy from time to time. Material changes will be no
 
 If you have questions about this Privacy Policy or wish to exercise your rights:
 
-- **Email:** [veilpayapp.modulator774@passinbox.com]
+- **Email:** veilpayapp.modulator774@passinbox.com
