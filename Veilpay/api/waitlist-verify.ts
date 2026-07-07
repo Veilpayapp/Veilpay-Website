@@ -23,15 +23,30 @@ export default async function handler(req: ApiReq, res: ApiRes) {
     return res.status(400).json({ error: msg });
   }
 
-  // Verified: the user proved they control this inbox. Notify Discord. A webhook
-  // failure must not fail the user's verification, so it's caught and swallowed.
+  // Verified: the user proved they control this inbox. Notify Discord with the
+  // verified email in a branded embed so signups are easy to read and collect.
+  // A webhook failure must not fail the user's verification, so it's swallowed.
   const webhook = process.env.DISCORD_WEBHOOK_URL;
   if (webhook) {
+    const fwd = req.headers?.['x-forwarded-for'];
+    const clientIp =
+      (Array.isArray(fwd) ? fwd[0] : fwd)?.split(',')[0]?.trim() || 'unknown';
+
     try {
       await fetch(webhook, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: `✅ New verified waitlist signup: **${email}**` }),
+        body: JSON.stringify({
+          embeds: [
+            {
+              title: '✅ New verified waitlist signup',
+              description: `**Email:** \`${email}\`\n**IP:** \`${clientIp}\``,
+              color: 15909234, // Veilpay amber
+              timestamp: new Date().toISOString(),
+              footer: { text: 'Email verified via 6-digit code (double opt-in)' },
+            },
+          ],
+        }),
       });
     } catch (err) {
       console.error('Discord webhook failed:', err);
