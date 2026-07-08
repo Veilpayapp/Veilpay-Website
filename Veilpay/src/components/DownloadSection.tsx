@@ -201,7 +201,9 @@ const DownloadSection: React.FC = () => {
   };
 
   return (
-    <section id="download" ref={sectionRef} className="relative w-full min-h-screen bg-black py-10 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-white/5 flex items-center justify-center">
+    <>
+      <div id="download-anchor" className="w-full h-0 absolute -mt-[1px]" aria-hidden="true" />
+      <section id="download" ref={sectionRef} className="relative w-full min-h-screen bg-black py-10 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-white/5 flex items-center justify-center">
       
       {/* Rounded Box Container */}
       {/* Fluid height: min-height keeps the box tall on normal screens but lets
@@ -502,6 +504,7 @@ const DownloadSection: React.FC = () => {
         )}
       </AnimatePresence>
     </section>
+    </>
   );
 };
 

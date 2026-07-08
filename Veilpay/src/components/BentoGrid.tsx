@@ -9,13 +9,16 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
   const [showTokensPopup, setShowTokensPopup] = useState(false);
 
   useEffect(() => {
+    const handleZk = () => setShowZkPopup(true);
     const handlePrivacy = () => setShowStealthPopup(true);
     const handleTokens = () => setShowTokensPopup(true);
 
+    window.addEventListener('openZkPopup', handleZk);
     window.addEventListener('openPrivacyPopup', handlePrivacy);
     window.addEventListener('openTokensPopup', handleTokens);
 
     return () => {
+      window.removeEventListener('openZkPopup', handleZk);
       window.removeEventListener('openPrivacyPopup', handlePrivacy);
       window.removeEventListener('openTokensPopup', handleTokens);
     };

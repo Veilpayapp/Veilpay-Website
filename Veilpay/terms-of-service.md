@@ -4,7 +4,7 @@
 
 ### 1. Acceptance of Terms
 
-These Terms of Service ("**Terms**") govern your access to and use of the Veilpay application, website, and related services (collectively, the "**Service**"), provided by Veilpay ("**Veilpay**," "**we**," "**us**"). By downloading, accessing, or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.
+These Terms of Service ("**Terms**") govern your access to and use of the Veilpay application, website, and related services (collectively, the "**Service**"), provided by Veilpay ("**Veilpay**", "**we**", "**us**"). By downloading, accessing, or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.
 
 ### 2. Description of Service
 

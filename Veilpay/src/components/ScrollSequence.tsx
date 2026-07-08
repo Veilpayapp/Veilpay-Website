@@ -89,7 +89,7 @@ const ScrollSequence: React.FC = () => {
     const img3 = image3Ref.current;
 
     const screenLogo = phone?.querySelector('.screen-logo');
-
+    const mockupBaseImages = phone?.querySelectorAll('.mockup-base-image');
     if (!container || !bg || !mesh || !phone || !coins || !glow || !cards || !title || !introTitle || !titleB) return;
 
     // Cancellation guard + cleanup holder — GSAP is imported asynchronously, so
@@ -126,7 +126,7 @@ const ScrollSequence: React.FC = () => {
       const getPhoneShiftX = () => (window.innerWidth > 768 ? '25vw' : '0vw');
       const getPhoneShiftY = () => (window.innerWidth > 768 ? '8vh' : '8vh');
 
-      if (img3) gsap.set(img3, { opacity: 0, y: getPhoneShiftY, scale: 0.78, x: getPhoneShiftX, transformOrigin: 'center center' });
+      if (img3) gsap.set(img3, { opacity: 0, y: '8vh', scale: 0.78, x: 0, transformOrigin: 'center center' });
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -166,6 +166,9 @@ const ScrollSequence: React.FC = () => {
       if (screenLogo) {
         tl.fromTo(screenLogo, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0.8);
       }
+      if (mockupBaseImages && mockupBaseImages.length) {
+        tl.to(mockupBaseImages, { opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.8);
+      }
 
       // STAGE 3 (1.4s): The Blank Pause (Intro fades out, image2 fades in over the center phone)
       tl.to(introTitle, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 1.4);
@@ -181,6 +184,9 @@ const ScrollSequence: React.FC = () => {
       tl.to(phone, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       if (img2) {
         tl.to(img2, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+      }
+      if (img3) {
+        tl.to(img3, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       }
       tl.fromTo(titleB, { y: '30vh', opacity: 0 }, { y: '4vh', opacity: 1, duration: 0.8, ease: 'power3.out' }, 2.2);
 
@@ -261,7 +267,7 @@ const ScrollSequence: React.FC = () => {
         className="absolute inset-0 z-[21] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
-          <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center translate-x-[2vw]">
+          <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center">
             <img
               src="/image2.webp"
               alt="Veilpay wallet screen (Dark)"
@@ -290,7 +296,7 @@ const ScrollSequence: React.FC = () => {
         className="absolute inset-0 z-[22] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
       >
         <div className="relative z-20 flex justify-center">
-          <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center translate-x-[2vw]">
+          <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center">
             <img
               src="/image3.webp"
               alt="Veilpay payment screen (Dark)"

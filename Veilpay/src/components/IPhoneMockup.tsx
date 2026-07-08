@@ -11,7 +11,7 @@ const IPhoneMockup: React.FC = () => {
       {/* Phone size bumped +5% (400->420 / 520->546) and nudged +2vw right.
           image2/image3 in ScrollSequence use the SAME wrapper so all three
           overlays stay pixel-aligned through the crossfades. */}
-      <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center translate-x-[2vw]">
+      <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center">
         {/* Subtle Aura Effect behind the phone */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"
@@ -33,7 +33,7 @@ const IPhoneMockup: React.FC = () => {
           width={1527}
           height={1024}
           fetchPriority="high"
-          className="w-full h-auto object-contain relative z-10 dark-image"
+          className="w-full h-auto object-contain relative z-10 dark-image mockup-base-image"
         />
         <img
           src="/MOCKUP2.WHITE.webp"
@@ -41,7 +41,7 @@ const IPhoneMockup: React.FC = () => {
           width={1527}
           height={1024}
           fetchPriority="high"
-          className="w-full h-auto object-contain relative z-10 white-image"
+          className="w-full h-auto object-contain relative z-10 white-image mockup-base-image"
         />
         {/* Screen Content - logo appears via GSAP.
             Raised to -mt-[20%] so the mark sits on the same line as the
@@ -52,9 +52,10 @@ const IPhoneMockup: React.FC = () => {
             {/* Dark radial scrim so the gold logo reads as a deliberate brand
                 reveal and separates cleanly from the wallet UI behind it,
                 instead of blending into the screenshot. Pure gradient stops
-                (no backdrop-filter / blur) so it's cheap to composite. */}
+                (no backdrop-filter / blur) so it's cheap to composite.
+                .screen-scrim flips to a white halo in light mode (index.css). */}
             <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
+              className="screen-scrim absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
               style={{
                 width: '320px',
                 height: '320px',
