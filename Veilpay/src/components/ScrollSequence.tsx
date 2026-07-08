@@ -127,9 +127,9 @@ const ScrollSequence: React.FC = () => {
       const getPhoneShiftY = () => (window.innerWidth > 768 ? '8vh' : '12vh');
       const getPhoneScale = () => (window.innerWidth > 768 ? 0.78 : 0.65);
       // Ensure the text stays well below the navbar (which is around 10vh tall)
-      const getTitleBEndY = () => (window.innerWidth > 768 ? '4vh' : '10vh');
+      const getTitleBEndY = () => (window.innerWidth > 768 ? '4vh' : '4vh');
       // On mobile, keep it in place while zooming out instead of sliding up
-      const getTitleBY = () => (window.innerWidth > 768 ? '-30vh' : '10vh');
+      const getTitleBY = () => (window.innerWidth > 768 ? '-30vh' : '4vh');
       const getTitleBScaleOut = () => (window.innerWidth > 768 ? 1 : 0.5);
 
       if (img3) gsap.set(img3, { opacity: 0, y: '8vh', scale: 0.78, x: 0, transformOrigin: 'center center' });
