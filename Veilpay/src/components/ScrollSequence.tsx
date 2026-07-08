@@ -124,7 +124,13 @@ const ScrollSequence: React.FC = () => {
       // Derive the horizontal and vertical phone shifts from the LIVE viewport width. 
       // Wrapped in a function + invalidateOnRefresh so a rotation/resize recomputes it.
       const getPhoneShiftX = () => (window.innerWidth > 768 ? '25vw' : '0vw');
-      const getPhoneShiftY = () => (window.innerWidth > 768 ? '8vh' : '8vh');
+      const getPhoneShiftY = () => (window.innerWidth > 768 ? '8vh' : '12vh');
+      const getPhoneScale = () => (window.innerWidth > 768 ? 0.78 : 0.65);
+      // Ensure the text stays well below the navbar (which is around 10vh tall)
+      const getTitleBEndY = () => (window.innerWidth > 768 ? '4vh' : '10vh');
+      // On mobile, keep it in place while zooming out instead of sliding up
+      const getTitleBY = () => (window.innerWidth > 768 ? '-30vh' : '10vh');
+      const getTitleBScaleOut = () => (window.innerWidth > 768 ? 1 : 0.5);
 
       if (img3) gsap.set(img3, { opacity: 0, y: '8vh', scale: 0.78, x: 0, transformOrigin: 'center center' });
 
@@ -181,17 +187,17 @@ const ScrollSequence: React.FC = () => {
 
       // STAGE 4 (2.0s): Phone (and image2) shifts up on mobile, right on desktop. "One Wallet" comes in.
       // Functional value → re-evaluated on invalidateOnRefresh for the live width.
-      tl.to(phone, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+      tl.to(phone, { x: getPhoneShiftX, y: getPhoneShiftY, scale: getPhoneScale, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       if (img2) {
-        tl.to(img2, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+        tl.to(img2, { x: getPhoneShiftX, y: getPhoneShiftY, scale: getPhoneScale, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       }
       if (img3) {
-        tl.to(img3, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+        tl.to(img3, { x: getPhoneShiftX, y: getPhoneShiftY, scale: getPhoneScale, duration: 1.2, ease: 'power3.inOut' }, 2.0);
       }
-      tl.fromTo(titleB, { y: '30vh', opacity: 0 }, { y: '4vh', opacity: 1, duration: 0.8, ease: 'power3.out' }, 2.2);
+      tl.fromTo(titleB, { y: '30vh', opacity: 0, scale: 1 }, { y: getTitleBEndY, opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' }, 2.2);
 
-      // STAGE 5 (3.6s): "One Wallet" fades out upwards, image2 fades out, and image3 fades in (crossfade)
-      tl.to(titleB, { y: '-30vh', opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 3.6);
+      // STAGE 5 (3.6s): "One Wallet" fades out upwards (or zooms out on mobile), image2 fades out, and image3 fades in (crossfade)
+      tl.to(titleB, { y: getTitleBY, scale: getTitleBScaleOut, opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 3.6);
       if (img2) {
         tl.to(img2, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 3.6);
       }
@@ -354,7 +360,7 @@ const ScrollSequence: React.FC = () => {
             <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#FDF3DC] to-[#E8B84B]">PRIVATE PAYMENTS</span> <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8B84B] via-[#D4A042] to-[#B8791F]">FULLY YOURS.</span>
           </h2>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4 w-fit">
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4 w-fit">
             <span className="text-[10px] font-semibold text-gray-400 tracking-wider uppercase">Stealth payments across 8+ chains</span>
             <div className="flex -space-x-2">
               {['xlm', 'eth', 'sol', 'xmr', 'zec'].map((coin) => (
