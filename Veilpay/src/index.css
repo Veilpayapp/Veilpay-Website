@@ -297,3 +297,14 @@ html.light-mode .scroll-progress {
     transition: none;
   }
 }
+
+/* The 3px edge is right for phones but reads too thin on a large desktop
+   display. Widen it only for real PCs (mouse pointer), leaving touch untouched. */
+@media (hover: hover) and (pointer: fine) {
+  .scroll-progress {
+    width: 6px;
+  }
+  .scroll-progress__fill {
+    box-shadow: 0 0 12px rgba(242, 197, 114, 0.5);
+  }
+}
