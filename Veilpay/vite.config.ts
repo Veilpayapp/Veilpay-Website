@@ -5,53 +5,59 @@ import tailwindcss from '@tailwindcss/vite'
 
 import path from "path"
 
-// Mock the Vercel Serverless Function locally in Vite
-function mockWaitlistApi(env: Record<string, string>) {
+// Run the REAL Vercel serverless functions locally under `vite dev`.
+// Plain Vite does NOT execute /api functions, so without this the two-step
+// waitlist (waitlist-start / waitlist-verify) 404s in dev and the UI shows
+// "Something went wrong". This middleware loads the actual handler modules via
+// Vite's SSR loader and adapts Node's req/res to the handlers' minimal API
+// shape, so dev matches production: same validation, Resend send, Discord ping.
+function devApi(env: Record<string, string>) {
+  const routes: Record<string, string> = {
+    '/api/waitlist-start': '/api/waitlist-start.ts',
+    '/api/waitlist-verify': '/api/waitlist-verify.ts',
+  };
   return {
-    name: 'mock-waitlist-api',
+    name: 'dev-waitlist-api',
     configureServer(server: any) {
-      server.middlewares.use('/api/waitlist', async (req: any, res: any, next: any) => {
-        if (req.method !== 'POST') return next();
-        
-        let body = '';
-        req.on('data', (chunk: any) => body += chunk);
+      // Handlers read secrets from process.env (RESEND_API_KEY,
+      // WAITLIST_SIGNING_SECRET, WAITLIST_FROM_EMAIL, DISCORD_WEBHOOK_URL).
+      // loadEnv() only returns them as an object, so mirror them into
+      // process.env for dev — exactly what Vercel injects in production.
+      Object.assign(process.env, env);
+
+      server.middlewares.use(async (req: any, res: any, next: any) => {
+        const url = (req.url || '').split('?')[0];
+        const modPath = routes[url];
+        if (!modPath || req.method !== 'POST') return next();
+
+        let raw = '';
+        req.on('data', (c: any) => (raw += c));
         req.on('end', async () => {
           try {
-            const { email } = JSON.parse(body);
-            const webhookUrl = env.DISCORD_WEBHOOK_URL;
-            
-            if (!webhookUrl) {
-              res.statusCode = 500;
-              res.end(JSON.stringify({ error: 'Missing DISCORD_WEBHOOK_URL in .env' }));
-              return;
-            }
-            
-            const discordRes = await fetch(webhookUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                embeds: [{
-                  title: '🚀 [DEV] New Waitlist Signup!',
-                  description: `A new user has joined the Veilpay waitlist locally.\n\n**Email:** \`${email}\``,
-                  color: 15909234,
-                  timestamp: new Date().toISOString(),
-                }]
-              })
-            });
-            
-            if (!discordRes.ok) throw new Error('Discord rejected');
-            
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ success: true }));
+            const mod = await server.ssrLoadModule(modPath);
+            const apiReq = {
+              method: req.method,
+              headers: req.headers,
+              body: raw ? JSON.parse(raw) : {},
+            };
+            const apiRes = {
+              status(code: number) { res.statusCode = code; return this; },
+              json(data: unknown) {
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify(data));
+              },
+            };
+            await mod.default(apiReq, apiRes);
           } catch (e) {
-            console.error(e);
-            res.statusCode = 500;
-            res.end(JSON.stringify({ error: 'Failed' }));
+            console.error('[dev api] error:', e);
+            if (!res.writableEnded) {
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: 'Dev API error — check the dev-server terminal.' }));
+            }
           }
         });
       });
-    }
+    },
   };
 }
 
@@ -76,14 +82,14 @@ function asyncCss() {
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  
+
   return {
     plugins: [
       react(),
       babel({ presets: [reactCompilerPreset()] }),
       tailwindcss(),
       asyncCss(),
-      mockWaitlistApi(env),
+      devApi(env),
   ],
   resolve: {
     alias: {
