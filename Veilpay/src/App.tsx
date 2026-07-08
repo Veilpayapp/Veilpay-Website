@@ -4,6 +4,7 @@ import Preloader from './components/Preloader';
 import GlassNavbar from './components/GlassNavbar';
 import ScrollSequence from './components/ScrollSequence';
 import SmoothScroll from './components/SmoothScroll';
+import ScrollProgress from './components/ScrollProgress';
 import NoiseOverlay from './components/NoiseOverlay';
 import { isLowEnd, isMobileDevice } from './lib/deviceCapability';
 import './App.css';
@@ -41,6 +42,7 @@ function App() {
         ) : (
           <Suspense fallback={null}>
             <SmoothScroll>
+              <ScrollProgress />
               <SqueezeFooterReveal footer={<BrutalistFooter />}>
                 <ScrollSequence />
                 <MassiveTextScroll />

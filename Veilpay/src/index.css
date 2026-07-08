@@ -242,3 +242,58 @@ html.light-mode .glass-panel {
     scroll-behavior: auto !important;
   }
 }
+
+/* ─── Slim right-edge scroll indicator ─────────────────────────────────────
+   Hide the native scrollbar (the custom indicator below replaces its
+   wayfinding job) while keeping the page fully scrollable. */
+html {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* legacy Edge/IE */
+}
+html::-webkit-scrollbar {       /* Chrome/Safari/Edge */
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Full-height faint track pinned to the right edge. Fixed so it stays put
+   while the document scrolls beneath it. pointer-events:none → purely ambient,
+   never intercepts clicks/drags. */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 60;                  /* above content, below the z-100 modals */
+  width: 3px;
+  height: 100vh;
+  height: 100dvh;              /* track the mobile viewport, not the URL-bar */
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Gold gradient fill. transform-origin:top so scaleY() grows it downward from
+   the top edge. will-change hints the compositor to keep it on its own layer. */
+.scroll-progress__fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: top center;
+  transform: scaleY(0);
+  background: linear-gradient(180deg, #F2C572 0%, #D4A042 55%, #8a6320 100%);
+  box-shadow: 0 0 10px rgba(242, 197, 114, 0.45);
+  /* Short ease smooths the per-rAF scale steps into a continuous glide.
+     Only transform/opacity animate → stays GPU-composited. */
+  transition: transform 0.12s linear, opacity 0.3s ease;
+  will-change: transform;
+}
+
+/* Light theme: track slightly darker so the gold reads on a light bg. */
+html.light-mode .scroll-progress {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Respect reduced-motion: no smoothing tween, just instant position. */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress__fill {
+    transition: none;
+  }
+}
