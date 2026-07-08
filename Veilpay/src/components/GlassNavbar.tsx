@@ -31,19 +31,21 @@ const logoStyle: React.CSSProperties = {
 
 // Uses only its arguments + module-scope helpers (no component state/props), so it lives
 // at module scope to avoid being rebuilt every render and to keep memoized children stable.
-const handleScroll = async (
-  e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+export const handleScroll = async (
+  e: React.MouseEvent<Element, MouseEvent>,
   target: string | number,
 ) => {
   e.preventDefault();
 
   let scrollTarget: string | number = target;
-  if (target === '#download') {
-    const downloadSection = document.getElementById('download');
-    if (downloadSection) {
+  if (target === '#download' || target === '#waitlist-social') {
+    const anchor = document.getElementById('download-anchor') || document.getElementById('download');
+    if (anchor) {
       // The DownloadSection pins and scales up for 150% of the viewport height.
       // Scroll perfectly to the end of the pin where the box is fully scaled.
-      const rect = downloadSection.getBoundingClientRect();
+      const rect = anchor.getBoundingClientRect();
+      // By using an unpinned anchor just above the section, absoluteTop is stable
+      // even if we are currently inside the pinned area.
       const absoluteTop = rect.top + window.scrollY;
       scrollTarget = absoluteTop + (window.innerHeight * 1.5);
     }
@@ -100,7 +102,7 @@ export default function GlassNavbar() {
   // On a sub-route (legal pages) there is no scroll timeline, so send the
   // visitor back to the home route instead of trying to scroll to a section.
   const handleNav = (
-    e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+    e: React.MouseEvent<Element, MouseEvent>,
     target: string | number,
   ) => {
     if (!onHome) {
@@ -135,12 +137,12 @@ export default function GlassNavbar() {
           <div className="flex items-center gap-2.5 md:gap-10">
             <a href="/" onClick={(e) => handleNav(e, 0)} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Home</a>
             <a href="/#features" onClick={(e) => handleNav(e, '#features')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Features</a>
-            <a href="/#download" onClick={(e) => handleNav(e, '#download')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Contact</a>
+            <a href="/#footer" onClick={(e) => handleNav(e, '#footer')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Contact</a>
           </div>
         </div>
 
         {/* Right Section (Action Buttons) */}
-        <div className="flex items-center gap-1.5 md:gap-3 relative z-10">
+        <div className="flex items-center gap-1.5 md:gap-3 relative z-10 md:pr-14">
           <button
             type="button"
             onClick={() => setShowDocsPopup(true)}
@@ -150,14 +152,16 @@ export default function GlassNavbar() {
           </button>
           <button
             type="button"
-            onClick={(e) => handleNav(e, '#download')}
+            onClick={(e) => handleNav(e, '#waitlist-social')}
             className="ios-glass-gold text-[10px] md:text-[12px] font-bold text-black hover:brightness-110 transition-all tracking-wide uppercase px-2.5 md:px-4 py-1.5 md:py-2 rounded-full preserve-color"
           >
             WAITLIST
           </button>
-          <div className="hidden md:block">
-            <ThemeToggle />
-          </div>
+        </div>
+
+        {/* Theme Toggle (PC - Navbar End) */}
+        <div className="hidden md:block absolute right-2 top-1/2 -translate-y-1/2 z-20">
+          <ThemeToggle className="!w-10 !h-10" />
         </div>
       </motion.nav>
 

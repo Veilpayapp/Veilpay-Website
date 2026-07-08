@@ -103,15 +103,40 @@ html.light-mode .dark-image {
   display: none !important;
 }
 
+/* Footer VEILPAY wordmark — edge-to-edge on ALL screens. Mobile needs a larger
+   vw term than desktop so it fills a narrow viewport (was a flat 18vw clamp that
+   left big side gaps on phones). Footer has overflow-x-hidden so overshoot is safe. */
+.footer-wordmark {
+  font-size: clamp(2.5rem, 26vw, 30rem);
+}
+@media (min-width: 768px) {
+  .footer-wordmark {
+    font-size: clamp(2.5rem, 18vw, 30rem);
+  }
+}
+
+/* Download-section social icons. The section fully inverts in light mode, so a
+   plain gray lands as a low-contrast mid-tone. Author a light gray in dark mode
+   (readable on black); in light mode author near-black which the page-wide
+   invert turns into a readable dark icon on the light box. */
+.download-social {
+  color: #9ca3af; /* gray-400 */
+}
+html.light-mode .download-social {
+  color: #e5e7eb !important; /* inverts to a dark tone; hover still gold */
+}
+
+/* Intro screen-logo scrim (inside the preserve-color phone layer). Its authored
+   black would stay black in light mode and read as a dark blob over the light
+   wallet UI, so in light mode swap it to a soft white halo around the gold mark. */
+html.light-mode .screen-scrim {
+  background: radial-gradient(circle at center, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.85) 32%, rgba(255,255,255,0.5) 56%, rgba(255,255,255,0) 78%) !important;
+}
+
 /* Glassmorphism that looks like white glass in BOTH Dark and Light modes */
 .glass-panel {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.01) 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-}
-html.light-mode .glass-panel {
-  /* Provide dark glass, which math mathematically inverts to white glass */
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0.01) 100%);
-  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /*

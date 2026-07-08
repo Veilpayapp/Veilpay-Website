@@ -13,7 +13,7 @@ import {
   normalizeEmail,
   type ApiReq,
   type ApiRes,
-} from './_utils';
+} from './_utils.js';
 
 export default async function handler(req: ApiReq, res: ApiRes) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' });

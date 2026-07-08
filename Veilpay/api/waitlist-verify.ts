@@ -2,7 +2,7 @@
 // Step 2 of double opt-in: check the typed code against the signed token. Only a
 // correct, unexpired code counts as a real signup and pings Discord.
 
-import { normalizeEmail, verifyToken, type ApiReq, type ApiRes } from './_utils';
+import { normalizeEmail, verifyToken, type ApiReq, type ApiRes } from './_utils.js';
 
 export default async function handler(req: ApiReq, res: ApiRes) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' });

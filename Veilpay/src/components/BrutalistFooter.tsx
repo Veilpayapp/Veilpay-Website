@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { handleScroll } from './GlassNavbar';
 
 import { SparklesCore } from './ui/SparklesCore';
 import { isHighEnd } from '@/lib/deviceCapability';
@@ -10,8 +11,9 @@ const FOOTER_DATA = [
   {
     title: 'Platform',
     links: [
-      { label: 'Privacy', href: '#features', eventName: 'openPrivacyPopup' },
-      { label: 'Stealth Addresses', href: '#features', eventName: 'openTokensPopup' },
+      { label: 'ZK Proofs', href: '#features', eventName: 'openZkPopup' },
+      { label: 'Stealth Addresses', href: '#features', eventName: 'openPrivacyPopup' },
+      { label: 'Privacy Tokens', href: '#features', eventName: 'openTokensPopup' },
       { label: 'Waitlist', href: '#download' },
     ],
   },
@@ -46,15 +48,15 @@ const BrutalistFooter: React.FC = () => {
   const handleLinkClick = (e: React.MouseEvent, href: string, eventName?: string) => {
     if (href.startsWith('#')) {
       e.preventDefault();
-      const el = document.querySelector(href);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-        if (eventName) {
-          // Add a small delay to allow smooth scroll to start
-          setTimeout(() => {
-            window.dispatchEvent(new CustomEvent(eventName));
-          }, 400);
-        }
+      
+      // Use the global cinematic scroll handler for internal anchors
+      handleScroll(e, href);
+
+      if (eventName) {
+        // Add a small delay to allow smooth scroll to start
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent(eventName));
+        }, 400);
       }
     }
   };
@@ -150,11 +152,8 @@ const BrutalistFooter: React.FC = () => {
           aria-label="Veilpay"
         >
           <span
-            className="flex justify-center items-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] from-[15%] via-[#5E3B09] via-[50%] to-[#3A2408] to-[90%] uppercase pb-4"
+            className="footer-wordmark flex justify-center items-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] from-[15%] via-[#5E3B09] via-[50%] to-[#3A2408] to-[90%] uppercase pb-4"
             style={{
-              // Edge-to-edge on all screens, but clamped so it never collapses
-              // on tiny viewports or blows past readable size on ultra-wide ones.
-              fontSize: 'clamp(2.5rem, 18vw, 30rem)',
               lineHeight: 0.85,
               WebkitTextFillColor: 'transparent',
             }}
