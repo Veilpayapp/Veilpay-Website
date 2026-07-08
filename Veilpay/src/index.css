@@ -92,6 +92,17 @@ html.light-mode .preserve-color {
   filter: invert(1) hue-rotate(180deg);
 }
 
+/* Image Swapping based on Theme */
+.white-image {
+  display: none !important;
+}
+html.light-mode .white-image {
+  display: block !important;
+}
+html.light-mode .dark-image {
+  display: none !important;
+}
+
 /* Glassmorphism that looks like white glass in BOTH Dark and Light modes */
 .glass-panel {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.01) 100%);
@@ -101,4 +112,199 @@ html.light-mode .glass-panel {
   /* Provide dark glass, which math mathematically inverts to white glass */
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0.01) 100%);
   border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/*
+ * iOS "liquid glass" — one shared recipe for the navbar and all glass buttons.
+ * A single backdrop-filter (blur + saturation) does the refraction; the layered
+ * inset shadows give the specular top-edge highlight and the thin dark bottom
+ * lip, and the top radial sheen reads as light bending through the surface.
+ * Kept to ONE blur layer per element so it stays cheap to composite.
+ */
+.ios-glass {
+  /* Top layer = specular sheen, bottom layer = faint glass tint. Both are
+   * backgrounds so they sit beneath text/icons. The actual refraction of the
+   * scene behind comes from the SVG displacement filter in backdrop-filter. */
+  background:
+    radial-gradient(130% 90% at 50% -25%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%);
+  /* Safari / fallback first (frost). Chrome then overrides with the SVG
+   * displacement refraction if it supports url() in backdrop-filter; if not,
+   * this frost declaration remains in effect. */
+  -webkit-backdrop-filter: blur(14px) saturate(185%);
+  backdrop-filter: url(#liquid-glass) blur(3px) saturate(185%) brightness(1.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+    inset -1px 0 2px rgba(255, 255, 255, 0.12),
+    0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* Golden-tinted variant for the primary CTA — warmer, more opaque glass. */
+.ios-glass-gold {
+  background:
+    radial-gradient(130% 90% at 50% -25%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(135deg, rgba(249, 212, 131, 0.92) 0%, rgba(212, 160, 66, 0.78) 100%);
+  -webkit-backdrop-filter: blur(14px) saturate(185%);
+  backdrop-filter: url(#liquid-glass) blur(3px) saturate(185%);
+  border: 1px solid rgba(255, 240, 210, 0.55);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.7),
+    inset 0 -1px 2px rgba(120, 70, 10, 0.5),
+    0 10px 25px rgba(212, 160, 66, 0.25);
+}
+
+/*
+ * Touch devices (all Android/iOS phones report `pointer: coarse`) drop the SVG
+ * displacement-map from backdrop-filter. That filter forces the GPU to re-run a
+ * fractal-noise distortion over the whole captured backdrop EVERY scroll frame —
+ * the single biggest cause of scroll jank on Android Chrome, since the navbar is
+ * position:fixed and repaints against everything scrolling behind it. Plain blur
+ * composites cheaply and is visually near-identical behind the gradient sheen, so
+ * the frosted-glass look is preserved while the per-frame cost collapses.
+ */
+@media (pointer: coarse) {
+  .ios-glass {
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(180%);
+  }
+  .ios-glass-gold {
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(180%);
+  }
+}
+
+/* Rendered markdown for the legal / about pages — matches the dark theme. */
+.legal-prose {
+  color: #cfcfcf;
+  line-height: 1.75;
+  font-size: 0.975rem;
+}
+.legal-prose h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0 0 1.25rem;
+  background: linear-gradient(180deg, #ffffff 0%, #d4a042 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.legal-prose h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f2c572;
+  margin: 2.25rem 0 0.85rem;
+}
+.legal-prose h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 1.75rem 0 0.6rem;
+}
+.legal-prose p { margin: 0 0 1rem; }
+.legal-prose a { color: #f2c572; text-decoration: underline; text-underline-offset: 2px; }
+.legal-prose a:hover { color: #ffe0a3; }
+.legal-prose strong { color: #ffffff; font-weight: 600; }
+.legal-prose ul, .legal-prose ol { margin: 0 0 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.legal-prose ul { list-style: disc; }
+.legal-prose ol { list-style: decimal; }
+.legal-prose li { padding-left: 0.25rem; }
+.legal-prose hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 2rem 0; }
+.legal-prose em { color: #9a9a9a; }
+.legal-prose blockquote {
+  border-left: 3px solid rgba(242, 197, 114, 0.5);
+  padding-left: 1rem;
+  color: #b8b8b8;
+  margin: 0 0 1rem;
+}
+.legal-prose code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/*
+ * Accessibility: honor the OS "reduce motion" setting (WCAG 2.3.3).
+ * Users who have not requested reduced motion see the full animated
+ * experience unchanged; only opted-in users get near-instant transitions.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Slim right-edge scroll indicator ─────────────────────────────────────
+   Hide the native scrollbar (the custom indicator below replaces its
+   wayfinding job) while keeping the page fully scrollable. */
+html {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* legacy Edge/IE */
+}
+html::-webkit-scrollbar {       /* Chrome/Safari/Edge */
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Full-height faint track pinned to the right edge. Fixed so it stays put
+   while the document scrolls beneath it. pointer-events:none → purely ambient,
+   never intercepts clicks/drags. */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 60;                  /* above content, below the z-100 modals */
+  width: 3px;
+  height: 100vh;
+  height: 100dvh;              /* track the mobile viewport, not the URL-bar */
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Gold gradient fill. transform-origin:top so scaleY() grows it downward from
+   the top edge. will-change hints the compositor to keep it on its own layer. */
+.scroll-progress__fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: top center;
+  transform: scaleY(0);
+  background: linear-gradient(180deg, #F2C572 0%, #D4A042 55%, #8a6320 100%);
+  box-shadow: 0 0 10px rgba(242, 197, 114, 0.45);
+  /* Short ease smooths the per-rAF scale steps into a continuous glide.
+     Only transform/opacity animate → stays GPU-composited. */
+  transition: transform 0.12s linear, opacity 0.3s ease;
+  will-change: transform;
+}
+
+/* Light theme: track slightly darker so the gold reads on a light bg. */
+html.light-mode .scroll-progress {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Respect reduced-motion: no smoothing tween, just instant position. */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress__fill {
+    transition: none;
+  }
+}
+
+/* The 3px edge is right for phones but reads too thin on a large desktop
+   display. Widen it only for real PCs (mouse pointer), leaving touch untouched. */
+@media (hover: hover) and (pointer: fine) {
+  .scroll-progress {
+    width: 6px;
+  }
+  .scroll-progress__fill {
+    box-shadow: 0 0 12px rgba(242, 197, 114, 0.5);
+  }
 }

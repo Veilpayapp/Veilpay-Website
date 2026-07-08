@@ -2,31 +2,66 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/image.png" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- Preload the hero phone mockup (LCP candidate) so it decodes early. -->
+    <link rel="preload" as="image" href="/MOCKUP2.webp" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Load fonts without blocking first paint. display=swap + system fallback
+         keeps CLS at 0; the sheet is applied once it arrives. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"></noscript>
+    <!-- Critical loader styles: paint the branded preloader with zero JS so
+         First Contentful Paint no longer waits on the React bundle. -->
+    <style>
+      html,body{margin:0;background:#000;color:#fff}
+      #root{min-height:100vh}
+      .v-boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;gap:12px;background:#000;z-index:100}
+      .v-boot i{width:18px;height:18px;border-radius:4px;background:#1a1103;display:block;animation:vb 1.5s ease-in-out infinite}
+      .v-boot i:nth-child(1){margin-top:0;animation-delay:0s}
+      .v-boot i:nth-child(2){margin-top:28px;animation-delay:.15s}
+      .v-boot i:nth-child(3){margin-top:56px;animation-delay:.3s}
+      .v-boot i:nth-child(4){margin-top:28px;animation-delay:.45s}
+      .v-boot i:nth-child(5){margin-top:0;animation-delay:.6s}
+      @keyframes vb{0%,100%{transform:scale(1);background:#F2C572;box-shadow:0 0 15px rgba(242,197,114,.4)}50%{transform:scale(1.3);background:#111;box-shadow:0 5px 15px rgba(0,0,0,.8)}}
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VeilPay — Private Multi-Chain Payments</title>
-    <meta name="description" content="VeilPay is the privacy-native multi-chain wallet. Send Stellar privacy payments, Monero, Zcash and Midnight with EIP-5564 stealth addresses and zero-knowledge proofs." />
-    <meta name="keywords" content="VeilPay, privacy wallet, stealth addresses, Stellar, Monero, Zcash, Midnight, ZK proofs, multi-chain, crypto payments" />
-    <meta name="author" content="VeilPay" />
+    <meta name="theme-color" content="#000000" />
+    <title>Veilpay | Private by Default. Multi-Chain by Design</title>
+    <meta name="description" content="Veilpay is a non-custodial crypto vault that makes private payments practical for everyday use. Cross-chain stealth addressing, native privacy assets, and Fiat on-ramps all in one unified experience." />
+    <meta name="keywords" content="Veilpay, privacy wallet, stealth addresses, Stellar, Monero, Zcash, Midnight, ZK proofs, multi-chain, crypto payments" />
+    <meta name="author" content="Veilpay" />
     
     <!-- OpenGraph (Facebook, LinkedIn, Discord) -->
-    <meta property="og:title" content="VeilPay — Private Multi-Chain Payments" />
-    <meta property="og:description" content="VeilPay is the privacy-native multi-chain wallet. Send Stellar privacy payments, Monero, Zcash and Midnight with EIP-5564 stealth addresses and zero-knowledge proofs." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://veilpay-eta.vercel.app/" />
-    <meta property="og:image" content="https://veilpay-eta.vercel.app/image.png" />
+    <meta property="og:url" content="https://veilpayapp.com/" />
+    <meta property="og:title" content="Veilpay | Private by Default. Multi-Chain by Design" />
+    <meta property="og:description" content="Veilpay is a non-custodial crypto vault that makes private payments practical for everyday use." />
+    <meta property="og:image" content="https://veilpayapp.com/og.jpg" />
     
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="VeilPay — Private Multi-Chain Payments" />
-    <meta name="twitter:description" content="VeilPay is the privacy-native multi-chain wallet. Send Stellar privacy payments, Monero, Zcash and Midnight with EIP-5564 stealth addresses and zero-knowledge proofs." />
-    <meta name="twitter:image" content="https://veilpay-eta.vercel.app/image.png" />
+    <meta name="twitter:url" content="https://veilpayapp.com/" />
+    <meta name="twitter:title" content="Veilpay | Private by Default. Multi-Chain by Design" />
+    <meta name="twitter:description" content="Veilpay is the privacy-native multi-chain wallet. Send Stellar privacy payments, Monero, Zcash and Midnight with EIP-5564 stealth addresses and zero-knowledge proofs." />
+    <meta name="twitter:image" content="https://veilpay-eta.vercel.app/og.jpg" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static bootstrap loader — replaced by React on mount (identical look). -->
+      <div class="v-boot"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <!-- iOS "liquid glass" refraction: distorts whatever is behind the glass
+         using fractal noise + displacement. Referenced by .ios-glass via
+         backdrop-filter: url(#liquid-glass). Zero-size, no layout impact. -->
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute;pointer-events:none">
+      <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.011 0.013" numOctaves="2" seed="17" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="1.4" result="soft" />
+        <feDisplacementMap in="SourceGraphic" in2="soft" scale="24" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

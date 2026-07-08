@@ -10,7 +10,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
   useEffect(() => {
     timer.current = setTimeout(() => {
       onComplete();
-    }, 2500);
+    }, 200);
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };

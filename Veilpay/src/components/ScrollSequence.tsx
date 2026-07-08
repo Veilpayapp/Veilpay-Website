@@ -1,17 +1,59 @@
-import React, { useRef, useLayoutEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { useRef, useEffect, useState, lazy, Suspense } from 'react';
+import type { ScrollTrigger as ScrollTriggerInstance } from 'gsap/ScrollTrigger';
 import MeshGrid from './MeshGrid';
 import IPhoneMockup from './IPhoneMockup';
-import CoinsScene from './CoinsScene';
 import LightArc from './LightArc';
 import BentoGrid from './BentoGrid';
 import HeroTitle from './HeroTitle';
 import IntroTitle from './IntroTitle';
+import { getDeviceTier, isMobileDevice } from '@/lib/deviceCapability';
+import { TOUCH, SEQUENCE_SCROLL_END } from '@/lib/scrollConfig';
 
-gsap.registerPlugin(ScrollTrigger);
+// The 3D coins pull in the entire Three.js runtime (~940KB). They are purely
+// decorative and fade in via GSAP, so we lazy-load them to keep Three.js off
+// the initial critical path — the hero paints first, coins mount right after.
+const CoinsScene = lazy(() => import('./CoinsScene'));
+
+// GSAP itself (~116KB + a heavy pin/timeline setup that forces a layout reflow)
+// is loaded dynamically inside the effect below rather than statically imported.
+// This keeps GSAP off the first-paint critical path so the hero text/mockup can
+// paint immediately; the scroll timeline wires up one frame later. Every
+// element's pre-scroll resting state is mirrored in CSS (see INITIAL_* styles in
+// the JSX) so there is zero visual flash before GSAP takes over.
 
 const ScrollSequence: React.FC = () => {
+  const tier = getDeviceTier();
+
+  // ── 3D coin mounting logic ──
+  // On high-end devices: show coins after first interaction OR after 2s idle
+  // (fixes the "coins don't appear on reload" bug).
+  // On medium/low-end devices: skip coins entirely.
+  const [showCoins, setShowCoins] = useState(false);
+  useEffect(() => {
+    if (tier !== 'high' || isMobileDevice()) return; // strictly disable coins on mobile and lower-end devices
+
+    let done = false;
+    // Interaction events → show coins immediately
+    const events = ['pointerdown', 'touchstart', 'scroll', 'keydown'] as const;
+    const trigger = () => {
+      if (done) return;
+      done = true;
+      setShowCoins(true);
+      events.forEach((e) => window.removeEventListener(e, trigger));
+    };
+    events.forEach((e) => window.addEventListener(e, trigger, { passive: true }));
+
+    // Fallback for idle viewers (fixes the "coins don't appear on reload" bug):
+    // Just trigger it 1.5 seconds after component mounts. This gives enough time for 
+    // the initial HTML/CSS paint to finish without lag, but guarantees they appear.
+    const idleTimer = window.setTimeout(trigger, 1500);
+
+    return () => {
+      clearTimeout(idleTimer);
+      events.forEach((e) => window.removeEventListener(e, trigger));
+    };
+  }, [tier]);
+
   // Main container ref for the pinned scroll section
   const containerRef = useRef<HTMLDivElement>(null);
   // Element refs for GSAP targeting
@@ -25,11 +67,14 @@ const ScrollSequence: React.FC = () => {
   const titleRef = useRef<HTMLDivElement>(null);
   const introTitleRef = useRef<HTMLDivElement>(null);
   const titleBRef = useRef<HTMLDivElement>(null);
+  // New mockup image refs
+  const image2Ref = useRef<HTMLDivElement>(null);
+  const image3Ref = useRef<HTMLDivElement>(null);
 
   // Track refs to avoid re-runs without cleanup
-  const stRef = useRef<ScrollTrigger | null>(null);
+  const stRef = useRef<ScrollTriggerInstance | null>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const container = containerRef.current;
     const bg = bgOverlayRef.current;
     const mesh = meshGridRef.current;
@@ -40,11 +85,30 @@ const ScrollSequence: React.FC = () => {
     const title = titleRef.current;
     const introTitle = introTitleRef.current;
     const titleB = titleBRef.current;
+    const img2 = image2Ref.current;
+    const img3 = image3Ref.current;
 
     const screenLogo = phone?.querySelector('.screen-logo');
 
     if (!container || !bg || !mesh || !phone || !coins || !glow || !cards || !title || !introTitle || !titleB) return;
-    let ctx = gsap.context(() => {
+
+    // Cancellation guard + cleanup holder — GSAP is imported asynchronously, so
+    // the component may unmount before it resolves.
+    let cancelled = false;
+    let ctx: gsap.Context | null = null;
+
+    // Load GSAP + ScrollTrigger off the critical path, then build the exact same
+    // timeline as before. The pre-scroll resting state is already applied via
+    // CSS in the JSX, so there is no flash while this resolves.
+    (async () => {
+      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger'),
+      ]);
+      if (cancelled) return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      ctx = gsap.context(() => {
       // ── Initial states before GSAP takes over ──
       gsap.set(bg, { opacity: 1 });
       gsap.set(mesh, { opacity: 0 });
@@ -54,22 +118,46 @@ const ScrollSequence: React.FC = () => {
       gsap.set(title, { opacity: 1, y: 0 });
       gsap.set(introTitle, { opacity: 0, y: 0 });
       gsap.set(titleB, { opacity: 0, y: 0 });
+      // New mockup images: start hidden, pre-positioned to match the phone's
+      // settled transform (y: 8vh, scale: 0.78).
+      if (img2) gsap.set(img2, { opacity: 0, y: '8vh', scale: 0.78, x: 0, transformOrigin: 'center center' });
+      // Derive the horizontal and vertical phone shifts from the LIVE viewport width. 
+      // Wrapped in a function + invalidateOnRefresh so a rotation/resize recomputes it.
+      const getPhoneShiftX = () => (window.innerWidth > 768 ? '25vw' : '0vw');
+      const getPhoneShiftY = () => (window.innerWidth > 768 ? '8vh' : '8vh');
+
+      if (img3) gsap.set(img3, { opacity: 0, y: getPhoneShiftY, scale: 0.78, x: getPhoneShiftX, transformOrigin: 'center center' });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          end: '+=12000', // Dramatically increased to make the story pass slowly
-          scrub: 1.5,
+          end: `+=${SEQUENCE_SCROLL_END}`,
+          scrub: TOUCH ? 0.6 : 1.5,
           pin: true,
+          pinSpacing: true,
           anticipatePin: 1,
+          fastScrollEnd: TOUCH,
+          invalidateOnRefresh: true,
+          // ── Stacked-pin ordering (critical) ──
+          // This is the FIRST of two pinned sections on the page, and its pin
+          // inserts a very tall spacer (SEQUENCE_SCROLL_END px). Because this
+          // trigger is created asynchronously (after the dynamic gsap import),
+          // it can be measured AFTER the MassiveTextScroll pin below it — which
+          // would leave that section (and everything after it, incl. the
+          // Download section) positioned as if this spacer didn't exist, so it
+          // scrolls in early / overlaps. A higher refreshPriority forces
+          // ScrollTrigger to measure THIS pin before the ones below on every
+          // refresh, regardless of creation order, so downstream sections land
+          // in the correct place.
+          refreshPriority: 2,
         },
       });
       stRef.current = tl.scrollTrigger as ScrollTrigger;
 
       // STAGE 1: Phone rises and shrinks, Text levitates instantly, Coins levitate slightly later
       tl.to(mesh, { opacity: 0.6, duration: 0.4, ease: 'power1.inOut' }, 0);
-      tl.to(phone, { y: '18vh', scale: 0.78, opacity: 1, duration: 0.4, ease: 'power2.out' }, 0);
+      tl.to(phone, { y: '8vh', scale: 0.78, opacity: 1, duration: 0.4, ease: 'power2.out' }, 0);
       tl.to(title, { y: '-100vh', opacity: 0, duration: 0.4, ease: 'power2.out' }, 0);
       tl.fromTo(coins, { y: '0vh', opacity: 1 }, { y: '-100vh', opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.3);
 
@@ -79,28 +167,40 @@ const ScrollSequence: React.FC = () => {
         tl.fromTo(screenLogo, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0.8);
       }
 
-      // STAGE 3 (1.4s): The Blank Pause (Intro fades out)
+      // STAGE 3 (1.4s): The Blank Pause (Intro fades out, image2 fades in over the center phone)
       tl.to(introTitle, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 1.4);
       if (screenLogo) {
         tl.to(screenLogo, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 1.4);
       }
+      if (img2) {
+        tl.to(img2, { opacity: 1, duration: 0.4, ease: 'power2.inOut' }, 1.4);
+      }
 
-      // STAGE 4 (2.0s): Phone shifts right, "One Wallet" comes in
-      const phoneShift = window.innerWidth > 768 ? '25vw' : '10vw';
-      tl.to(phone, { x: phoneShift, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+      // STAGE 4 (2.0s): Phone (and image2) shifts up on mobile, right on desktop. "One Wallet" comes in.
+      // Functional value → re-evaluated on invalidateOnRefresh for the live width.
+      tl.to(phone, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+      if (img2) {
+        tl.to(img2, { x: getPhoneShiftX, y: getPhoneShiftY, duration: 1.2, ease: 'power3.inOut' }, 2.0);
+      }
       tl.fromTo(titleB, { y: '30vh', opacity: 0 }, { y: '4vh', opacity: 1, duration: 0.8, ease: 'power3.out' }, 2.2);
 
-      // STAGE 5 (3.6s): "One Wallet" fades out upwards
+      // STAGE 5 (3.6s): "One Wallet" fades out upwards, image2 fades out, and image3 fades in (crossfade)
       tl.to(titleB, { y: '-30vh', opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 3.6);
+      if (img2) {
+        tl.to(img2, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 3.6);
+      }
+      if (img3) {
+        tl.to(img3, { opacity: 1, duration: 0.4, ease: 'power2.inOut' }, 3.6);
+      }
 
-      // STAGE 6 (4.0s): Bento Grid slides in staggered
+      // STAGE 6 (4.0s): Bento Grid slides in staggered, image3 fades in
       tl.to(glow, { opacity: 1, duration: 0.15, ease: 'power2.out' }, 4.0);
       const bentoCards = cards.querySelectorAll('.bento-card');
       tl.fromTo(
         bentoCards,
-        { opacity: 0, y: 50 },
+        { autoAlpha: 0, y: 50 },
         { 
-          opacity: 1, 
+          autoAlpha: 1, 
           y: 0, 
           duration: 0.8, 
           stagger: 0.15, 
@@ -109,15 +209,18 @@ const ScrollSequence: React.FC = () => {
         4.0,
       );
     }, container);
+    })();
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, []);
 
   return (
     <div
       ref={containerRef}
       className="relative h-screen w-full overflow-hidden bg-black"
-      style={{ willChange: 'transform' }}
     >
       {/* Stage 0: Pure OLED Black Background Layer */}
       <div
@@ -141,7 +244,70 @@ const ScrollSequence: React.FC = () => {
       {/* 3D Coins Layer — translated by GSAP but NOT scaled */}
       <div ref={coinsContainerRef} className="absolute inset-0 z-40 pointer-events-none preserve-color">
         <div className="relative h-full w-full">
-          <CoinsScene />
+          {showCoins && (
+            <Suspense fallback={null}>
+              <CoinsScene />
+            </Suspense>
+          )}
+        </div>
+      </div>
+
+      {/* image2.webp — appears at Stage 4 when phone shifts right.
+          Same container structure as the phone mockup so size & position match exactly.
+          GSAP sets initial y/scale to match the phone's settled position, then fades in.
+          Opacity-only animation: no vertical translation to avoid stacking mockups. */}
+      <div
+        ref={image2Ref}
+        className="absolute inset-0 z-[21] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
+      >
+        <div className="relative z-20 flex justify-center">
+          <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center translate-x-[2vw]">
+            <img
+              src="/image2.webp"
+              alt="Veilpay wallet screen (Dark)"
+              width={1527}
+              height={1024}
+              className="w-full h-auto object-contain relative z-10 dark-image"
+              loading="lazy"
+            />
+            <img
+              src="/image2.white.webp"
+              alt="Veilpay wallet screen (Light)"
+              width={1527}
+              height={1024}
+              className="w-full h-auto object-contain relative z-10 white-image"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* image3.webp — appears at Stage 6 alongside the bento grid.
+          Same container structure as the phone mockup so size & position match exactly.
+          Opacity-only animation: no vertical translation. */}
+      <div
+        ref={image3Ref}
+        className="absolute inset-0 z-[22] flex items-center justify-center pointer-events-none opacity-0 preserve-color"
+      >
+        <div className="relative z-20 flex justify-center">
+          <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center translate-x-[2vw]">
+            <img
+              src="/image3.webp"
+              alt="Veilpay payment screen (Dark)"
+              width={1527}
+              height={1024}
+              className="w-full h-auto object-contain relative z-10 dark-image"
+              loading="lazy"
+            />
+            <img
+              src="/image3.white.webp"
+              alt="Veilpay payment screen (Light)"
+              width={1527}
+              height={1024}
+              className="w-full h-auto object-contain relative z-10 white-image"
+              loading="lazy"
+            />
+          </div>
         </div>
       </div>
 
@@ -152,8 +318,12 @@ const ScrollSequence: React.FC = () => {
         </div>
       </div>
 
-      {/* iPhone Mockup Layer (anchored to bottom fold, then moves right) */}
-      <div ref={phoneRef} className="absolute left-[1%] w-full bottom-0 z-20 flex items-end justify-center pointer-events-none translate-y-[20%] preserve-color">
+      {/* iPhone Mockup Layer — vertically CENTERED (items-center + inset-y-0) so
+          it holds its position in line with the bento cards (which are also
+          items-center) at every width, instead of being bottom-anchored and
+          "settling" lower as the viewport shrinks. GSAP still drives the intro
+          rise via its y offsets (y:95vh → y:18vh), now measured from center. */}
+      <div ref={phoneRef} className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none preserve-color">
         <IPhoneMockup />
       </div>
 
@@ -162,15 +332,19 @@ const ScrollSequence: React.FC = () => {
         <HeroTitle />
       </div>
 
-      {/* Intro Title Layer (left & right side, sits behind phone) */}
-      <div ref={introTitleRef} className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center w-full">
+      {/* Intro Title Layer — on mobile z-[25] puts it ABOVE the phone (z-20),
+           on desktop md:z-10 keeps it behind the phone as designed */}
+      <div ref={introTitleRef} className="absolute inset-0 z-[25] md:z-10 pointer-events-none flex items-stretch justify-center w-full">
         <IntroTitle />
       </div>
 
-      {/* Feature Title Layer B (left side, appears after IntroTitle) */}
-      <div ref={titleBRef} className="absolute inset-0 z-30 pointer-events-none flex flex-col justify-center px-8 md:px-16 lg:px-24">
-        <div className="max-w-3xl">
-          <h2 className="text-6xl md:text-8xl lg:text-[9rem] font-extrabold tracking-tighter leading-[1.0] mb-6 preserve-color">
+      {/* Feature Title Layer B (left side on desktop, top-center on mobile, appears after IntroTitle) */}
+      <div ref={titleBRef} className="absolute inset-0 z-50 pointer-events-none flex flex-col justify-start pt-[12vh] md:pt-0 md:justify-center items-center md:items-start px-8 md:px-16 lg:px-24">
+        {/* On desktop the phone occupies the right half, so cap this block to
+            ~half the viewport and let the heading scale fluidly — this stops the
+            fixed 6-9rem text from sliding under the phone at mid widths. */}
+        <div className="max-w-3xl md:max-w-[48vw] flex flex-col items-center md:items-start text-center md:text-left">
+          <h2 className="font-extrabold tracking-tighter leading-[1.0] mb-6 preserve-color text-[clamp(2.5rem,7vw,9rem)]">
             <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#FDF3DC] to-[#E8B84B]">PRIVATE PAYMENTS</span> <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8B84B] via-[#D4A042] to-[#B8791F]">FULLY YOURS.</span>
           </h2>

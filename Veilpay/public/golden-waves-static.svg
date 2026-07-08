@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="gw1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,204,0,0.45)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </linearGradient>
+    <linearGradient id="gw2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,153,0,0.55)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </linearGradient>
+    <linearGradient id="gw3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,102,0,0.65)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </linearGradient>
+    <linearGradient id="gw4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,204,80,0.4)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </linearGradient>
+  </defs>
+  <!-- Band 1: y=0.74 amp=0.095 freq=1.1 -->
+  <path d="M0 800 L0 592 Q150 540 300 570 T600 600 T900 555 T1200 580 L1200 800 Z" fill="url(#gw1)"/>
+  <!-- Band 2: y=0.62 amp=0.085 freq=1.5 -->
+  <path d="M0 800 L0 496 Q150 460 300 510 T600 480 T900 520 T1200 470 L1200 800 Z" fill="url(#gw2)"/>
+  <!-- Band 3: y=0.52 amp=0.075 freq=1.9 -->
+  <path d="M0 800 L0 416 Q150 385 300 430 T600 390 T900 425 T1200 400 L1200 800 Z" fill="url(#gw3)"/>
+  <!-- Band 4: y=0.42 amp=0.065 freq=2.4 -->
+  <path d="M0 800 L0 336 Q150 310 300 350 T600 320 T900 345 T1200 330 L1200 800 Z" fill="url(#gw4)"/>
+</svg>

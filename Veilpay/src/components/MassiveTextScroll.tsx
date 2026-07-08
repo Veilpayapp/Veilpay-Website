@@ -1,6 +1,7 @@
 import React, { useRef, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { TOUCH } from '@/lib/scrollConfig';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,7 +19,18 @@ const MassiveTextScroll: React.FC = () => {
           start: 'top top',
           end: '+=250%', // Reduced from 600% to eliminate the huge gap
           pin: true,
-          scrub: 2, // Slower smoothing
+          pinSpacing: true,
+          // Phones: light scrub so the giant text stops chasing quickly after a
+          // flick. Desktop keeps the slower, smoother 2s catch-up.
+          scrub: TOUCH ? 0.6 : 2,
+          fastScrollEnd: TOUCH,
+          invalidateOnRefresh: true, // re-derive vh offsets on rotation/resize
+          // ── Stacked-pin ordering (critical) ──
+          // Lower than ScrollSequence (refreshPriority 2) so the tall pin above
+          // is always measured first. This guarantees this section starts only
+          // AFTER ScrollSequence has fully played "PRIVATE PAYMENTS FULLY YOURS"
+          // and released its pin, instead of racing in early and overlapping.
+          refreshPriority: 1,
         },
       });
 
@@ -56,7 +68,7 @@ const MassiveTextScroll: React.FC = () => {
         <h1 
           ref={text1Ref} 
           className="absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] via-[#F9D423] to-[#5E3B09] uppercase preserve-color"
-          style={{ fontSize: '18vw', lineHeight: 1, filter: 'drop-shadow(0 0 60px rgba(242, 197, 114, 0.3))' }}
+          style={{ fontSize: 'clamp(3rem, 18vw, 20rem)', lineHeight: 1 }}
         >
           SECURE
         </h1>
@@ -64,7 +76,7 @@ const MassiveTextScroll: React.FC = () => {
         <h1 
           ref={text2Ref} 
           className="absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-600 uppercase"
-          style={{ fontSize: '25vw', lineHeight: 1 }}
+          style={{ fontSize: 'clamp(4rem, 25vw, 28rem)', lineHeight: 1 }}
         >
           &
         </h1>
@@ -72,7 +84,7 @@ const MassiveTextScroll: React.FC = () => {
         <h1 
           ref={text3Ref} 
           className="absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] via-[#F9D423] to-[#5E3B09] uppercase preserve-color"
-          style={{ fontSize: '16vw', lineHeight: 1, filter: 'drop-shadow(0 0 60px rgba(242, 197, 114, 0.3))' }}
+          style={{ fontSize: 'clamp(2.75rem, 16vw, 18rem)', lineHeight: 1 }}
         >
           PRIVATE
         </h1>
