@@ -110,7 +110,14 @@ const BrutalistFooter: React.FC = () => {
               <ul className="flex flex-col gap-3 md:gap-4">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    {link.href.startsWith('/') || link.href.startsWith('http') ? (
+                    {link.href.startsWith('/') ? (
+                      <Link
+                        to={link.href}
+                        className="text-xs md:text-sm font-medium text-neutral-400 hover:text-white transition-colors duration-200"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : link.href.startsWith('http') ? (
                       <a
                         href={link.href}
                         target="_blank"

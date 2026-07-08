@@ -67,7 +67,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
             name="Privacy Tokens"
             className="bento-card w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
             Icon={Globe}
-            description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, Polygon and Aptos — one vault, full privacy."
+            description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, Polygon and Aptos - one vault, full privacy."
             onClick={() => setShowTokensPopup(true)}
             cta="See supported assets"
             background={

@@ -1,14 +1,6 @@
 # Veilpay Privacy Policy
 
 > **Legal note:** This policy is a working draft based on Veilpay's described architecture. It is not legal advice and has not been reviewed by counsel. Because privacy-focused crypto payment products face jurisdiction-specific rules 
-## Footer / concise version
-
-Veilpay is a non-custodial app, so we never hold your private keys or funds. Our providers collect limited account, device, and diagnostic data to run the app, and we don't sell your personal data. If you use our fiat on/off-ramp feature, our partner Transak collects identity information directly from you under its own privacy policy. You can request access to, correction of, or deletion of your data at any time by contacting veilpayapp.modulator774@passinbox.com. See the full policy below for details on your rights under GDPR, CCPA, and India's DPDP Act.
-
----
-
-## Full Privacy Policy
-
 ### 1. Information We Collect
 
 Because Veilpay is a **non-custodial** application, we never collect or store your private keys, seed phrases, or spend-authority credentials. Those remain on your device at all times.
@@ -22,7 +14,7 @@ Our providers collect the following categories of information:
 - **Fiat on/off-ramp data:** if you use the embedded on-ramp or off-ramp, our partner **Transak** collects identity verification information (such as government ID and proof of address) directly from you, under Transak's own privacy policy. Veilpay does not directly collect or store this identity-verification data.
 - **Communications:** information you provide when contacting support.
 
-Our providers do **not** knowingly collect biometric templates — biometric authentication (e.g., Face ID/fingerprint) is processed locally on your device via your device's operating system and is never transmitted to Veilpay.
+Our providers do **not** knowingly collect biometric templates. Biometric authentication (e.g., Face ID/fingerprint) is processed locally on your device via your device's operating system and is never transmitted to Veilpay.
 
 ### 2. How We Use It
 
@@ -99,12 +91,12 @@ To exercise any of these rights, contact us at veilpayapp.modulator774@passinbox
 
 We apply technical and organizational safeguards appropriate to a non-custodial architecture, including:
 
-- Local, on-device storage and encryption of key material — Veilpay's backend never receives your private keys;
+- Local, on-device storage and encryption of key material (Veilpay's backend never receives your private keys);
 - Encryption of data in transit and at rest for backend-held data;
 - Biometric authentication gating for sensitive in-app actions;
 - Access controls and monitoring on backend infrastructure;
 
-No system is completely secure. Because Veilpay does not custody funds, Veilpay cannot recover lost private keys, seed phrases, or funds sent to an incorrect address — see the Terms of Service for details on your responsibilities as a non-custodial wallet holder.
+No system is completely secure. Because Veilpay does not custody funds, Veilpay cannot recover lost private keys, seed phrases, or funds sent to an incorrect address. See the Terms of Service for details on your responsibilities as a non-custodial wallet holder.
 
 ### 8. Children's Privacy
 
@@ -116,7 +108,7 @@ Your information may be processed or stored in countries other than your own. Wh
 
 ### 10. Changes to This Policy
 
-We may update this Privacy Policy from time to time. Material changes will be notified via email (mentioned below). Continued use of Veilpay after changes take effect constitutes acceptance of the updated policy.
+We may update this Privacy Policy from time to time. Material changes will be communicated by email. Continued use of Veilpay after changes take effect constitutes acceptance of the updated policy.
 
 ### 11. Contact Us
 

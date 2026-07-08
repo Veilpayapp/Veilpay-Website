@@ -12,18 +12,18 @@ type DocKey = 'about' | 'privacy' | 'terms';
 
 const DOCS: Record<DocKey, { title: string; description: string; source: string }> = {
   about: {
-    title: 'About Us — Veilpay',
+    title: 'About Us | Veilpay',
     description:
       'Veilpay is a non-custodial, multi-chain payments app that makes private crypto payments practical for everyday use.',
     source: aboutMd,
   },
   privacy: {
-    title: 'Privacy Policy — Veilpay',
+    title: 'Privacy Policy | Veilpay',
     description: 'How Veilpay collects, uses, and protects your information.',
     source: privacyMd,
   },
   terms: {
-    title: 'Terms of Service — Veilpay',
+    title: 'Terms of Service | Veilpay',
     description: 'The terms that govern your use of Veilpay.',
     source: termsMd,
   },

@@ -1,14 +1,6 @@
 # Veilpay Terms of Service
 
-> **Legal note:** This is a working draft, not legal advice, and has not been reviewed by counsel. Crypto payment products — especially those supporting privacy-native assets — can trigger money-transmitter licensing, MSB registration, AML/KYC, and sanctions-screening obligations that vary by jurisdiction. Have this reviewed by a qualified attorney, and confirm licensing requirements in every jurisdiction where Veilpay will operate, before publishing.
-
-## Footer / concise version
-
-By using Veilpay, you agree to these Terms. Veilpay is a non-custodial app — we never hold your funds or keys, and you are solely responsible for safeguarding your seed phrase and confirming transaction details before sending. Veilpay does not guarantee absolute or untraceable anonymity, is not a bank, and digital assets carry significant financial risk. You may not use Veilpay for illegal activity, including money laundering, sanctions evasion, or fraud. Full terms below.
-
----
-
-## Full Terms of Service
+> **Legal note:** This is a working draft, not legal advice, and has not been reviewed by counsel. Crypto payment products (especially those supporting privacy-native assets) can trigger money-transmitter licensing, MSB registration, AML/KYC, and sanctions-screening obligations that vary by jurisdiction. Have this reviewed by a qualified attorney, and confirm licensing requirements in every jurisdiction where Veilpay will operate, before publishing.
 
 ### 1. Acceptance of Terms
 
@@ -19,8 +11,8 @@ These Terms of Service ("**Terms**") govern your access to and use of the Veilpa
 Veilpay is a **non-custodial**, multi-chain crypto payments application. The Service enables you to:
 
 - Create and manage a non-custodial wallet across supported networks (including EVM-compatible chains, Solana, and Aptos, as well as privacy-native networks such as Monero, Zcash, Midnight, and Stellar private payment flows);
-- Send and receive digital assets using a selectable privacy tier — native privacy, zero-knowledge-wrapped privacy, or stealth-only privacy — depending on asset and network support;
-- Access fiat-to-crypto and crypto-to-fiat conversion through our third-party partner, **Transak**, subject to Transak's own terms and identity verification requirements.
+- Send and receive digital assets using a selectable privacy tier (native privacy, zero-knowledge-wrapped privacy, or stealth-only privacy) depending on asset and network support;
+- Access fiat-to-crypto and crypto-to-fiat conversion through our third-party partners including **Stellar anchors**, **Transak**, **Onramp.money**, and **MoonPay**, subject to their own terms and identity verification requirements.
 
 Because Veilpay is non-custodial, **we do not hold, control, or have access to your private keys or digital assets at any time.** All transactions are signed and broadcast from your device under your control.
 
@@ -35,7 +27,7 @@ To use the Service, you must:
 - Provide accurate information where an account or profile is required;
 - Comply with all applicable laws in connection with your use of the Service.
 
-You are responsible for maintaining the confidentiality of any account credentials, device access, and — critically — your wallet's seed phrase and private keys. **Veilpay cannot recover lost seed phrases, reset wallet access, or reverse transactions.**
+You are responsible for maintaining the confidentiality of any account credentials, device access, and (critically) your wallet's seed phrase and private keys. **Veilpay cannot recover lost seed phrases, reset wallet access, or reverse transactions.**
 
 ### 4. Acceptable Use
 
@@ -77,7 +69,7 @@ THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTIES OF ANY KI
 
 ### 9. Limitation of Liability
 
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, Veilpay AND ITS AFFILIATES, OFFICERS, EMPLOYEES, AND AGENTS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF FUNDS, PROFITS, OR DATA, ARISING FROM YOUR USE OF THE SERVICE, INCLUDING BUT NOT LIMITED TO: LOSS OF PRIVATE KEYS OR SEED PHRASES, TRANSACTIONS SENT TO AN INCORRECT ADDRESS, NETWORK CONGESTION OR FAILURE, THIRD-PARTY SERVICE FAILURES, OR UNAUTHORIZED ACCESS TO YOUR DEVICE. OUR TOTAL AGGREGATE LIABILITY FOR ANY CLAIM SHALL NOT EXCEED the greater of USD 100 or fees paid to Veilpay in the preceding 12 months.
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, Veilpay AND ITS AFFILIATES, OFFICERS, EMPLOYEES, AND AGENTS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF FUNDS, PROFITS, OR DATA, ARISING FROM YOUR USE OF THE SERVICE, INCLUDING BUT NOT LIMITED TO: LOSS OF PRIVATE KEYS OR SEED PHRASES, TRANSACTIONS SENT TO AN INCORRECT ADDRESS, NETWORK CONGESTION OR FAILURE, THIRD-PARTY SERVICE FAILURES, OR UNAUTHORIZED ACCESS TO YOUR DEVICE. OUR TOTAL AGGREGATE LIABILITY FOR ANY CLAIM SHALL NOT EXCEED THE GREATER OF USD 100 OR FEES PAID TO VEILPAY IN THE PRECEDING 12 MONTHS.
 
 Some jurisdictions do not allow certain limitations of liability, so some of the above limitations may not apply to you.
 
