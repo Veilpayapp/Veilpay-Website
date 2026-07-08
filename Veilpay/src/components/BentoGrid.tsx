@@ -30,7 +30,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
       id="features"
       className="pointer-events-auto absolute inset-0 z-20 flex flex-col justify-center items-center md:items-start px-4 md:px-16 lg:px-24 mt-[4vh]"
     >
-      <div className="flex flex-col w-full max-w-2xl md:max-w-[min(64rem,58vw)] gap-[clamp(0.5rem,1.5vw,1.5rem)]">
+      <div className="flex flex-col w-full max-w-2xl md:max-w-[min(64rem,58vw)] gap-4 md:gap-6">
 
         {/* Wide Card - ZK Proofs (full width of the column) */}
         <BentoCard
@@ -48,7 +48,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
         />
 
         {/* Pair row — two equal, together-shrinking cards */}
-        <div className="flex flex-col md:flex-row gap-[clamp(0.5rem,1.5vw,1.5rem)] w-full">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full">
           {/* Square Card - Stealth Address */}
           <BentoCard
             name="Stealth Addresses"
