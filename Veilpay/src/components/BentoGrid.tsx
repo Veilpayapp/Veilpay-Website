@@ -54,7 +54,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
             name="Stealth Addresses"
             className="bento-card w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#141414]/95 md:bg-[#141414]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
             Icon={ArrowDownCircle}
-            description="EIP-5564 dual-key stealth addresses generate a fresh one-time address per transaction, breaking on-chain linkability across Stellar, EVM, Solana and Aptos."
+            description="EIP-5564 dual-key stealth addresses generate a fresh one-time address per transaction, breaking on-chain linkability across Stellar, EVM, and Solana."
             onClick={() => setShowStealthPopup(true)}
             cta="Explore privacy"
             background={
@@ -70,7 +70,7 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
             name="Privacy Tokens"
             className="bento-card w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
             Icon={Globe}
-            description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, Polygon and Aptos - one vault, full privacy."
+            description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, and Polygon - one vault, full privacy."
             onClick={() => setShowTokensPopup(true)}
             cta="See supported assets"
             background={

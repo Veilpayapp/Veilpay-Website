@@ -10,7 +10,7 @@ Veilpay is a non-custodial multi-chain payments application. "Non-custodial" mea
 
 On top of that foundation, Veilpay unifies several things that usually live in separate apps:
 
-- **Multi-chain support**, spanning both transparent networks (including EVM chains, Solana, and Aptos) and privacy-native networks, all accessible through a single interface.
+- **Multi-chain support**, spanning both transparent networks (including EVM chains and Solana) and privacy-native networks, all accessible through a single interface.
 - **A tiered privacy model**, so you can choose the level of privacy that fits each payment: from lightweight stealth addressing, to zero-knowledge-wrapped transfers on otherwise transparent chains, to fully native privacy assets like Monero, Zcash, Midnight, and Stellar's private payment flows.
 - **Embedded fiat access**, through our on-ramp and off-ramp partner Transak, so moving between local currency and crypto doesn't require juggling a separate exchange account.
 

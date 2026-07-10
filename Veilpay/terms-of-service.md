@@ -10,7 +10,7 @@ These Terms of Service ("**Terms**") govern your access to and use of the Veilpa
 
 Veilpay is a **non-custodial**, multi-chain crypto payments application. The Service enables you to:
 
-- Create and manage a non-custodial wallet across supported networks (including EVM-compatible chains, Solana, and Aptos, as well as privacy-native networks such as Monero, Zcash, Midnight, and Stellar private payment flows);
+- Create and manage a non-custodial wallet across supported networks (including EVM-compatible chains and Solana, as well as privacy-native networks such as Monero, Zcash, Midnight, and Stellar private payment flows);
 - Send and receive digital assets using a selectable privacy tier (native privacy, zero-knowledge-wrapped privacy, or stealth-only privacy) depending on asset and network support;
 - Access fiat-to-crypto and crypto-to-fiat conversion through our third-party partners including **Stellar anchors**, **Transak**, **Onramp.money**, and **MoonPay**, subject to their own terms and identity verification requirements.
 
