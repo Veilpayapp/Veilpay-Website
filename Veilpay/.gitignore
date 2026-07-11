@@ -28,3 +28,8 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# AI and Generated
+.claude
+*.report.json
+lh-*.json
