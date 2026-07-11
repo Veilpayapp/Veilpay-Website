@@ -428,8 +428,8 @@ const DownloadSection: React.FC = () => {
             </svg>
           </a>
           <a href="https://veilpay.medium.com" target="_blank" rel="noopener noreferrer" aria-label="Follow Veilpay on Medium" className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center download-social hover:text-[#F2C572] transition-all transform hover:scale-110 glass-panel">
-            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-              <path d="M6.9 12.012A6.9 6.9 0 1 0 0 12.012a6.9 6.9 0 0 0 6.9 0zm10.74 0c0 3.633-1.464 6.58-3.268 6.58-1.803 0-3.267-2.947-3.267-6.58 0-3.632 1.464-6.579 3.267-6.579 1.804 0 3.268 2.947 3.268 6.579zm6.36 0c0 3.255-.634 5.892-1.417 5.892-.782 0-1.416-2.637-1.416-5.892 0-3.254.634-5.891 1.416-5.891.783 0 1.417 2.637 1.417 5.891z"/>
+            <svg className="w-6 h-6 fill-current" viewBox="0 0 16 16">
+              <path d="M9.025 8c0 2.485-2.02 4.5-4.513 4.5A4.506 4.506 0 0 1 0 8c0-2.486 2.02-4.5 4.512-4.5A4.506 4.506 0 0 1 9.025 8m4.95 0c0 2.34-1.01 4.236-2.256 4.236S9.463 10.339 9.463 8c0-2.34 1.01-4.236 2.256-4.236S13.975 5.661 13.975 8M16 8c0 2.096-.355 3.795-.794 3.795-.438 0-.793-1.7-.793-3.795 0-2.096.355-3.795.794-3.795.438 0 .793 1.699.793 3.795"/>
             </svg>
           </a>
         </div>
