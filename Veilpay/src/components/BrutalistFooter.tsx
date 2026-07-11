@@ -33,6 +33,7 @@ const FOOTER_DATA = [
       { label: 'Telegram', href: 'https://telegram.veilpayapp.com' },
       { label: 'Instagram', href: 'https://instagram.veilpayapp.com' },
       { label: 'LinkedIn', href: 'https://linkedin.veilpayapp.com' },
+      { label: 'Medium', href: 'https://veilpay.medium.com' },
     ],
   },
 ];
