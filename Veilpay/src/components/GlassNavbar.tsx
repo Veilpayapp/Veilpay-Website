@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getLenisInstance } from '@/lib/utils';
 import { isLowEnd } from '@/lib/deviceCapability';
 import { FEATURES_SCROLL_TARGET } from '@/lib/scrollConfig';
@@ -32,22 +32,24 @@ const logoStyle: React.CSSProperties = {
 // Uses only its arguments + module-scope helpers (no component state/props), so it lives
 // at module scope to avoid being rebuilt every render and to keep memoized children stable.
 export const handleScroll = async (
-  e: React.MouseEvent<Element, MouseEvent>,
+  e: React.MouseEvent<Element, MouseEvent> | null,
   target: string | number,
 ) => {
-  e.preventDefault();
+  if (e) e.preventDefault();
 
   let scrollTarget: string | number = target;
-  if (target === '#download' || target === '#waitlist-social') {
+  if (target === '#download' || target === '#waitlist-social' || target === '#waitlist') {
     const anchor = document.getElementById('download-anchor') || document.getElementById('download');
     if (anchor) {
-      // The DownloadSection pins and scales up for 150% of the viewport height.
+      // The DownloadSection pins and scales up for 150% of the section height.
       // Scroll perfectly to the end of the pin where the box is fully scaled.
       const rect = anchor.getBoundingClientRect();
       // By using an unpinned anchor just above the section, absoluteTop is stable
       // even if we are currently inside the pinned area.
       const absoluteTop = rect.top + window.scrollY;
-      scrollTarget = absoluteTop + (window.innerHeight * 1.5);
+      const section = document.getElementById('download');
+      const pinDistance = section ? section.offsetHeight * 1.5 : window.innerHeight * 1.5;
+      scrollTarget = absoluteTop + pinDistance;
     }
   } else if (target === '#features') {
     // The Bento Grid is deep inside a GSAP ScrollSequence pinned timeline. It
@@ -76,7 +78,18 @@ export const handleScroll = async (
     // result is the stutter you feel jumping to a section. A GSAP ScrollToPlugin
     // tween updates ScrollTrigger in lockstep, so the pins scrub cleanly.
     // autoKill stops the tween the instant the user touches the screen.
-    const y = typeof scrollTarget === 'number' ? scrollTarget : 0;
+    let y: number | undefined;
+    if (typeof scrollTarget === 'number') {
+      y = scrollTarget;
+    } else {
+      const el = document.querySelector(scrollTarget as string);
+      if (el) {
+        y = el.getBoundingClientRect().top + window.scrollY;
+      }
+    }
+
+    if (y === undefined || isNaN(y)) return;
+
     const [{ default: gsap }, { ScrollToPlugin }] = await Promise.all([
       import('gsap'),
       import('gsap/ScrollToPlugin'),
@@ -95,7 +108,7 @@ export default function GlassNavbar() {
   const lowEnd = isLowEnd();
   const navigate = useNavigate();
   const location = useLocation();
-  const onHome = location.pathname === '/';
+  const onHome = ['/', '/waitlist', '/features', '/contact'].includes(location.pathname);
   const [showDocsPopup, setShowDocsPopup] = useState(false);
 
   // On the home page, anchor clicks drive the Lenis smooth-scroll timeline.
@@ -104,13 +117,21 @@ export default function GlassNavbar() {
   const handleNav = (
     e: React.MouseEvent<Element, MouseEvent>,
     target: string | number,
+    routePath: string
   ) => {
+    e.preventDefault();
+
     if (!onHome) {
-      e.preventDefault();
-      navigate('/');
+      navigate(routePath);
       return;
     }
-    handleScroll(e, target);
+    
+    // Update the URL without reloading the page while preserving the smooth scroll
+    if (window.history.pushState) {
+      window.history.pushState(null, '', routePath);
+    }
+    
+    handleScroll(null, target);
   };
 
   // On low-end devices, skip the heavy backdrop-filter + SVG displacement
@@ -131,13 +152,13 @@ export default function GlassNavbar() {
         {/* Left Section (Logo + Links) */}
         <div className="flex items-center gap-2 md:gap-8 relative z-10">
           {/* Logo → home */}
-          <Link to="/" aria-label="Veilpay home" className="preserve-color block flex-shrink-0" style={logoStyle} />
+          <a href="/" onClick={(e) => handleNav(e, 0, '/')} aria-label="Veilpay home" className="preserve-color block flex-shrink-0" style={logoStyle} />
 
           {/* Nav Links — visible on all screen sizes, smaller text on mobile */}
           <div className="flex items-center gap-2.5 md:gap-10">
-            <a href="/" onClick={(e) => handleNav(e, 0)} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Home</a>
-            <a href="/#features" onClick={(e) => handleNav(e, '#features')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Features</a>
-            <a href="/#footer" onClick={(e) => handleNav(e, '#footer')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Contact</a>
+            <a href="/" onClick={(e) => handleNav(e, 0, '/')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Home</a>
+            <a href="/features" onClick={(e) => handleNav(e, '#features', '/features')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Features</a>
+            <a href="/contact" onClick={(e) => handleNav(e, '#footer', '/contact')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Contact</a>
           </div>
         </div>
 
@@ -152,7 +173,7 @@ export default function GlassNavbar() {
           </button>
           <button
             type="button"
-            onClick={(e) => handleNav(e, '#waitlist-social')}
+            onClick={(e) => handleNav(e, '#waitlist', '/waitlist')}
             className="ios-glass-gold text-[10px] md:text-[12px] font-bold text-black hover:brightness-110 transition-all tracking-wide uppercase px-2.5 md:px-4 py-1.5 md:py-2 rounded-full preserve-color"
           >
             WAITLIST

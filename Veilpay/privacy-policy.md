@@ -85,7 +85,7 @@ Depending on your location, you may have rights including:
 - Right to grievance redressal through our designated Grievance Officer;
 - Right to nominate another individual to exercise your rights in the event of death or incapacity.
 
-To exercise any of these rights, contact us at veilpayapp.modulator774@passinbox.com. We may need to verify your identity before completing certain requests. Some data (e.g., legally mandated records, or identity data held solely by Transak) may not be deletable on request.
+To exercise any of these rights, contact us at veilpay@veilpayapp.com. We may need to verify your identity before completing certain requests. Some data (e.g., legally mandated records, or identity data held solely by Transak) may not be deletable on request.
 
 ### 7. Security
 
@@ -100,7 +100,7 @@ No system is completely secure. Because Veilpay does not custody funds, Veilpay 
 
 ### 8. Children's Privacy
 
-Veilpay is not directed to, and is not intended for use by, individuals under the age of 18. Our providers do not knowingly collect personal data from children. If you believe a child has provided us with personal data, contact us at veilpayapp.modulator774@passinbox.com so we can take appropriate action.
+Veilpay is not directed to, and is not intended for use by, individuals under the age of 18. Our providers do not knowingly collect personal data from children. If you believe a child has provided us with personal data, contact us at veilpay@veilpayapp.com so we can take appropriate action.
 
 ### 9. International Data Transfers
 
@@ -114,4 +114,4 @@ We may update this Privacy Policy from time to time. Material changes will be co
 
 If you have questions about this Privacy Policy or wish to exercise your rights:
 
-- **Email:** veilpayapp.modulator774@passinbox.com
+- **Email:** veilpay@veilpayapp.com

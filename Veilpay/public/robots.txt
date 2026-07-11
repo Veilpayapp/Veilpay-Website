@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://veilpay-eta.vercel.app/sitemap.xml
+Sitemap: https://veilpayapp.com/sitemap.xml

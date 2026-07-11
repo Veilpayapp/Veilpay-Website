@@ -46,6 +46,9 @@ const SmoothScroll: React.FC<SmoothScrollProps> = ({ children }) => {
       });
       setLenisInstance(lenis);
 
+      // Note: Initial load auto-scrolling is now fully handled centrally in App.tsx
+      // which properly waits for components and lenis to be ready.
+
       // Connect GSAP ScrollTrigger to Lenis
       lenis.on('scroll', ScrollTrigger.update);
 

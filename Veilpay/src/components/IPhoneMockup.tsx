@@ -27,22 +27,17 @@ const IPhoneMockup: React.FC = () => {
           />
         </div>
 
-        <img
-          src="/MOCKUP2.webp"
-          alt="iPhone Mockup (Dark)"
-          width={1527}
-          height={1024}
-          fetchPriority="high"
-          className="w-full h-auto object-contain relative z-10 dark-image mockup-base-image"
-        />
-        <img
-          src="/MOCKUP2.WHITE.webp"
-          alt="iPhone Mockup (Light)"
-          width={1527}
-          height={1024}
-          fetchPriority="high"
-          className="w-full h-auto object-contain relative z-10 white-image mockup-base-image"
-        />
+        <picture>
+          <source srcSet="/MOCKUP2.WHITE.webp" media="(prefers-color-scheme: light)" />
+          <img
+            src="/MOCKUP2.webp"
+            alt="iPhone Mockup"
+            width={1527}
+            height={1024}
+            fetchPriority="high"
+            className="w-full h-auto object-contain relative z-10 mockup-base-image"
+          />
+        </picture>
         {/* Screen Content - logo appears via GSAP.
             Raised to -mt-[20%] so the mark sits on the same line as the
             "Introducing ... VEILPAY" text instead of sitting low over the

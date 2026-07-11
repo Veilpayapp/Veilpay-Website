@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { marked } from 'marked';
 import GlassNavbar from '../components/GlassNavbar';
 import NoiseOverlay from '../components/NoiseOverlay';
@@ -40,9 +41,11 @@ export default function LegalPage({ doc }: { doc: DocKey }) {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* React 19 hoists these into <head> for per-page SEO. */}
-      <title>{title}</title>
-      <meta name="description" content={description} />
+      <Helmet>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={`https://veilpayapp.com/${doc}`} />
+      </Helmet>
 
       <NoiseOverlay />
       <GlassNavbar />

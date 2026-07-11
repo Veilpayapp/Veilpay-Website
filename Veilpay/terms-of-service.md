@@ -93,4 +93,4 @@ These Terms are governed by the laws of the applicable jurisdiction, without reg
 
 Questions about these Terms can be directed to:
 
-- **Email:** veilpayapp.modulator774@passinbox.com
+- **Email:** veilpay@veilpayapp.com

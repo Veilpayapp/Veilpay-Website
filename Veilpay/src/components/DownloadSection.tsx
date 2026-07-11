@@ -4,7 +4,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import GoldenWaves from './GoldenWaves';
 
-
 gsap.registerPlugin(ScrollTrigger);
 
 const DownloadSection: React.FC = () => {
@@ -21,6 +20,9 @@ const DownloadSection: React.FC = () => {
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [code, setCode] = useState('');
   const [token, setToken] = useState('');
+
+  // Initial load auto-scrolling is now fully handled centrally in App.tsx
+  // which properly waits for components and lenis to be ready.
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -242,92 +244,116 @@ const DownloadSection: React.FC = () => {
         </p>
         
         {/* Waitlist Form Replacement */}
-        <div id="waitlist-social" className="flex flex-col items-center justify-center mt-12 w-full max-w-lg mx-auto">
-          {!hasFollowed ? (
-            <div className="relative z-10 w-full flex flex-col items-center gap-4">
-              <p className="text-white/70 text-sm font-medium">Follow us on X to unlock the waitlist</p>
-              <a 
-                href="https://x.com/Veilpayapp" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                onMouseEnter={() => setIsFollowHovered(true)}
-                onMouseLeave={() => setIsFollowHovered(false)}
-                onClick={() => {
-                  const clickTime = Date.now();
+        <div id="waitlist" className="flex flex-col items-center justify-center mt-12 w-full max-w-lg mx-auto relative">
+          
+          {/* Follow Gate */}
+          <div className={`relative z-10 w-full flex flex-col items-center gap-4 ${hasFollowed ? 'hidden' : ''}`}>
+            <p className="text-white/70 text-sm font-medium">Follow us on X to unlock the waitlist</p>
+            <a 
+              href="https://x.com/Veilpayapp" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onMouseEnter={() => setIsFollowHovered(true)}
+              onMouseLeave={() => setIsFollowHovered(false)}
+              onClick={() => {
+                const clickTime = Date.now();
 
-                  const handleReturn = () => {
-                    if (document.visibilityState !== 'visible') return;
-                    const timeAway = Date.now() - clickTime;
-                    
-                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                    
-                    // Android/iOS browsers fire a phantom event when target="_blank" opens.
-                    // This happens extremely fast (< 500ms). Ignore it so we don't prematurely popup.
-                    if (isMobile && timeAway < 500) return;
-                    
-                    cleanup();
-                    // User requested 1.5s threshold
-                    if (timeAway >= 1500) {
-                      setHasFollowed(true);
-                    } else {
-                      setShowErrorPopup(true);
-                    }
-                  };
-
-                  // Also listen for window focus as a secondary signal (desktop)
-                  const handleFocus = () => {
-                    const timeAway = Date.now() - clickTime;
-                    
-                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                    
-                    // Ignore phantom focus events on mobile (< 500ms)
-                    if (isMobile && timeAway < 500) return;
-                    
-                    cleanup();
-                    // User requested 1.5s threshold
-                    if (timeAway >= 1500) {
-                      setHasFollowed(true);
-                    } else {
-                      setShowErrorPopup(true);
-                    }
-                  };
-
-                  // Fallback: if neither event fires after 8s (some Android
-                  // in-app browsers swallow both events), just unlock anyway.
-                  const fallbackTimer = window.setTimeout(() => {
-                    cleanup();
+                const handleReturn = () => {
+                  if (document.visibilityState !== 'visible') return;
+                  const timeAway = Date.now() - clickTime;
+                  
+                  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                  
+                  if (isMobile && timeAway < 500) return;
+                  
+                  cleanup();
+                  if (timeAway >= 1500) {
                     setHasFollowed(true);
-                  }, 8000);
+                  } else {
+                    setShowErrorPopup(true);
+                  }
+                };
 
-                  const cleanup = () => {
-                    document.removeEventListener('visibilitychange', handleReturn);
-                    window.removeEventListener('focus', handleFocus);
-                    clearTimeout(fallbackTimer);
-                  };
+                const handleFocus = () => {
+                  const timeAway = Date.now() - clickTime;
+                  
+                  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                  
+                  if (isMobile && timeAway < 500) return;
+                  
+                  cleanup();
+                  if (timeAway >= 1500) {
+                    setHasFollowed(true);
+                  } else {
+                    setShowErrorPopup(true);
+                  }
+                };
 
-                  document.addEventListener('visibilitychange', handleReturn);
-                  window.addEventListener('focus', handleFocus);
-                }}
-                className={`w-full flex items-center justify-center gap-3 h-14 px-8 text-white font-bold rounded-full transition-all transform hover:scale-[1.02] cursor-pointer ${isFollowHovered ? 'hover:text-[#F2C572] hover:border-[#F2C572]/50 glass-panel' : 'bg-black border border-white/20'}`}
-              >
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
-                </svg>
-                Follow @Veilpayapp
-              </a>
+                const fallbackTimer = window.setTimeout(() => {
+                  cleanup();
+                  setHasFollowed(true);
+                }, 8000);
+
+                const cleanup = () => {
+                  document.removeEventListener('visibilitychange', handleReturn);
+                  window.removeEventListener('focus', handleFocus);
+                  clearTimeout(fallbackTimer);
+                };
+
+                document.addEventListener('visibilitychange', handleReturn);
+                window.addEventListener('focus', handleFocus);
+              }}
+              className={`w-full flex items-center justify-center gap-3 h-14 px-8 text-white font-bold rounded-full transition-all transform hover:scale-[1.02] cursor-pointer ${isFollowHovered ? 'hover:text-[#F2C572] hover:border-[#F2C572]/50 glass-panel' : 'bg-black border border-white/20'}`}
+            >
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+              </svg>
+              Follow @Veilpayapp
+            </a>
+          </div>
+
+          {/* Success Card */}
+          <div className={`relative z-10 w-full flex flex-col items-center gap-2 animate-fade-in text-center ${status !== 'success' ? 'hidden' : ''}`}>
+            <div className="w-12 h-12 rounded-full bg-green-500/15 border border-green-400/40 flex items-center justify-center mb-1">
+              <svg className="w-6 h-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-          ) : status === 'success' ? (
-            <div className="relative z-10 w-full flex flex-col items-center gap-2 animate-fade-in text-center">
-              <div className="w-12 h-12 rounded-full bg-green-500/15 border border-green-400/40 flex items-center justify-center mb-1">
-                <svg className="w-6 h-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <p className="text-green-400 text-sm font-semibold">You're on the waitlist!</p>
-              <p className="text-white/60 text-xs">Email verified. We'll be in touch soon.</p>
+            <p className="text-green-400 text-sm font-semibold">You're on the waitlist!</p>
+            <p className="text-white/60 text-xs">Email verified. We'll be in touch soon.</p>
+          </div>
+
+          {/* SEO-Accessible Forms (Hidden until unlocked) */}
+          <div className={`w-full flex flex-col items-center gap-4 animate-fade-in ${!hasFollowed || status === 'success' ? 'hidden' : ''}`}>
+            
+            {/* Email Step */}
+            <div className={`w-full flex flex-col items-center gap-4 w-full ${step !== 'email' ? 'hidden' : ''}`}>
+              <p className="text-[#F2C572] text-sm font-medium">Enter your email to join</p>
+              <form onSubmit={handleSubmit} className="w-full flex flex-col sm:flex-row gap-4 relative z-10 mx-auto justify-center items-center">
+                <div className="relative flex-1 w-full sm:w-auto">
+                  <input 
+                    type="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email" 
+                    aria-label="Email address"
+                    required={step === 'email'}
+                    disabled={status === 'loading'}
+                    className="w-full h-14 bg-[#111111] border border-[#F2C572]/20 rounded-full px-6 text-white placeholder-gray-500 text-center sm:text-left focus:outline-none focus:border-[#F2C572]/60 focus:bg-black/60 transition-all text-sm"
+                  />
+                </div>
+                <button 
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="h-14 px-8 rounded-full bg-gradient-to-r from-[#F2C572] to-[#D4A042] text-black font-bold hover:brightness-110 transition-all shadow-[0_0_30px_rgba(242,197,114,0.1)] hover:shadow-[0_0_50px_rgba(242,197,114,0.3)] flex items-center justify-center min-w-[140px] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-105 w-full sm:w-auto"
+                >
+                  {status === 'loading' ? 'Sending…' : 'Send code'}
+                </button>
+              </form>
             </div>
-          ) : step === 'code' ? (
-            <div className="relative z-10 w-full flex flex-col items-center gap-4 animate-fade-in">
+
+            {/* Code Verification Step */}
+            <div className={`w-full flex flex-col items-center gap-4 w-full ${step !== 'code' ? 'hidden' : ''}`}>
               <p className="text-[#F2C572] text-sm font-medium text-center">
                 Enter the 6-digit code sent to<br />
                 <span className="text-white/80 break-all">{email}</span>
@@ -343,7 +369,7 @@ const DownloadSection: React.FC = () => {
                     onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="6-digit code"
                     aria-label="Verification code"
-                    required
+                    required={step === 'code'}
                     disabled={status === 'loading'}
                     className="w-full h-14 bg-[#111111] border border-[#F2C572]/20 rounded-full px-6 text-white placeholder-gray-500 text-center tracking-[0.4em] focus:outline-none focus:border-[#F2C572]/60 focus:bg-black/60 transition-all text-base"
                   />
@@ -364,32 +390,7 @@ const DownloadSection: React.FC = () => {
                 Use a different email
               </button>
             </div>
-          ) : (
-            <div className="relative z-10 w-full flex flex-col items-center gap-4 animate-fade-in">
-              <p className="text-[#F2C572] text-sm font-medium">Enter your email to join</p>
-              <form onSubmit={handleSubmit} className="w-full flex flex-col sm:flex-row gap-4 relative z-10 mx-auto justify-center items-center">
-                <div className="relative flex-1 w-full sm:w-auto">
-                  <input 
-                    type="email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email" 
-                    aria-label="Email address"
-                    required
-                    disabled={status === 'loading'}
-                    className="w-full h-14 bg-[#111111] border border-[#F2C572]/20 rounded-full px-6 text-white placeholder-gray-500 text-center sm:text-left focus:outline-none focus:border-[#F2C572]/60 focus:bg-black/60 transition-all text-sm"
-                  />
-                </div>
-                <button 
-                  type="submit"
-                  disabled={status === 'loading'}
-                  className="h-14 px-8 rounded-full bg-gradient-to-r from-[#F2C572] to-[#D4A042] text-black font-bold hover:brightness-110 transition-all shadow-[0_0_30px_rgba(242,197,114,0.1)] hover:shadow-[0_0_50px_rgba(242,197,114,0.3)] flex items-center justify-center min-w-[140px] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-105 w-full sm:w-auto"
-                >
-                  {status === 'loading' ? 'Sending…' : 'Send code'}
-                </button>
-              </form>
-            </div>
-          )}
+          </div>
 
           {/* Success is rendered as a verified card in the form area above. */}
           {status === 'error' && (

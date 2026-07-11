@@ -274,22 +274,17 @@ const ScrollSequence: React.FC = () => {
       >
         <div className="relative z-20 flex justify-center">
           <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center">
-            <img
-              src="/image2.webp"
-              alt="Veilpay wallet screen (Dark)"
-              width={1527}
-              height={1024}
-              className="w-full h-auto object-contain relative z-10 dark-image"
-              loading="lazy"
-            />
-            <img
-              src="/image2.white.webp"
-              alt="Veilpay wallet screen (Light)"
-              width={1527}
-              height={1024}
-              className="w-full h-auto object-contain relative z-10 white-image"
-              loading="lazy"
-            />
+            <picture>
+              <source srcSet="/image2.white.webp" media="(prefers-color-scheme: light)" />
+              <img
+                src="/image2.webp"
+                alt="Veilpay wallet screen"
+                width={1527}
+                height={1024}
+                className="w-full h-auto object-contain relative z-10"
+                loading="lazy"
+              />
+            </picture>
           </div>
         </div>
       </div>
@@ -303,22 +298,17 @@ const ScrollSequence: React.FC = () => {
       >
         <div className="relative z-20 flex justify-center">
           <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center">
-            <img
-              src="/image3.webp"
-              alt="Veilpay payment screen (Dark)"
-              width={1527}
-              height={1024}
-              className="w-full h-auto object-contain relative z-10 dark-image"
-              loading="lazy"
-            />
-            <img
-              src="/image3.white.webp"
-              alt="Veilpay payment screen (Light)"
-              width={1527}
-              height={1024}
-              className="w-full h-auto object-contain relative z-10 white-image"
-              loading="lazy"
-            />
+            <picture>
+              <source srcSet="/image3.white.webp" media="(prefers-color-scheme: light)" />
+              <img
+                src="/image3.webp"
+                alt="Veilpay payment screen"
+                width={1527}
+                height={1024}
+                className="w-full h-auto object-contain relative z-10"
+                loading="lazy"
+              />
+            </picture>
           </div>
         </div>
       </div>
@@ -361,7 +351,7 @@ const ScrollSequence: React.FC = () => {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8B84B] via-[#D4A042] to-[#B8791F]">FULLY YOURS.</span>
           </h2>
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4 w-fit">
-            <span className="text-[10px] font-semibold text-gray-400 tracking-wider uppercase">Stealth payments across 8+ chains</span>
+            <span className="text-[10px] font-semibold text-gray-400 tracking-wider uppercase">Stealth payments across 7+ chains</span>
             <div className="flex -space-x-2">
               {['xlm', 'eth', 'sol', 'xmr', 'zec'].map((coin) => (
                 <div key={coin} className="w-5 h-5 rounded-full bg-black border border-white/20 p-0.5 z-10">

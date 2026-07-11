@@ -7,9 +7,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 const MassiveTextScroll: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
-  const text1Ref = useRef<HTMLHeadingElement>(null);
-  const text2Ref = useRef<HTMLHeadingElement>(null);
-  const text3Ref = useRef<HTMLHeadingElement>(null);
+  const text1Ref = useRef<HTMLDivElement>(null);
+  const text2Ref = useRef<HTMLDivElement>(null);
+  const text3Ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -64,30 +64,31 @@ const MassiveTextScroll: React.FC = () => {
   return (
     <section ref={sectionRef} className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center z-10 border-t border-white/5">
       {/* Container for texts to ensure absolute centering */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        <h1 
+      <div className="relative w-full h-full flex items-center justify-center" aria-hidden="true">
+        <h1 className="sr-only">Private Crypto Payments &amp; Anonymous Donations</h1>
+        <div 
           ref={text1Ref} 
           className="absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] via-[#F9D423] to-[#5E3B09] uppercase preserve-color"
           style={{ fontSize: 'clamp(3rem, 18vw, 20rem)', lineHeight: 1 }}
         >
           SECURE
-        </h1>
+        </div>
 
-        <h1 
+        <div 
           ref={text2Ref} 
           className="absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-600 uppercase"
           style={{ fontSize: 'clamp(4rem, 25vw, 28rem)', lineHeight: 1 }}
         >
-          &
-        </h1>
+          &amp;
+        </div>
 
-        <h1 
+        <div 
           ref={text3Ref} 
           className="absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] via-[#F9D423] to-[#5E3B09] uppercase preserve-color"
           style={{ fontSize: 'clamp(2.75rem, 16vw, 18rem)', lineHeight: 1 }}
         >
           PRIVATE
-        </h1>
+        </div>
       </div>
     </section>
   );
