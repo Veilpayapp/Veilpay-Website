@@ -36,6 +36,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/about" element={<LegalPage doc="about" />} />
               <Route path="/privacy" element={<LegalPage doc="privacy" />} />
               <Route path="/terms" element={<LegalPage doc="terms" />} />
+              <Route path="/docs" element={<LegalPage doc="docs" />} />
             </Routes>
           </Suspense>
         </LazyMotion>

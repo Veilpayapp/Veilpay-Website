@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getLenisInstance } from '@/lib/utils';
 import { isLowEnd } from '@/lib/deviceCapability';
@@ -109,7 +109,7 @@ export default function GlassNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const onHome = ['/', '/waitlist', '/features', '/contact'].includes(location.pathname);
-  const [showDocsPopup, setShowDocsPopup] = useState(false);
+
 
   // On the home page, anchor clicks drive the Lenis smooth-scroll timeline.
   // On a sub-route (legal pages) there is no scroll timeline, so send the
@@ -166,7 +166,7 @@ export default function GlassNavbar() {
         <div className="flex items-center gap-1.5 md:gap-3 relative z-10 md:pr-14">
           <button
             type="button"
-            onClick={() => setShowDocsPopup(true)}
+            onClick={() => navigate('/docs')}
             className="ios-glass text-[10px] md:text-[12px] font-bold text-white hover:text-amber-400 transition-colors tracking-wide uppercase px-2.5 md:px-4 py-1.5 md:py-2 rounded-full"
           >
             DOCS
@@ -190,42 +190,6 @@ export default function GlassNavbar() {
         <ThemeToggle className="fixed bottom-6 right-4 z-[100] w-12 h-12 shadow-2xl" />
       </div>
 
-      <AnimatePresence>
-        {showDocsPopup && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowDocsPopup(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="ios-glass p-8 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-4 border border-white/20 rounded-[32px]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E8B84B] to-[#B8791F] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(232,184,75,0.4)]">
-                <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-white tracking-tight">Docs Coming Soon</h3>
-              <p className="text-sm text-white/70 leading-relaxed">
-                We're actively building out our developer documentation. Stay tuned!
-              </p>
-              <button
-                onClick={() => setShowDocsPopup(false)}
-                className="mt-2 ios-glass-gold px-6 py-2.5 rounded-full text-black font-bold text-sm uppercase tracking-wide w-full hover:brightness-110 transition-all"
-              >
-                Got it
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

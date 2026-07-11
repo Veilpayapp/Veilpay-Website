@@ -8,8 +8,9 @@ import NoiseOverlay from '../components/NoiseOverlay';
 import aboutMd from '../../about-us.md?raw';
 import privacyMd from '../../privacy-policy.md?raw';
 import termsMd from '../../terms-of-service.md?raw';
+import docsMd from '../../docs.md?raw';
 
-type DocKey = 'about' | 'privacy' | 'terms';
+type DocKey = 'about' | 'privacy' | 'terms' | 'docs';
 
 const DOCS: Record<DocKey, { title: string; description: string; source: string }> = {
   about: {
@@ -27,6 +28,11 @@ const DOCS: Record<DocKey, { title: string; description: string; source: string 
     title: 'Terms of Service | Veilpay',
     description: 'The terms that govern your use of Veilpay.',
     source: termsMd,
+  },
+  docs: {
+    title: 'Documentation | Veilpay',
+    description: 'Developer documentation and guides for Veilpay.',
+    source: docsMd,
   },
 };
 
@@ -61,6 +67,7 @@ export default function LegalPage({ doc }: { doc: DocKey }) {
           <Link to="/about" className="hover:text-amber-400 transition-colors">About</Link>
           <Link to="/privacy" className="hover:text-amber-400 transition-colors">Privacy</Link>
           <Link to="/terms" className="hover:text-amber-400 transition-colors">Terms</Link>
+          <Link to="/docs" className="hover:text-amber-400 transition-colors">Docs</Link>
           <span className="text-neutral-600">© 2026 Veilpay</span>
         </nav>
       </main>
