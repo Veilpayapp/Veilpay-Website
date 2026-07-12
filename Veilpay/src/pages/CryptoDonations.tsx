@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import GlassNavbar from '../components/GlassNavbar';
 import NoiseOverlay from '../components/NoiseOverlay';
 import BrutalistFooter from '../components/BrutalistFooter';
+import ScrollProgress from '../components/ScrollProgress';
 
 const CryptoDonations: React.FC = () => {
   useEffect(() => {
@@ -11,6 +12,7 @@ const CryptoDonations: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-amber-500/30">
+      <ScrollProgress />
       <Helmet>
         <title>Accept Crypto Donations Privately | Anonymous Crypto Donation Platform</title>
         <meta

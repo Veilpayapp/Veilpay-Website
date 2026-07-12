@@ -4,13 +4,13 @@ import { Helmet } from 'react-helmet-async';
 import { marked } from 'marked';
 import GlassNavbar from '../components/GlassNavbar';
 import NoiseOverlay from '../components/NoiseOverlay';
+import ScrollProgress from '../components/ScrollProgress';
 // Legal copy lives as markdown at the repo root; imported raw and rendered.
 import aboutMd from '../../about-us.md?raw';
 import privacyMd from '../../privacy-policy.md?raw';
 import termsMd from '../../terms-of-service.md?raw';
-import docsMd from '../../docs.md?raw';
 
-type DocKey = 'about' | 'privacy' | 'terms' | 'docs';
+type DocKey = 'about' | 'privacy' | 'terms';
 
 const DOCS: Record<DocKey, { title: string; description: string; source: string }> = {
   about: {
@@ -29,11 +29,6 @@ const DOCS: Record<DocKey, { title: string; description: string; source: string 
     description: 'The terms that govern your use of Veilpay.',
     source: termsMd,
   },
-  docs: {
-    title: 'Documentation | Veilpay',
-    description: 'Developer documentation and guides for Veilpay.',
-    source: docsMd,
-  },
 };
 
 export default function LegalPage({ doc }: { doc: DocKey }) {
@@ -47,6 +42,7 @@ export default function LegalPage({ doc }: { doc: DocKey }) {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <ScrollProgress />
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />

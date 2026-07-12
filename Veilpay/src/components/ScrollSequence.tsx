@@ -274,17 +274,24 @@ const ScrollSequence: React.FC = () => {
       >
         <div className="relative z-20 flex justify-center">
           <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center">
-            <picture>
-              <source srcSet="/image2.white.webp" media="(prefers-color-scheme: light)" />
+            <>
               <img
                 src="/image2.webp"
                 alt="Veilpay wallet screen"
                 width={1527}
                 height={1024}
-                className="w-full h-auto object-contain relative z-10"
+                className="w-full h-auto object-contain relative z-10 dark-image"
                 loading="lazy"
               />
-            </picture>
+              <img
+                src="/image2.white.webp"
+                alt="Veilpay wallet screen"
+                width={1527}
+                height={1024}
+                className="w-full h-auto object-contain relative z-10 white-image"
+                loading="lazy"
+              />
+            </>
           </div>
         </div>
       </div>
@@ -298,17 +305,24 @@ const ScrollSequence: React.FC = () => {
       >
         <div className="relative z-20 flex justify-center">
           <div className="relative w-[420px] md:w-[min(546px,52.5vw)] flex justify-center items-center">
-            <picture>
-              <source srcSet="/image3.white.webp" media="(prefers-color-scheme: light)" />
+            <>
               <img
                 src="/image3.webp"
                 alt="Veilpay payment screen"
                 width={1527}
                 height={1024}
-                className="w-full h-auto object-contain relative z-10"
+                className="w-full h-auto object-contain relative z-10 dark-image"
                 loading="lazy"
               />
-            </picture>
+              <img
+                src="/image3.white.png"
+                alt="Veilpay payment screen"
+                width={1527}
+                height={1024}
+                className="w-full h-auto object-contain relative z-10 white-image"
+                loading="lazy"
+              />
+            </>
           </div>
         </div>
       </div>

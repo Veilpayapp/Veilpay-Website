@@ -10,25 +10,38 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className }) => {
 
   const [isLightMode, setIsLightMode] = useState(() => {
     if (typeof window !== 'undefined') {
-      return window.matchMedia('(prefers-color-scheme: light)').matches;
+      return document.documentElement.classList.contains('light-mode') || 
+             (!document.documentElement.classList.contains('dark-mode') && window.matchMedia('(prefers-color-scheme: light)').matches);
     }
     return false;
   });
 
   useEffect(() => {
-    // Check if the user has a preference saved (optional, defaulting to dark mode)
+    // Initial sync just in case
+    setIsLightMode(document.documentElement.classList.contains('light-mode'));
+
+    // Sync state if another ThemeToggle instance changes the class
+    const observer = new MutationObserver(() => {
+      setIsLightMode(document.documentElement.classList.contains('light-mode'));
+    });
+    
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  const toggleTheme = () => {
     if (isLightMode) {
-      document.documentElement.classList.add('light-mode');
-    } else {
       document.documentElement.classList.remove('light-mode');
+    } else {
+      document.documentElement.classList.add('light-mode');
     }
-  }, [isLightMode]);
+  };
 
   return (
     <button
       type="button"
       aria-label="Toggle light and dark mode"
-      onClick={() => setIsLightMode(!isLightMode)}
+      onClick={toggleTheme}
       className={cn(
         "ios-glass flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full transition-transform hover:scale-110 active:scale-95 flex-shrink-0",
         className

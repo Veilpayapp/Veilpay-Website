@@ -87,6 +87,11 @@ html.light-mode {
   background: white;
 }
 
+/* Top-layer elements like native dialogs bypass the HTML filter rendering, so they must be explicitly inverted */
+html.light-mode dialog {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 /* Preserve original colors for specific elements if needed by double inverting */
 html.light-mode .preserve-color {
   filter: invert(1) hue-rotate(180deg);
@@ -205,6 +210,8 @@ html.light-mode .screen-scrim {
   color: #cfcfcf;
   line-height: 1.75;
   font-size: 0.975rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .legal-prose h1 {
   font-size: clamp(2rem, 5vw, 3rem);
@@ -251,6 +258,154 @@ html.light-mode .screen-scrim {
   border-radius: 4px;
   font-size: 0.85em;
 }
+
+/* ── Documentation page (docs.md) ──────────────────────────────────────────
+   Builds on .legal-prose with table / pre / code-block / heading-anchor
+   styling so the consolidated docs render cleanly and anchor links scroll
+   under the fixed navbar without clipping headings. */
+.legal-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.legal-prose thead th {
+  text-align: left;
+  font-weight: 700;
+  color: #f2c572;
+  border-bottom: 1px solid rgba(242, 197, 114, 0.4);
+  padding: 0.55rem 0.75rem;
+}
+.legal-prose tbody td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cfcfcf;
+  white-space: normal;
+  vertical-align: top;
+}
+.legal-prose tbody tr:hover td { background: rgba(255, 255, 255, 0.03); }
+.legal-prose pre {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.15rem;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 0 0 1.25rem;
+}
+.legal-prose pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.85em;
+  color: #e6e6e6;
+  line-height: 1.6;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+/* Anchor targets: leave room for the fixed navbar so headings are not
+   clipped when navigated to via in-page links. */
+.legal-prose [id] { scroll-margin-top: 110px; }
+.legal-prose a.anchor-link {
+  color: rgba(242, 197, 114, 0.5);
+  text-decoration: none;
+  margin-left: 0.4rem;
+  font-weight: 400;
+  font-size: 0.75em;
+}
+.legal-prose a.anchor-link:hover { color: #ffe0a3; }
+/* The horizontal rules act as section separators in docs.md. */
+.legal-prose hr {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  margin: 2.75rem 0;
+}
+
+/* ── Docs layout: sticky TOC sidebar + content column ───────────────────── */
+.docs-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 6rem;
+}
+@media (min-width: 1024px) {
+  .docs-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 2.5rem;
+    padding-top: 2rem;
+  }
+}
+.docs-toc {
+  position: sticky;
+  top: 100px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding-right: 0.5rem;
+}
+@media (max-width: 1023px) {
+  .docs-toc { display: none; }
+}
+.docs-toc h4 {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #f2c572;
+  margin: 0 0 0.65rem;
+}
+.docs-toc ul { list-style: none; margin: 0 0 0.9rem; padding: 0; display: block; gap: 0; }
+.docs-toc li { margin: 0; padding: 0; }
+.docs-toc a {
+  display: block;
+  color: #9a9a9a;
+  text-decoration: none;
+  padding: 0.2rem 0.5rem 0.2rem 0.65rem;
+  border-left: 2px solid transparent;
+  border-radius: 0 4px 4px 0;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.docs-toc a:hover { color: #ffe0a3; }
+.docs-toc a.is-active {
+  color: #f2c572;
+  border-left-color: #f2c572;
+  background: rgba(242, 197, 114, 0.06);
+}
+.docs-content { min-width: 0; }
+
+/* Mobile docs in-page TOC toggle (collapsed under 1024px) */
+.docs-mobile-toc {
+  margin: 0 0 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+@media (min-width: 1024px) { .docs-mobile-toc { display: none; } }
+.docs-mobile-toc summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  color: #f2c572;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  list-style: none;
+}
+.docs-mobile-toc summary::-webkit-details-marker { display: none; }
+.docs-mobile-toc[open] summary { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.docs-mobile-toc ul { list-style: none; margin: 0; padding: 0.5rem 0.75rem 0.75rem; display: block; gap: 0; }
+.docs-mobile-toc a {
+  display: block;
+  padding: 0.3rem 0.5rem;
+  color: #9a9a9a;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.docs-mobile-toc a:hover { color: #ffe0a3; }
 
 /*
  * Accessibility: honor the OS "reduce motion" setting (WCAG 2.3.3).
@@ -321,6 +476,28 @@ html.light-mode .scroll-progress {
   .scroll-progress__fill {
     transition: none;
   }
+}
+
+/* Custom Premium Scrollbar for inner scrollable containers */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #D4A042 rgba(255, 255, 255, 0.06);
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #F2C572 0%, #D4A042 55%, #8a6320 100%);
+  border-radius: 0;
+}
+html.light-mode .custom-scrollbar {
+  scrollbar-color: #D4A042 rgba(0, 0, 0, 0.08);
+}
+html.light-mode .custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.08);
 }
 
 /* The 3px edge is right for phones but reads too thin on a large desktop

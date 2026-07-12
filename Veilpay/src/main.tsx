@@ -13,10 +13,13 @@ import './index.css'
 // timelines are created — it only sets global config + a resize listener.
 configureScrollTriggers()
 
-// Legal pages (+ the markdown renderer) are code-split so they never load on
-// the home path — keeps the home bundle lean for Core Web Vitals.
+// Code-split: legal pages + docs stay off the home path so Core Web Vitals
+// measurements (LCP/FCP/SI) on the landing page do not include this weight.
+// DocsPage is a rich docs layout (sticky TOC + heading anchors) built on top
+// of the consolidated docs.md export of veilpay-docs/.
 const LegalPage = lazy(() => import('./pages/LegalPage.tsx'))
 const CryptoDonations = lazy(() => import('./pages/CryptoDonations.tsx'))
+const DocsPage = lazy(() => import('./pages/DocsPage.tsx'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -36,7 +39,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/about" element={<LegalPage doc="about" />} />
               <Route path="/privacy" element={<LegalPage doc="privacy" />} />
               <Route path="/terms" element={<LegalPage doc="terms" />} />
-              <Route path="/docs" element={<LegalPage doc="docs" />} />
+              <Route path="/docs/*" element={<DocsPage />} />
             </Routes>
           </Suspense>
         </LazyMotion>
