@@ -13,7 +13,7 @@ export function DocsPager() {
       {prev ? (
         <Link 
           to={prev.routePath} 
-          className="flex-1 group flex flex-col gap-1 p-4 rounded-2xl border border-white/5 hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.04] transition-all"
+          className="flex-1 group flex flex-col gap-1 p-4 rounded-2xl border border-white/5 hover:border-white/20 ios-glass hover:bg-white/5 transition-all"
         >
           <span className="text-xs text-neutral-500 uppercase tracking-wider flex items-center gap-2">
             <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
@@ -28,7 +28,7 @@ export function DocsPager() {
       {next ? (
         <Link 
           to={next.routePath} 
-          className="flex-1 group flex flex-col gap-1 items-end text-right p-4 rounded-2xl border border-white/5 hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.04] transition-all"
+          className="flex-1 group flex flex-col gap-1 items-end text-right p-4 rounded-2xl border border-white/5 hover:border-white/20 ios-glass hover:bg-white/5 transition-all"
         >
           <span className="text-xs text-neutral-500 uppercase tracking-wider flex items-center gap-2">
             Next

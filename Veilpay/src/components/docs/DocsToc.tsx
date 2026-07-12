@@ -51,7 +51,8 @@ export function DocsToc({ toc }: DocsTocProps) {
   if (toc.length === 0) return null;
 
   return (
-    <aside className="hidden xl:block w-64 flex-shrink-0 pl-8 overflow-y-auto custom-scrollbar h-[calc(100vh-8rem)] sticky top-32" aria-label="Table of contents">
+    <div className="hidden xl:block w-64 flex-shrink-0">
+      <aside className="fixed w-64 pl-8 overflow-y-auto custom-scrollbar h-fit max-h-[85vh] top-1/2 -translate-y-1/2 z-40" aria-label="Table of contents">
       <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">On this page</h4>
       <ul className="space-y-2.5">
         {toc.map((entry) => (
@@ -69,6 +70,7 @@ export function DocsToc({ toc }: DocsTocProps) {
           </li>
         ))}
       </ul>
-    </aside>
+      </aside>
+    </div>
   );
 }

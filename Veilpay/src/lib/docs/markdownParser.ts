@@ -38,8 +38,7 @@ export function parseMarkdown(markdownContent: string, currentSourcePath: string
       toc.push({ id, text: stripped, level: depth });
     }
 
-    const escapedText = stripped.replace(/"/g, '&#34;');
-    return `<h${depth} id="${id}">${rawText}<a class="anchor-link" href="#${id}" aria-label="${escapedText}">&#182;</a></h${depth}>\n`;
+    return `<h${depth} id="${id}">${rawText}</h${depth}>\n`;
   };
 
   renderer.link = function (this: Renderer, { tokens, href, title }: Tokens.Link): string {

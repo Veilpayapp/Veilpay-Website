@@ -18,7 +18,7 @@ html, body, #root {
   min-height: 100vh;
   background: #000000;
   color: #ffffff;
-  overflow-x: hidden;
+  overflow-x: clip;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
@@ -307,11 +307,17 @@ html.light-mode .screen-scrim {
    clipped when navigated to via in-page links. */
 .legal-prose [id] { scroll-margin-top: 110px; }
 .legal-prose a.anchor-link {
+  opacity: 0;
+  transition: opacity 0.2s ease;
   color: rgba(242, 197, 114, 0.5);
   text-decoration: none;
   margin-left: 0.4rem;
   font-weight: 400;
-  font-size: 0.75em;
+  font-size: 0.85em;
+}
+.legal-prose *:hover > a.anchor-link,
+.legal-prose a.anchor-link:focus {
+  opacity: 1;
 }
 .legal-prose a.anchor-link:hover { color: #ffe0a3; }
 /* The horizontal rules act as section separators in docs.md. */

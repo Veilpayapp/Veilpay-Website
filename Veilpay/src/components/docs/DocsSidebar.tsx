@@ -18,11 +18,12 @@ export function DocsSidebar() {
   }, [pathname]);
 
   return (
-    <aside className="hidden lg:block w-64 xl:w-72 flex-shrink-0 border-r border-white/10 px-6 pb-20 overflow-y-auto custom-scrollbar h-[calc(100vh-8rem)] sticky top-32" ref={navRef}>
+    <div className="hidden lg:block w-64 xl:w-72 flex-shrink-0">
+      <aside className="fixed w-64 xl:w-72 border-r border-white/10 px-6 pb-20 overflow-y-auto custom-scrollbar h-fit max-h-[85vh] top-1/2 -translate-y-1/2 z-40" ref={navRef}>
       <nav aria-label="Documentation Desktop Sidebar">
         {docsGroups.map((group, i) => (
           <div key={i} className="mb-8">
-            <h4 className="text-sm font-semibold text-white/90 mb-3">{group.title}</h4>
+            <h4 className="text-sm font-semibold text-white/90 mb-3 sticky top-0 bg-black/95 backdrop-blur-md py-2 px-6 -mx-6 z-10">{group.title}</h4>
             <ul className="space-y-2">
               {group.pages.map((page) => {
                 const isActive = pathname === page.routePath;
@@ -44,7 +45,8 @@ export function DocsSidebar() {
           </div>
         ))}
       </nav>
-    </aside>
+      </aside>
+    </div>
   );
 }
 
@@ -118,7 +120,7 @@ export function DocsMobileNav() {
             <nav aria-label="Documentation Mobile Sidebar">
               {docsGroups.map((group, i) => (
                 <div key={i} className="mb-8">
-                  <h4 className="text-sm font-semibold text-white/90 mb-3">{group.title}</h4>
+                  <h4 className="text-sm font-semibold text-white/90 mb-3 sticky top-0 bg-black/95 backdrop-blur-md py-2 px-6 -mx-6 z-10">{group.title}</h4>
                   <ul className="space-y-2">
                     {group.pages.map((page) => {
                       const isActive = pathname === page.routePath;
