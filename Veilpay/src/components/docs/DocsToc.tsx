@@ -1,4 +1,3 @@
-import { useEffect, useState, useRef } from 'react';
 import type { TocEntry } from '../../lib/docs/markdownParser';
 
 interface DocsTocProps {
@@ -6,71 +5,41 @@ interface DocsTocProps {
 }
 
 export function DocsToc({ toc }: DocsTocProps) {
-  const [activeId, setActiveId] = useState<string>('');
-  const observerRef = useRef<IntersectionObserver | null>(null);
-
-  useEffect(() => {
-    // Disconnect old observer
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-
-    if (!toc.length) return;
-
-    // Use setTimeout to ensure DOM is rendered with injected HTML
-    const timer = setTimeout(() => {
-      const headings = toc
-        .map((t) => document.getElementById(t.id))
-        .filter((el): el is HTMLElement => !!el);
-        
-      if (!headings.length) return;
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          const visible = entries
-            .filter((e) => e.isIntersecting)
-            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-            
-          if (visible.length) {
-            setActiveId(visible[0].target.id);
-          }
-        },
-        { rootMargin: '-120px 0px -70% 0px', threshold: 0 }
-      );
-      
-      headings.forEach((h) => observer.observe(h));
-      observerRef.current = observer;
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      if (observerRef.current) observerRef.current.disconnect();
-    };
-  }, [toc]);
-
   if (toc.length === 0) return null;
 
   return (
-    <div className="hidden xl:block w-64 flex-shrink-0">
-      <aside className="fixed w-64 pl-8 overflow-y-auto custom-scrollbar h-fit max-h-[85vh] top-1/2 -translate-y-1/2 z-40" aria-label="Table of contents">
-      <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">On this page</h4>
-      <ul className="space-y-2.5">
-        {toc.map((entry) => (
-          <li
-            key={entry.id}
-            style={{ paddingLeft: `${(entry.level - 2) * 0.75}rem` }}
-          >
-            <a
-              href={`#${entry.id}`}
-              className={`block text-sm transition-colors ${
-                activeId === entry.id ? 'text-amber-400 font-medium' : 'text-neutral-400 hover:text-white'
-              }`}
-              dangerouslySetInnerHTML={{ __html: entry.text }}
-            />
-          </li>
-        ))}
-      </ul>
+    <div className="hidden lg:block w-52 xl:w-64 flex-shrink-0 h-full">
+      <aside 
+        className="w-full h-full border-l border-white/10 overflow-y-auto custom-scrollbar py-6 px-4 select-none" 
+        aria-label="Table of contents"
+      >
+        <h4 className="text-xs font-semibold text-white/90 uppercase tracking-wider mb-4 px-2.5">
+          On this page
+        </h4>
+        <ul className="space-y-1">
+          {toc.map((entry) => (
+            <li
+              key={entry.id}
+              style={{ paddingLeft: `${Math.max(0, entry.level - 2) * 0.75}rem` }}
+            >
+              <a
+                href={`#${entry.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const el = document.getElementById(entry.id);
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    window.history.pushState(null, '', window.location.pathname + `#${entry.id}`);
+                  }
+                }}
+                className="block text-[13px] leading-snug py-1.5 px-2.5 rounded-lg text-neutral-400 hover:text-white transition-colors"
+                dangerouslySetInnerHTML={{ __html: entry.text }}
+              />
+            </li>
+          ))}
+        </ul>
       </aside>
     </div>
   );
 }
+

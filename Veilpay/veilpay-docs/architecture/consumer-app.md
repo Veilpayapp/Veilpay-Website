@@ -46,4 +46,4 @@ Mnemonic material is stored in SecureStore and signing is isolated to chain-spec
 - Transaction history and transaction details.
 - WalletConnect session management.
 - Fiat on-ramp and off-ramp flows.
-- Stellar SPP screen for private XLM testnet work.
+- Private XLM Home surface with explicit setup, synchronization, action, and reconciliation states for Stellar Mainnet.

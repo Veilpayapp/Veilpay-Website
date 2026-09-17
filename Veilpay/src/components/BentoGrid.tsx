@@ -35,9 +35,9 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
         {/* Wide Card - ZK Proofs (full width of the column) */}
         <BentoCard
           name="ZK Proofs"
-          className="bento-card w-full min-w-0 flex-none md:flex-1 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111]/95 md:bg-[#111]/80 md:backdrop-blur-xl shadow-2xl rounded-3xl"
+          className="bento-card opacity-0 w-full min-w-0 flex-none md:flex-1 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111]/95 md:bg-[#111]/80 md:backdrop-blur-xl shadow-2xl rounded-3xl"
           Icon={ShieldCheck}
-          description="Prove a payment is valid without revealing sender, receiver, or amount. Zero-knowledge proofs keep every transaction cryptographically private."
+          description="Zero-knowledge proofs allow us to mathematically prove a payment is valid without ever revealing the sender, receiver, or amount to the public ledger. Your transactions remain cryptographically private from end to end."
           onClick={() => setShowZkPopup(true)}
           cta="Learn more"
           background={
@@ -52,9 +52,9 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
           {/* Square Card - Stealth Address */}
           <BentoCard
             name="Stealth Addresses"
-            className="bento-card w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#141414]/95 md:bg-[#141414]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
+            className="bento-card opacity-0 w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#141414]/95 md:bg-[#141414]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
             Icon={ArrowDownCircle}
-            description="EIP-5564 dual-key stealth addresses generate a fresh one-time address per transaction, breaking on-chain linkability across Stellar, EVM, and Solana."
+            description="We implement EIP-5564 dual-key stealth addresses to generate a fresh, one-time address for every incoming transaction. This breaks on-chain linkability, ensuring your public financial history remains private on transparent networks."
             onClick={() => setShowStealthPopup(true)}
             cta="Explore privacy"
             background={
@@ -68,9 +68,9 @@ const BentoGrid = ({ ref }: { ref?: React.Ref<HTMLDivElement> }) => {
           {/* Square Card - Privacy Tokens */}
           <BentoCard
             name="Privacy Tokens"
-            className="bento-card w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
+            className="bento-card opacity-0 w-full flex-none md:flex-1 md:basis-0 min-w-0 min-h-[200px] md:h-[clamp(220px,30vh,340px)] border border-amber-500/20 bg-[#111111]/95 md:bg-[#111111]/80 md:backdrop-blur-xl shadow-xl rounded-3xl"
             Icon={Globe}
-            description="Send and receive Stellar privacy payments, Monero, Zcash and Midnight alongside Ethereum, Solana, Base, Arbitrum, and Polygon - one vault, full privacy."
+            description="Veilpay supports fully native privacy assets like Stellar, Monero, Zcash, and Midnight, alongside transparent chains like Ethereum, Solana, and Base. Choose the level of privacy that fits your needs in a single unified interface."
             onClick={() => setShowTokensPopup(true)}
             cta="See supported assets"
             background={

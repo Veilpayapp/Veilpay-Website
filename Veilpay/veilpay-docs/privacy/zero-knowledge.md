@@ -1,17 +1,17 @@
 # Zero-knowledge direction
 
-Veilpay includes ZK-oriented infrastructure and privacy-pool direction, but production private settlement requires careful gating.
+Veilpay uses zero-knowledge infrastructure for Private XLM and continues to develop privacy-pool components for other networks.
 
 ## Current direction
 
 - Groth16-style proof concepts.
 - Nullifier-based double-spend prevention.
 - Privacy pool patterns.
-- Separate Stellar SPP circuit and native-proving path.
+- A dedicated Stellar Private Payments circuit and native proving path for Private XLM.
 
 ## Important boundary
 
-ZK code and circuit scaffolding must not be presented as production-live private payments unless the full proving, verification, relayer, indexing, audit, and operational controls are complete.
+Private XLM availability is documented separately from its audit status. Experimental EVM, Solana, or future-chain scaffolding must not be presented as production-live private payments until the relevant proving, verification, recovery, security, and operational controls are complete.
 
 ## Production requirements
 

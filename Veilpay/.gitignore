@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.ssr-temp
 *.local
 
 # Local env files (never commit real secrets)
@@ -33,3 +34,9 @@ dist-ssr
 .claude
 *.report.json
 lh-*.json
+coverage/
+.obsidian/
+docs-toc-test.html
+performance-analysis.json
+pnpm-lock.yaml
+pnpm-workspace.yaml

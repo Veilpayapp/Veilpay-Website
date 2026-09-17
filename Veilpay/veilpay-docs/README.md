@@ -11,7 +11,7 @@ This documentation is the public product and developer knowledge base for Veilpa
 - Backend-proxied RPC access to avoid exposing provider credentials in the mobile app.
 - Fiat on-ramp and off-ramp flows through provider integrations.
 - WalletConnect v2 for external dapp sessions.
-- Privacy tooling including stealth-address primitives, encrypted notes, and a Stellar Private Payments track for native privacy.
+- Privacy tooling including stealth-address primitives, encrypted notes, and Private XLM on Stellar Mainnet.
 - Production-oriented security controls: server-side credential isolation, rate limiting, strict CORS, typed validation, secret management, and operational health checks.
 
 ## Documentation map
@@ -29,8 +29,8 @@ Veilpay currently focuses on:
 
 - EVM networks: Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, and Sepolia for testing.
 - Solana mainnet and devnet flows.
-- Stellar mainnet and testnet flows.
-- Stellar Private Payments on testnet as the first native privacy-chain integration track.
+- Stellar Mainnet and Testnet wallet flows.
+- Private XLM on Stellar Mainnet, including shield, private send and receive, and unshield flows.
 
 Planned privacy-chain tracks include Monero, Zcash, and Midnight. Those tracks are documented as roadmap items and are not described as production-live integrations.
 

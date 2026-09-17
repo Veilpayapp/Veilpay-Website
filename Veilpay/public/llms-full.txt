@@ -1,0 +1,121 @@
+# Veilpay (veilpayapp) — Complete AI Agent & LLM Reference Manual
+
+> Private by Default. Multi-Chain by Design.
+
+**Veilpay** (domain: `https://veilpayapp.com`, docs: `https://docs.veilpayapp.com`, brand: `Veilpay`, identifier: `veilpayapp`) is a non-custodial multi-chain crypto vault, developer payments platform, and private payments protocol. It enables everyday users, creators, and merchants to send, receive, and accept crypto donations and invoice payments without exposing public wallet addresses or transaction history.
+
+---
+
+## 1. Developer Resources & Machine-Readable Endpoints
+
+- **OpenAPI 3.1.0 JSON Spec:** `https://veilpayapp.com/openapi.json`
+- **OpenAPI 3.1.0 YAML Spec:** `https://veilpayapp.com/openapi.yaml`
+- **LLM Summary Index:** `https://veilpayapp.com/llms.txt`
+- **Complete LLM Manual:** `https://veilpayapp.com/llms-full.txt`
+- **Machine Site Map:** `https://veilpayapp.com/index.md`
+- **XML Sitemap:** `https://veilpayapp.com/sitemap.xml`
+- **Developer Documentation:** `https://docs.veilpayapp.com/`
+- **API Route Reference:** `https://docs.veilpayapp.com/reference/api-routes`
+- **Merchant API Overview:** `https://docs.veilpayapp.com/merchant-api/overview`
+- **Merchant Authentication:** `https://docs.veilpayapp.com/merchant-api/authentication`
+- **Invoices API:** `https://docs.veilpayapp.com/merchant-api/invoices`
+- **Webhooks Integration:** `https://docs.veilpayapp.com/merchant-api/webhooks`
+- **RPC Proxy:** `https://docs.veilpayapp.com/merchant-api/rpc-proxy`
+- **Stealth Addresses (EIP-5564):** `https://docs.veilpayapp.com/privacy/stealth-addresses`
+
+---
+
+## 2. Core Cryptographic Architecture
+
+### 2.1 EIP-5564 Dual-Key Stealth Addressing
+Veilpay implements dual-key stealth addressing to break on-chain linkability on transparent blockchains (Ethereum, Solana, Stellar, Base, Arbitrum, Polygon, Optimism, BSC).
+
+1. **Meta-Address Generation**: Recipient generates spending key pair `(k_spend, K_spend)` and viewing key pair `(k_view, K_view)`. The public meta-address consists of `(K_spend, K_view)`.
+2. **Ephemeral Derivation**: Sender generates an ephemeral key pair `(r, R = r*G)`.
+3. **Shared Secret**: Sender computes shared secret `S = r * K_view`.
+4. **Stealth Address Calculation**: Sender derives one-time address `P = K_spend + hash(S)*G`.
+5. **Announcement**: Sender broadcasts transaction to `P` with public ephemeral key `R` in metadata/calldata.
+6. **Recipient Discovery**: Recipient continuously scans announcements using private viewing key `k_view` to compute `S = k_view * R`. If `P == K_spend + hash(S)*G`, the payment belongs to the recipient.
+7. **Spending Key Recovery**: Recipient computes one-time private key `p = k_spend + hash(S)` locally.
+
+### 2.2 Zero-Knowledge Proofs
+Veilpay leverages zk-SNARKs and Bulletproofs to mathematically verify transaction validity, asset backing, and non-double-spending without revealing amounts, sender identities, or recipient addresses on public ledgers.
+
+### 2.3 Non-Custodial Security Model
+- Private keys (BIP-39 mnemonics, Ed25519, secp256k1) are generated and stored exclusively on client devices (Web Crypto API, Secure Enclave, Android Keystore).
+- The Veilpay backend never receives, stores, or transmits private keys, mnemonics, or raw signing material.
+- No KYC is required to generate a vault or receive private crypto payments.
+
+---
+
+## 3. Public API Specifications
+
+### 3.1 Waitlist Double Opt-In API
+
+#### `POST /api/waitlist-start`
+Initiates email verification by validating address format, ensuring major provider domain (Gmail, Outlook, Proton, etc.), generating a 6-digit code, and dispatching via Resend.
+
+- **Request Body:**
+  ```json
+  {
+    "email": "user@gmail.com"
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "token": "base64url_payload.signature"
+  }
+  ```
+- **Error Response (400/405/429/500/502):**
+  ```json
+  {
+    "error": {
+      "code": "INVALID_EMAIL_FORMAT",
+      "message": "Please enter a valid email address.",
+      "hint": "Ensure your email contains a valid username and domain."
+    }
+  }
+  ```
+
+#### `POST /api/waitlist-verify`
+Validates the typed 6-digit code against the signed HMAC token.
+
+- **Request Body:**
+  ```json
+  {
+    "email": "user@gmail.com",
+    "code": "123456",
+    "token": "base64url_payload.signature"
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "ok": true
+  }
+  ```
+
+### 3.2 Merchant & Wallet API (`/api/v1`)
+
+- `POST /api/v1/invoice/create`: Create private invoice with stealth addressing.
+- `GET /api/v1/invoice/{id}`: Fetch invoice details.
+- `GET /api/v1/invoice/{id}/status`: Public status check for checkout interfaces.
+- `POST /api/v1/webhook/verify`: Verify webhook signatures.
+- `POST /api/v1/onramp/url`: Create fiat-to-crypto on-ramp session.
+- `POST /api/v1/rpc/{chainKey}`: Proxied multi-chain JSON-RPC.
+
+---
+
+## 4. Supported Blockchains
+
+1. **Native Privacy Chains**: Monero (`XMR`), Zcash (`ZEC`), Midnight (Cardano privacy partner), Stellar Private Payments (`SEP-0041`).
+2. **Transparent Chains with Stealth Addressing**: Ethereum (`ETH`), Solana (`SOL`), Stellar (`XLM`), Base, Arbitrum, Polygon, Optimism, BNB Smart Chain (`BSC`).
+3. **Testnets**: Sepolia (EVM), Solana Devnet, Stellar Testnet.
+
+---
+
+## 5. Agent Negotiation & Recovery
+
+- **Accept Negotiation (`acceptmarkdown.com`)**: When requests provide `Accept: text/markdown`, clean markdown representations are returned with `Vary: Accept, Accept-Encoding`.
+- **404 Recovery**: Nonexistent endpoints return HTTP 404 with structured recovery links pointing to `llms.txt`, `openapi.json`, `sitemap.xml`, and `docs`.

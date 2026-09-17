@@ -17,4 +17,4 @@ WalletConnect namespace support includes Solana session handling where supported
 
 ## Privacy roadmap
 
-Solana is part of the supported chain set, but the native privacy-chain roadmap is currently centered on Stellar SPP first, followed by planned Monero, Zcash, and Midnight tracks.
+Solana is part of the supported chain set. Veilpay's first native private-payment integration is Private XLM on Stellar Mainnet; additional privacy-chain work remains planned.

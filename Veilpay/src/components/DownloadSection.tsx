@@ -11,15 +11,8 @@ const DownloadSection: React.FC = () => {
   const boxRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [hasFollowed, setHasFollowed] = useState(false);
-  const [isFollowHovered, setIsFollowHovered] = useState(false);
-  const [showErrorPopup, setShowErrorPopup] = useState(false);
+
   const [showInvalidEmailPopup, setShowInvalidEmailPopup] = useState(false);
-  // Two-step waitlist: 'email' collects the address, 'code' verifies the 6-digit
-  // code emailed to it. `token` is the opaque HMAC-signed handle from the server.
-  const [step, setStep] = useState<'email' | 'code'>('email');
-  const [code, setCode] = useState('');
-  const [token, setToken] = useState('');
 
   // Initial load auto-scrolling is now fully handled centrally in App.tsx
   // which properly waits for components and lenis to be ready.
@@ -30,6 +23,7 @@ const DownloadSection: React.FC = () => {
       // ── Desktop: original cinematic pinned scale ──
       const tl = gsap.timeline({
         scrollTrigger: {
+          id: 'download-trigger',
           trigger: sectionRef.current,
           start: 'top top',
           end: '+=150%', // The scroll distance the pin holds for
@@ -133,17 +127,7 @@ const DownloadSection: React.FC = () => {
       });
 
       if (response.ok) {
-        const data = (await response.json().catch(() => ({}))) as { token?: string };
-        if (!data.token) {
-          setErrorMessage('Something went wrong sending your code. Please try again.');
-          setShowInvalidEmailPopup(true);
-          setStatus('error');
-          return;
-        }
-        setToken(data.token);
-        setCode('');
-        setStep('code');
-        setStatus('idle');
+        setStatus('success');
       } else {
         const errorJson = await response.json().catch(() => ({} as Record<string, string>));
         console.error('Waitlist start error:', response.status, errorJson);
@@ -154,47 +138,6 @@ const DownloadSection: React.FC = () => {
           setShowInvalidEmailPopup(true);
         }
         setStatus('error');
-      }
-    } catch (error) {
-      console.error("Fetch/Network Error (Check Adblockers or CORS):", error);
-      setStatus('error');
-    }
-  };
-
-  // Step 2 of double opt-in: verify the typed code against the signed token.
-  // Only a correct, unexpired code flips the user to "success" and (server-side)
-  // pings Discord.
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanCode = code.trim();
-    if (!/^\d{6}$/.test(cleanCode)) {
-      setErrorMessage('Enter the 6-digit code from your email.');
-      setShowInvalidEmailPopup(true);
-      return;
-    }
-
-    setStatus('loading');
-
-    try {
-      const response = await fetch('/api/waitlist-verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), code: cleanCode, token }),
-      });
-
-      if (response.ok) {
-        setStatus('success');
-      } else {
-        const errorJson = await response.json().catch(() => ({} as Record<string, string>));
-        console.error('Waitlist verify error:', response.status, errorJson);
-        if (errorJson.error) {
-          setErrorMessage(errorJson.error);
-          setShowInvalidEmailPopup(true);
-        }
-        // Keep them on the code step so they can re-enter the code.
-        setStatus('idle');
       }
     } catch (error) {
       console.error("Fetch/Network Error (Check Adblockers or CORS):", error);
@@ -246,72 +189,6 @@ const DownloadSection: React.FC = () => {
         {/* Waitlist Form Replacement */}
         <div id="waitlist" className="flex flex-col items-center justify-center mt-12 w-full max-w-lg mx-auto relative">
           
-          {/* Follow Gate */}
-          <div className={`relative z-10 w-full flex flex-col items-center gap-4 ${hasFollowed ? 'hidden' : ''}`}>
-            <p className="text-white/70 text-sm font-medium">Follow us on X to unlock the waitlist</p>
-            <a 
-              href="https://x.com/Veilpayapp" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              onMouseEnter={() => setIsFollowHovered(true)}
-              onMouseLeave={() => setIsFollowHovered(false)}
-              onClick={() => {
-                const clickTime = Date.now();
-
-                const handleReturn = () => {
-                  if (document.visibilityState !== 'visible') return;
-                  const timeAway = Date.now() - clickTime;
-                  
-                  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                  
-                  if (isMobile && timeAway < 500) return;
-                  
-                  cleanup();
-                  if (timeAway >= 1500) {
-                    setHasFollowed(true);
-                  } else {
-                    setShowErrorPopup(true);
-                  }
-                };
-
-                const handleFocus = () => {
-                  const timeAway = Date.now() - clickTime;
-                  
-                  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                  
-                  if (isMobile && timeAway < 500) return;
-                  
-                  cleanup();
-                  if (timeAway >= 1500) {
-                    setHasFollowed(true);
-                  } else {
-                    setShowErrorPopup(true);
-                  }
-                };
-
-                const fallbackTimer = window.setTimeout(() => {
-                  cleanup();
-                  setHasFollowed(true);
-                }, 8000);
-
-                const cleanup = () => {
-                  document.removeEventListener('visibilitychange', handleReturn);
-                  window.removeEventListener('focus', handleFocus);
-                  clearTimeout(fallbackTimer);
-                };
-
-                document.addEventListener('visibilitychange', handleReturn);
-                window.addEventListener('focus', handleFocus);
-              }}
-              className={`w-full flex items-center justify-center gap-3 h-14 px-8 text-white font-bold rounded-full transition-all transform hover:scale-[1.02] cursor-pointer ${isFollowHovered ? 'hover:text-[#F2C572] hover:border-[#F2C572]/50 glass-panel' : 'bg-black border border-white/20'}`}
-            >
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
-              </svg>
-              Follow @Veilpayapp
-            </a>
-          </div>
-
           {/* Success Card */}
           <div className={`relative z-10 w-full flex flex-col items-center gap-2 animate-fade-in text-center ${status !== 'success' ? 'hidden' : ''}`}>
             <div className="w-12 h-12 rounded-full bg-green-500/15 border border-green-400/40 flex items-center justify-center mb-1">
@@ -320,14 +197,14 @@ const DownloadSection: React.FC = () => {
               </svg>
             </div>
             <p className="text-green-400 text-sm font-semibold">You're on the waitlist!</p>
-            <p className="text-white/60 text-xs">Email verified. We'll be in touch soon.</p>
+            <p className="text-white/60 text-xs mt-1 max-w-xs mx-auto">Please check your email for a verification link to confirm your spot.</p>
           </div>
 
-          {/* SEO-Accessible Forms (Hidden until unlocked) */}
-          <div className={`w-full flex flex-col items-center gap-4 animate-fade-in ${!hasFollowed || status === 'success' ? 'hidden' : ''}`}>
+          {/* SEO-Accessible Forms */}
+          <div className={`w-full flex flex-col items-center gap-4 animate-fade-in ${status === 'success' ? 'hidden' : ''}`}>
             
             {/* Email Step */}
-            <div className={`w-full flex flex-col items-center gap-4 w-full ${step !== 'email' ? 'hidden' : ''}`}>
+            <div className="w-full flex flex-col items-center gap-4">
               <p className="text-[#F2C572] text-sm font-medium">Enter your email to join</p>
               <form onSubmit={handleSubmit} className="w-full flex flex-col sm:flex-row gap-4 relative z-10 mx-auto justify-center items-center">
                 <div className="relative flex-1 w-full sm:w-auto">
@@ -337,7 +214,7 @@ const DownloadSection: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email" 
                     aria-label="Email address"
-                    required={step === 'email'}
+                    required
                     disabled={status === 'loading'}
                     className="w-full h-14 bg-[#111111] border border-[#F2C572]/20 rounded-full px-6 text-white placeholder-gray-500 text-center sm:text-left focus:outline-none focus:border-[#F2C572]/60 focus:bg-black/60 transition-all text-sm"
                   />
@@ -347,55 +224,16 @@ const DownloadSection: React.FC = () => {
                   disabled={status === 'loading'}
                   className="h-14 px-8 rounded-full bg-gradient-to-r from-[#F2C572] to-[#D4A042] text-black font-bold hover:brightness-110 transition-all shadow-[0_0_30px_rgba(242,197,114,0.1)] hover:shadow-[0_0_50px_rgba(242,197,114,0.3)] flex items-center justify-center min-w-[140px] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-105 w-full sm:w-auto"
                 >
-                  {status === 'loading' ? 'Sending…' : 'Send code'}
+                  {status === 'loading' ? 'Joining…' : 'Join Waitlist'}
                 </button>
               </form>
-            </div>
-
-            {/* Code Verification Step */}
-            <div className={`w-full flex flex-col items-center gap-4 w-full ${step !== 'code' ? 'hidden' : ''}`}>
-              <p className="text-[#F2C572] text-sm font-medium text-center">
-                Enter the 6-digit code sent to<br />
-                <span className="text-white/80 break-all">{email}</span>
-              </p>
-              <form onSubmit={handleVerify} className="w-full flex flex-col sm:flex-row gap-4 relative z-10 mx-auto justify-center items-center">
-                <div className="relative flex-1 w-full sm:w-auto">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    maxLength={6}
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="6-digit code"
-                    aria-label="Verification code"
-                    required={step === 'code'}
-                    disabled={status === 'loading'}
-                    className="w-full h-14 bg-[#111111] border border-[#F2C572]/20 rounded-full px-6 text-white placeholder-gray-500 text-center tracking-[0.4em] focus:outline-none focus:border-[#F2C572]/60 focus:bg-black/60 transition-all text-base"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={status === 'loading' || code.length !== 6}
-                  className="h-14 px-8 rounded-full bg-gradient-to-r from-[#F2C572] to-[#D4A042] text-black font-bold hover:brightness-110 transition-all shadow-[0_0_30px_rgba(242,197,114,0.1)] hover:shadow-[0_0_50px_rgba(242,197,114,0.3)] flex items-center justify-center min-w-[140px] disabled:opacity-70 disabled:cursor-not-allowed transform hover:scale-105 w-full sm:w-auto"
-                >
-                  {status === 'loading' ? 'Verifying…' : 'Verify & Join'}
-                </button>
-              </form>
-              <button
-                type="button"
-                onClick={() => { setStep('email'); setCode(''); setStatus('idle'); }}
-                className="text-white/50 hover:text-white/80 text-xs underline underline-offset-4 transition-colors"
-              >
-                Use a different email
-              </button>
             </div>
           </div>
 
           {/* Success is rendered as a verified card in the form area above. */}
           {status === 'error' && (
             <p className="text-red-400 text-sm mt-4 animate-fade-in relative z-10 font-medium text-center">
-              Something went wrong. Please try again.
+              {errorMessage || 'Something went wrong. Please try again.'}
             </p>
           )}
         </div>
@@ -432,46 +270,14 @@ const DownloadSection: React.FC = () => {
               <path d="M9.025 8c0 2.485-2.02 4.5-4.513 4.5A4.506 4.506 0 0 1 0 8c0-2.486 2.02-4.5 4.512-4.5A4.506 4.506 0 0 1 9.025 8m4.95 0c0 2.34-1.01 4.236-2.256 4.236S9.463 10.339 9.463 8c0-2.34 1.01-4.236 2.256-4.236S13.975 5.661 13.975 8M16 8c0 2.096-.355 3.795-.794 3.795-.438 0-.793-1.7-.793-3.795 0-2.096.355-3.795.794-3.795.438 0 .793 1.699.793 3.795"/>
             </svg>
           </a>
+          <a href="/blogs" aria-label="Read Veilpay Blog" className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center download-social hover:text-[#F2C572] transition-all transform hover:scale-110 glass-panel">
+            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M16 2.012H8a5.992 5.992 0 0 0-6 6v7.975a5.992 5.992 0 0 0 6 6h8a5.992 5.992 0 0 0 6-6V8.013a5.993 5.993 0 0 0-6-6Zm-4 13.5a1.5 1.5 0 1 1-1.5-1.5 1.5 1.5 0 0 1 1.5 1.5Zm3.5-3h-7a2.5 2.5 0 0 1 0-5h7a2.5 2.5 0 0 1 0 5Z"/>
+            </svg>
+          </a>
         </div>
         </div>
       </div>
-
-      <AnimatePresence>
-        {showErrorPopup && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowErrorPopup(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="ios-glass p-8 flex flex-col items-center justify-center gap-4 text-center max-w-sm mx-4 border border-white/20 rounded-[32px]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E8B84B] to-[#B8791F] flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(232,184,75,0.4)]">
-                <svg className="w-6 h-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-white tracking-tight">Too fast!</h3>
-              <p className="text-sm text-white/70 leading-relaxed">
-                Please actually click Follow on X to join the waitlist! It seems you came back a bit too quickly.
-              </p>
-              <button
-                onClick={() => setShowErrorPopup(false)}
-                className="mt-2 ios-glass-gold px-6 py-2.5 rounded-full text-black font-bold text-sm uppercase tracking-wide w-full hover:brightness-110 transition-all"
-              >
-                Got it
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {showInvalidEmailPopup && (

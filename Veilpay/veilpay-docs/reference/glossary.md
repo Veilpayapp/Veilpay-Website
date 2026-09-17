@@ -22,7 +22,11 @@ A wallet model where private keys and mnemonics stay on the user's device and ar
 
 ## SPP
 
-Stellar Private Payments, the Stellar testnet privacy-pool integration track.
+Stellar Private Payments, the protocol behind Private XLM on Stellar Mainnet.
+
+## Private XLM
+
+Veilpay's private Stellar balance. Users can shield public XLM, send and receive privately, and unshield to a public Stellar address.
 
 ## Stealth address
 

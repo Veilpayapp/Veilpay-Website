@@ -16,3 +16,9 @@ The app uses price feed logic with cache and fallback behavior. Stale or unavail
 ## Asset list UX
 
 Dashboard asset lists are optimized for mobile performance and should not block core wallet navigation if a network or price provider is degraded.
+
+## Private XLM balance
+
+On Stellar Mainnet, Private XLM appears as a separate private balance rather than a new public token. The Home screen can retain a cached private balance while Veilpay refreshes private history. Cached data is not treated as permission to move funds: Shield, Send privately, and Unshield remain unavailable until account setup and synchronization are current.
+
+See [Private XLM on Stellar Mainnet](private-xlm-mainnet.md).

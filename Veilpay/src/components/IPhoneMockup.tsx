@@ -30,7 +30,7 @@ const IPhoneMockup: React.FC = () => {
         <>
           <img
             src="/MOCKUP2.webp"
-            alt="iPhone Mockup"
+            alt="Veilpay private crypto wallet app — stealth address vault"
             width={1527}
             height={1024}
             fetchPriority="high"
@@ -38,7 +38,7 @@ const IPhoneMockup: React.FC = () => {
           />
           <img
             src="/MOCKUP2.WHITE.webp"
-            alt="iPhone Mockup"
+            alt="Veilpay private crypto wallet app — stealth address vault"
             width={1527}
             height={1024}
             fetchPriority="high"

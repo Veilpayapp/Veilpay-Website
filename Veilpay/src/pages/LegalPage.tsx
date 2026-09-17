@@ -47,6 +47,28 @@ export default function LegalPage({ doc }: { doc: DocKey }) {
         <title>{title}</title>
         <meta name="description" content={description} />
         <link rel="canonical" href={`https://veilpayapp.com/${doc}`} />
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://veilpayapp.com/${doc}`} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://veilpayapp.com/og.jpg" />
+        <meta property="og:site_name" content="Veilpay" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://veilpayapp.com/og.jpg" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://veilpayapp.com/" },
+              { "@type": "ListItem", "position": 2, "name": title.split(' | ')[0], "item": `https://veilpayapp.com/${doc}` }
+            ]
+          })}
+        </script>
       </Helmet>
 
       <NoiseOverlay />
@@ -63,7 +85,7 @@ export default function LegalPage({ doc }: { doc: DocKey }) {
           <Link to="/about" className="hover:text-amber-400 transition-colors">About</Link>
           <Link to="/privacy" className="hover:text-amber-400 transition-colors">Privacy</Link>
           <Link to="/terms" className="hover:text-amber-400 transition-colors">Terms</Link>
-          <Link to="/docs" className="hover:text-amber-400 transition-colors">Docs</Link>
+          <a href="https://docs.veilpayapp.com" className="hover:text-amber-400 transition-colors">Docs</a>
           <span className="text-neutral-600">© 2026 Veilpay</span>
         </nav>
       </main>

@@ -29,7 +29,7 @@ Data stores
   PostgreSQL through Prisma, Redis for queues and coordination
 
 Blockchain layer
-  EVM networks, Solana, Stellar, Stellar SPP testnet track
+  EVM networks, Solana, Stellar, Private XLM on Stellar Mainnet
 ```
 
 ## Design principles
@@ -37,5 +37,5 @@ Blockchain layer
 - Keep user signing material on-device.
 - Keep RPC provider credentials server-side.
 - Validate addresses, amounts, and chain identifiers before signing.
-- Treat stronger privacy as a gated, explicit mode rather than an ambiguous default.
+- Treat stronger privacy as an explicit mode with clear readiness and transaction states.
 - Clearly separate shipped features from testnet and roadmap work.

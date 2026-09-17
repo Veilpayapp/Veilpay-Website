@@ -17,12 +17,11 @@ const MassiveTextScroll: React.FC = () => {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top top',
-          end: '+=250%', // Reduced from 600% to eliminate the huge gap
+          end: TOUCH ? '+=380%' : '+=480%', // Balanced pacing: gives each word comfortable scroll breathing room
           pin: true,
           pinSpacing: true,
-          // Phones: light scrub so the giant text stops chasing quickly after a
-          // flick. Desktop keeps the slower, smoother 2s catch-up.
-          scrub: TOUCH ? 0.6 : 2,
+          // Responsive scrub: tight 1s catch-up on desktop (replaces the rushed 2s lag), 0.4s on touch
+          scrub: TOUCH ? 0.4 : 1,
           fastScrollEnd: TOUCH,
           invalidateOnRefresh: true, // re-derive vh offsets on rotation/resize
           // ── Stacked-pin ordering (critical) ──
@@ -41,20 +40,20 @@ const MassiveTextScroll: React.FC = () => {
         y: '50vh', // Start slightly below center
       });
 
-      // Sequence for "SECURE"
-      tl.to(text1Ref.current, { scale: 1, opacity: 1, y: 0, duration: 1.5, ease: 'power2.out' })
-        .to(text1Ref.current, { scale: 1.2, duration: 1.5, ease: 'none' }) // Longer hold while scaling slowly
-        .to(text1Ref.current, { scale: 0.2, opacity: 0, y: '-50vh', duration: 1.5, ease: 'power2.in' });
+      // Sequence for "SECURE" — extended hold at center so it doesn't rush past
+      tl.to(text1Ref.current, { scale: 1, opacity: 1, y: 0, duration: 1.2, ease: 'power2.out' })
+        .to(text1Ref.current, { scale: 1.15, duration: 1.8, ease: 'none' })
+        .to(text1Ref.current, { scale: 0.2, opacity: 0, y: '-50vh', duration: 1.2, ease: 'power2.in' });
 
       // Sequence for "&"
-      tl.to(text2Ref.current, { scale: 1, opacity: 1, y: 0, duration: 1.5, ease: 'power2.out' }, "-=0.3")
-        .to(text2Ref.current, { scale: 1.2, duration: 1.5, ease: 'none' }) // Longer hold
-        .to(text2Ref.current, { scale: 0.2, opacity: 0, y: '-50vh', duration: 1.5, ease: 'power2.in' });
+      tl.to(text2Ref.current, { scale: 1, opacity: 1, y: 0, duration: 1.2, ease: 'power2.out' }, "-=0.2")
+        .to(text2Ref.current, { scale: 1.15, duration: 1.8, ease: 'none' })
+        .to(text2Ref.current, { scale: 0.2, opacity: 0, y: '-50vh', duration: 1.2, ease: 'power2.in' });
 
       // Sequence for "PRIVATE"
-      tl.to(text3Ref.current, { scale: 1, opacity: 1, y: 0, duration: 1.5, ease: 'power2.out' }, "-=0.3")
-        .to(text3Ref.current, { scale: 1.2, duration: 1.5, ease: 'none' }) // Longer hold
-        .to(text3Ref.current, { scale: 0.2, opacity: 0, y: '-50vh', duration: 1.5, ease: 'power2.in' });
+      tl.to(text3Ref.current, { scale: 1, opacity: 1, y: 0, duration: 1.2, ease: 'power2.out' }, "-=0.2")
+        .to(text3Ref.current, { scale: 1.15, duration: 1.8, ease: 'none' })
+        .to(text3Ref.current, { scale: 0.2, opacity: 0, y: '-50vh', duration: 1.2, ease: 'power2.in' });
 
     }, sectionRef);
 

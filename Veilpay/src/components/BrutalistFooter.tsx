@@ -14,12 +14,14 @@ const FOOTER_DATA = [
       { label: 'ZK Proofs', href: '#features', eventName: 'openZkPopup' },
       { label: 'Stealth Addresses', href: '#features', eventName: 'openPrivacyPopup' },
       { label: 'Privacy Tokens', href: '#features', eventName: 'openTokensPopup' },
+      { label: 'How It Works', href: '/how-it-works' },
       { label: 'Waitlist', href: '#download' },
     ],
   },
   {
     title: 'Company',
     links: [
+      { label: 'Private Wallet', href: '/private-wallet' },
       { label: 'About Us', href: '/about' },
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Terms of Service', href: '/terms' },
@@ -34,6 +36,7 @@ const FOOTER_DATA = [
       { label: 'Instagram', href: 'https://instagram.veilpayapp.com' },
       { label: 'LinkedIn', href: 'https://linkedin.veilpayapp.com' },
       { label: 'Medium', href: 'https://veilpay.medium.com' },
+      { label: 'Blog', href: '/blogs' },
     ],
   },
 ];
@@ -107,9 +110,9 @@ const BrutalistFooter: React.FC = () => {
               transition={{ duration: 0.5, delay: idx * 0.1 + 0.3 }}
               className="flex flex-1 flex-col gap-4 md:gap-6 min-w-[100px] md:min-w-[120px]"
             >
-              <h4 className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-amber-500/80">
+              <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-amber-500/80">
                 {col.title}
-              </h4>
+              </h3>
               <ul className="flex flex-col gap-3 md:gap-4">
                 {col.links.map((link) => (
                   <li key={link.label}>

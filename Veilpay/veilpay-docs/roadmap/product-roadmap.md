@@ -12,11 +12,13 @@ Veilpay’s roadmap is organized around secure wallet foundations, private payme
 - WalletConnect.
 - Security hardening.
 - Observability and CI checks.
+- Private XLM on Stellar Mainnet.
+- Native private-payment proof generation and recovery in supported mobile releases.
 
 ## Active and gated work
 
-- Stellar SPP private XLM testnet flow.
-- Native SPP proof generation and device readiness.
+- Private XLM audit evidence and operational hardening.
+- Private-history recovery performance and provider resilience.
 - WebSocket or streaming price updates.
 - Indexer-based transaction-history expansion.
 - Certificate pinning finalization.

@@ -8,7 +8,6 @@ const OTHER_LOGOS = [
   '/cryptos/zec.svg',
   '/cryptos/bnb.svg',
   '/cryptos/ltc.svg',
-  '/cryptos/xrp.svg',
 ];
 
 let currentBatch: string[] = [];

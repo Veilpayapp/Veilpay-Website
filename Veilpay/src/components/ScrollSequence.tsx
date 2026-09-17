@@ -29,29 +29,19 @@ const ScrollSequence: React.FC = () => {
   // (fixes the "coins don't appear on reload" bug).
   // On medium/low-end devices: skip coins entirely.
   const [showCoins, setShowCoins] = useState(false);
+  const [coinsLoaded, setCoinsLoaded] = useState(false);
   useEffect(() => {
-    if (tier !== 'high' || isMobileDevice()) return; // strictly disable coins on mobile and lower-end devices
+    if (tier !== 'high' || isMobileDevice()) {
+      // strictly disable coins on mobile and lower-end devices.
+      // immediately clear the placeholder since we won't load coins.
+      setCoinsLoaded(true);
+      return;
+    }
 
-    let done = false;
-    // Interaction events → show coins immediately
-    const events = ['pointerdown', 'touchstart', 'scroll', 'keydown'] as const;
-    const trigger = () => {
-      if (done) return;
-      done = true;
-      setShowCoins(true);
-      events.forEach((e) => window.removeEventListener(e, trigger));
-    };
-    events.forEach((e) => window.addEventListener(e, trigger, { passive: true }));
-
-    // Fallback for idle viewers (fixes the "coins don't appear on reload" bug):
-    // Just trigger it 1.5 seconds after component mounts. This gives enough time for 
-    // the initial HTML/CSS paint to finish without lag, but guarantees they appear.
-    const idleTimer = window.setTimeout(trigger, 1500);
-
-    return () => {
-      clearTimeout(idleTimer);
-      events.forEach((e) => window.removeEventListener(e, trigger));
-    };
+    // Load coins immediately after mount. Because they are dynamically imported
+    // via React.lazy, they are downloaded in a separate async chunk and will
+    // NOT block the main thread or hurt initial SEO (FCP/LCP metrics).
+    setShowCoins(true);
   }, [tier]);
 
   // Main container ref for the pinned scroll section
@@ -100,7 +90,7 @@ const ScrollSequence: React.FC = () => {
     // Load GSAP + ScrollTrigger off the critical path, then build the exact same
     // timeline as before. The pre-scroll resting state is already applied via
     // CSS in the JSX, so there is no flash while this resolves.
-    (async () => {
+    const loadGSAP = async () => {
       const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
         import('gsap'),
         import('gsap/ScrollTrigger'),
@@ -221,7 +211,13 @@ const ScrollSequence: React.FC = () => {
         4.0,
       );
     }, container);
-    })();
+    };
+    
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      window.requestIdleCallback(() => loadGSAP());
+    } else {
+      setTimeout(loadGSAP, 1);
+    }
 
     return () => {
       cancelled = true;
@@ -230,7 +226,8 @@ const ScrollSequence: React.FC = () => {
   }, []);
 
   return (
-    <div
+    <section
+      aria-label="Veilpay Main Hero Sequence"
       ref={containerRef}
       className="relative h-screen w-full overflow-hidden bg-black"
     >
@@ -256,9 +253,23 @@ const ScrollSequence: React.FC = () => {
       {/* 3D Coins Layer — translated by GSAP but NOT scaled */}
       <div ref={coinsContainerRef} className="absolute inset-0 z-40 pointer-events-none preserve-color">
         <div className="relative h-full w-full">
+          {/* Static placeholder logo that shows immediately (hidden on mobile entirely) */}
+          <div 
+            className={`hidden md:flex absolute inset-0 w-full h-full bg-black items-center justify-center transition-opacity duration-700 ${coinsLoaded ? 'opacity-0' : 'opacity-100'}`}
+            style={{ pointerEvents: 'none' }}
+          >
+            <img 
+              src="/logo.webp" 
+              alt="VeilPay" 
+              className="w-32 md:w-48 h-auto object-contain"
+            />
+          </div>
+
           {showCoins && (
             <Suspense fallback={null}>
-              <CoinsScene />
+              <div className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${coinsLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                <CoinsScene onLoaded={() => setCoinsLoaded(true)} />
+              </div>
             </Suspense>
           )}
         </div>
@@ -277,7 +288,7 @@ const ScrollSequence: React.FC = () => {
             <>
               <img
                 src="/image2.webp"
-                alt="Veilpay wallet screen"
+                alt="Veilpay multi-chain crypto wallet with privacy features"
                 width={1527}
                 height={1024}
                 className="w-full h-auto object-contain relative z-10 dark-image"
@@ -285,7 +296,7 @@ const ScrollSequence: React.FC = () => {
               />
               <img
                 src="/image2.white.webp"
-                alt="Veilpay wallet screen"
+                alt="Veilpay multi-chain crypto wallet with privacy features"
                 width={1527}
                 height={1024}
                 className="w-full h-auto object-contain relative z-10 white-image"
@@ -308,15 +319,15 @@ const ScrollSequence: React.FC = () => {
             <>
               <img
                 src="/image3.webp"
-                alt="Veilpay payment screen"
+                alt="Veilpay private crypto payment with stealth addresses"
                 width={1527}
                 height={1024}
                 className="w-full h-auto object-contain relative z-10 dark-image"
                 loading="lazy"
               />
               <img
-                src="/image3.white.png"
-                alt="Veilpay payment screen"
+                src="/image3.white.webp"
+                alt="Veilpay private crypto payment with stealth addresses"
                 width={1527}
                 height={1024}
                 className="w-full h-auto object-contain relative z-10 white-image"
@@ -339,7 +350,7 @@ const ScrollSequence: React.FC = () => {
           items-center) at every width, instead of being bottom-anchored and
           "settling" lower as the viewport shrinks. GSAP still drives the intro
           rise via its y offsets (y:95vh → y:18vh), now measured from center. */}
-      <div ref={phoneRef} className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none preserve-color">
+      <div ref={phoneRef} className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none preserve-color translate-y-[95vh]">
         <IPhoneMockup />
       </div>
 
@@ -350,12 +361,12 @@ const ScrollSequence: React.FC = () => {
 
       {/* Intro Title Layer — on mobile z-[25] puts it ABOVE the phone (z-20),
            on desktop md:z-10 keeps it behind the phone as designed */}
-      <div ref={introTitleRef} className="absolute inset-0 z-[25] md:z-10 pointer-events-none flex items-stretch justify-center w-full">
+      <div ref={introTitleRef} className="absolute inset-0 z-[25] md:z-10 pointer-events-none flex items-stretch justify-center w-full opacity-0">
         <IntroTitle />
       </div>
 
       {/* Feature Title Layer B (left side on desktop, top-center on mobile, appears after IntroTitle) */}
-      <div ref={titleBRef} className="absolute inset-0 z-50 pointer-events-none flex flex-col justify-start pt-[12vh] md:pt-0 md:justify-center items-center md:items-start px-8 md:px-16 lg:px-24">
+      <div ref={titleBRef} className="absolute inset-0 z-50 pointer-events-none flex flex-col justify-start pt-[12vh] md:pt-0 md:justify-center items-center md:items-start px-8 md:px-16 lg:px-24 opacity-0">
         {/* On desktop the phone occupies the right half, so cap this block to
             ~half the viewport and let the heading scale fluidly — this stops the
             fixed 6-9rem text from sliding under the phone at mid widths. */}
@@ -369,7 +380,7 @@ const ScrollSequence: React.FC = () => {
             <div className="flex -space-x-2">
               {['xlm', 'eth', 'sol', 'xmr', 'zec'].map((coin) => (
                 <div key={coin} className="w-5 h-5 rounded-full bg-black border border-white/20 p-0.5 z-10">
-                  <img src={`/cryptos/${coin}.svg`} alt={coin} className="w-full h-full" />
+                  <img src={`/cryptos/${coin}.svg`} alt={`${coin.toUpperCase()} privacy payments on Veilpay`} className="w-full h-full" />
                 </div>
               ))}
             </div>
@@ -378,7 +389,7 @@ const ScrollSequence: React.FC = () => {
       </div>
 
 
-    </div>
+    </section>
   );
 };
 

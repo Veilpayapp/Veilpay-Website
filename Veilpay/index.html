@@ -5,6 +5,14 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <!-- Preload the hero phone mockup (LCP candidate) so it decodes early. -->
     <link rel="preload" as="image" href="/MOCKUP2.webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/cryptos/xlm.svg" />
+    <link rel="preload" as="image" href="/cryptos/eth.svg" />
+    <link rel="preload" as="image" type="image/svg+xml" href="/cryptos/sol.svg" crossorigin="anonymous" />
+    <link rel="preload" as="image" type="image/svg+xml" href="/cryptos/xmr.svg" crossorigin="anonymous" />
+    <link rel="preload" as="image" type="image/svg+xml" href="/cryptos/zec.svg" crossorigin="anonymous" />
+    <link rel="preload" as="image" type="image/svg+xml" href="/cryptos/btc.svg" crossorigin="anonymous" />
+    <link rel="preload" as="image" type="image/svg+xml" href="/cryptos/bnb.svg" crossorigin="anonymous" />
+    <link rel="preload" as="image" type="image/svg+xml" href="/cryptos/ltc.svg" crossorigin="anonymous" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Load fonts without blocking first paint. display=swap + system fallback
@@ -28,29 +36,189 @@
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://veilpayapp.com/" />
+    <meta http-equiv="content-language" content="en" />
+    <meta name="language" content="English" />
+    <meta name="rating" content="general" />
     <title>Veilpay | Private by Default. Multi-Chain by Design</title>
     <meta name="description" content="Veilpay is a non-custodial crypto vault that makes private payments practical for everyday use. Cross-chain stealth addressing, native privacy assets, and Fiat on-ramps all in one unified experience." />
-    <meta name="keywords" content="Veilpay, privacy wallet, stealth addresses, Stellar, Monero, Zcash, Midnight, ZK proofs, multi-chain, crypto payments" />
+    <meta name="keywords" content="Veilpay, privacy wallet, stealth addresses, Stellar, Monero, Zcash, Midnight, ZK proofs, multi-chain, crypto payments, anonymous crypto donations, private crypto payments, non-custodial wallet, EIP-5564, zero-knowledge proofs, crypto vault" />
     <meta name="author" content="Veilpay" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="https://veilpayapp.com/sitemap.xml" />
     
-    <!-- OpenGraph (Facebook, LinkedIn, Discord) -->
+    <!-- OpenGraph (Facebook, LinkedIn, Discord, WhatsApp) -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://veilpayapp.com/" />
     <meta property="og:title" content="Veilpay | Private by Default. Multi-Chain by Design" />
     <meta property="og:description" content="Veilpay is a non-custodial crypto vault that makes private payments practical for everyday use." />
-    <meta property="og:image" content="https://veilpayapp.com/og.jpg" />
+    <meta property="og:image" content="https://veilpayapp.com/og.jpg?v=2" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Veilpay" />
+    
+    <!-- Schema.org for Google+ / WhatsApp -->
+    <meta itemprop="name" content="Veilpay" />
+    <meta itemprop="description" content="Veilpay is a non-custodial crypto vault that makes private payments practical for everyday use." />
+    <meta itemprop="image" content="https://veilpayapp.com/og.jpg?v=2" />
     
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:domain" content="veilpayapp.com" />
     <meta name="twitter:url" content="https://veilpayapp.com/" />
     <meta name="twitter:title" content="Veilpay | Private by Default. Multi-Chain by Design" />
     <meta name="twitter:description" content="Veilpay is the privacy-native multi-chain wallet. Send Stellar privacy payments, Monero, Zcash and Midnight with EIP-5564 stealth addresses and zero-knowledge proofs." />
-    <meta name="twitter:image" content="https://veilpay-eta.vercel.app/og.jpg" />
+    <meta name="twitter:image" content="https://veilpayapp.com/og.jpg?v=2" />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Veilpay",
+        "operatingSystem": "Web, iOS, Android",
+        "applicationCategory": "FinanceApplication",
+        "description": "Non-custodial crypto vault that makes private payments practical for everyday use.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": [
+          {
+            "@type": "SiteNavigationElement",
+            "position": 1,
+            "name": "Documentation",
+            "url": "https://docs.veilpayapp.com/"
+          },
+          {
+            "@type": "SiteNavigationElement",
+            "position": 2,
+            "name": "Blog",
+            "url": "https://veilpayapp.com/blogs"
+          },
+          {
+            "@type": "SiteNavigationElement",
+            "position": 3,
+            "name": "Private Wallet",
+            "url": "https://veilpayapp.com/private-wallet"
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://veilpayapp.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Features",
+            "item": "https://veilpayapp.com/features"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Documentation",
+            "item": "https://docs.veilpayapp.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Blog",
+            "item": "https://veilpayapp.com/blogs"
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Veilpay and how does it work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Veilpay is a non-custodial crypto vault that uses EIP-5564 stealth addresses and zero-knowledge proofs to enable private payments across 7+ blockchains including Stellar, Monero, Zcash, Ethereum, Solana, Base, and Arbitrum. Your private keys never leave your device."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are stealth addresses and how do they provide privacy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Stealth addresses (EIP-5564) generate a unique, one-time address for every incoming transaction, breaking on-chain linkability. This ensures your public financial history remains private on transparent networks by preventing transaction tracing."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do zero-knowledge proofs enhance privacy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Zero-knowledge proofs allow us to mathematically verify that a payment is valid without ever revealing the sender, receiver, or transaction amount to the public ledger. Your transactions remain cryptographically private from end to end."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Veilpay non-custodial and does it require KYC?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, Veilpay is fully non-custodial. Your private keys never leave your device, and no KYC (Know Your Customer) verification is required. You maintain complete control over your assets."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which blockchain networks does Veilpay support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Veilpay supports privacy-native assets like Stellar, Monero, and Zcash, alongside transparent chains including Ethereum, Solana, Base, Arbitrum, and others. All blockchains are integrated into a single unified interface."
+            }
+          }
+        ]
+      }
+    ]
+    </script>
   </head>
   <body>
     <div id="root">
       <!-- Static bootstrap loader — replaced by React on mount (identical look). -->
       <div class="v-boot"><i></i><i></i><i></i><i></i><i></i></div>
+      <noscript>
+        <main style="max-width:900px;margin:0 auto;padding:80px 24px;font-family:system-ui,sans-serif">
+          <h1 style="font-size:2.5rem;font-weight:800;margin-bottom:16px;background:linear-gradient(to bottom,#fff,#999);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Veilpay — Private Crypto Payments & Anonymous Donations</h1>
+          <p style="color:#999;font-size:1.1rem;line-height:1.7;margin-bottom:32px">Veilpay is a <strong style="color:#F2C572">non-custodial crypto vault</strong> that uses EIP-5564 stealth addresses and zero-knowledge proofs to make private payments practical for everyday use. Send, receive, and hold crypto across 7+ blockchains — Stellar, Monero, Zcash, Ethereum, Solana, Base, and Arbitrum — without exposing your wallet address or financial history.</p>
+          <h2 style="color:#F2C572;font-size:1.5rem;margin-bottom:12px">Core Privacy Features</h2>
+          <ul style="color:#aaa;line-height:2;margin-bottom:32px">
+            <li><strong style="color:#fff">EIP-5564 Stealth Addresses</strong> — Generate a unique one-time address for every incoming payment, breaking on-chain linkability.</li>
+            <li><strong style="color:#fff">Zero-Knowledge Proofs</strong> — Mathematically verify payments without revealing sender, receiver, or amount.</li>
+            <li><strong style="color:#fff">Multi-Chain Privacy</strong> — Native support for Stellar, Monero, Zcash, Ethereum, Solana, Base, and Arbitrum.</li>
+            <li><strong style="color:#fff">Non-Custodial Vault</strong> — Your keys never leave your device. No KYC required.</li>
+            <li><strong style="color:#fff">Fiat On-Ramps</strong> — Buy crypto and enter the private ecosystem seamlessly.</li>
+          </ul>
+          <h2 style="color:#F2C572;font-size:1.5rem;margin-bottom:12px">Accept Crypto Donations Privately</h2>
+          <p style="color:#999;line-height:1.7;margin-bottom:32px">Use Veilpay to accept anonymous crypto donations without exposing your public wallet address. Stealth addresses ensure complete donor privacy across all supported chains.</p>
+          <nav style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1)">
+            <a href="/private-wallet" style="color:#F2C572">Private Wallet</a>
+            <a href="/how-it-works" style="color:#F2C572">How It Works</a>
+            <a href="/docs" style="color:#F2C572">Documentation</a>
+            <a href="/blogs" style="color:#F2C572">Blog</a>
+            <a href="/about" style="color:#F2C572">About Us</a>
+            <a href="/privacy" style="color:#F2C572">Privacy Policy</a>
+            <a href="/terms" style="color:#F2C572">Terms of Service</a>
+          </nav>
+        </main>
+      </noscript>
     </div>
     <!-- iOS "liquid glass" refraction: distorts whatever is behind the glass
          using fractal noise + displacement. Referenced by .ios-glass via

@@ -11,6 +11,7 @@
     "optimize:img": "node scripts/optimize-images.mjs",
     "docs:manifest": "tsx scripts/generate-docs-manifest.ts",
     "docs:check": "tsx scripts/validate-docs.ts",
+    "postbuild": "tsx scripts/prerender-ssg.ts",
     "test": "vitest run"
   },
   "dependencies": {
@@ -18,6 +19,7 @@
     "@radix-ui/react-icons": "^1.3.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
+    "@vercel/functions": "^3.7.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dompurify": "^3.4.12",

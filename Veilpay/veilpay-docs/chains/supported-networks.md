@@ -15,6 +15,8 @@ The public Veilpay docs focus on the networks currently used by the product road
 | Solana | SVM | Supported |
 | Stellar | XLM | Supported |
 
+Stellar Mainnet support includes public XLM and Private XLM in supported Veilpay releases.
+
 ## Test networks
 
 | Network | Purpose |
@@ -25,4 +27,4 @@ The public Veilpay docs focus on the networks currently used by the product road
 
 ## Privacy-chain roadmap
 
-Stellar SPP is the first native privacy-chain track. Monero, Zcash, and Midnight are planned tracks and are not production-live Veilpay integrations.
+Private XLM on Stellar Mainnet is Veilpay's first generally available native private-payment integration. Monero, Zcash, and Midnight remain planned tracks and are not production-live Veilpay integrations.

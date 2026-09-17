@@ -18,7 +18,9 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className }) => {
 
   useEffect(() => {
     // Initial sync just in case
-    setIsLightMode(document.documentElement.classList.contains('light-mode'));
+    requestAnimationFrame(() => {
+      setIsLightMode(document.documentElement.classList.contains('light-mode'));
+    });
 
     // Sync state if another ThemeToggle instance changes the class
     const observer = new MutationObserver(() => {

@@ -1,4 +1,33 @@
 User-agent: *
 Allow: /
+Allow: /blogs/
+Allow: /features
+Allow: /private-wallet
+Allow: /how-it-works
+Allow: /about
+Allow: /contact
+Allow: /waitlist
 
+Disallow: /api/
+Disallow: /.well-known/
+Disallow: /_next/
+Disallow: /__pycache__/
+Disallow: /node_modules/
+Disallow: /*.json$
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+
+# Crawl delay for responsible bot behavior (milliseconds)
+Crawl-delay: 1
+
+# Sitemaps for comprehensive indexing
 Sitemap: https://veilpayapp.com/sitemap.xml
+Sitemap: https://veilpayapp.com/sitemap-docs.xml
+Sitemap: https://veilpayapp.com/sitemap-blogs.xml
+
+# Host specification
+Host: https://veilpayapp.com
+
+# AI crawler reference files
+# Llms-txt: https://veilpayapp.com/llms.txt
+# Index-md: https://veilpayapp.com/index.md

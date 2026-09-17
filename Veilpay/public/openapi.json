@@ -1,0 +1,686 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Veilpay API",
+    "version": "1.0.0",
+    "description": "Veilpay developer and merchant API for non-custodial private payments, EIP-5564 stealth addresses, zero-knowledge verification, and double opt-in beta waitlist.",
+    "contact": {
+      "name": "Veilpay Support",
+      "url": "https://veilpayapp.com",
+      "email": "support@veilpayapp.com"
+    },
+    "license": {
+      "name": "Proprietary",
+      "url": "https://veilpayapp.com/terms"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://veilpayapp.com",
+      "description": "Primary Production Server"
+    },
+    {
+      "url": "https://docs.veilpayapp.com",
+      "description": "Documentation & Reference Host"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Waitlist",
+      "description": "Double opt-in waitlist registration and email verification endpoints."
+    },
+    {
+      "name": "Invoices",
+      "description": "Merchant invoice creation, tracking, and settlement with stealth addressing."
+    },
+    {
+      "name": "Webhooks",
+      "description": "Idempotent signed webhook delivery and verification for merchant order systems."
+    },
+    {
+      "name": "On-Ramp",
+      "description": "Fiat on-ramp quotes and checkout sessions."
+    },
+    {
+      "name": "RPC Proxy",
+      "description": "Multi-chain JSON-RPC proxy maintaining server-side node provider credentials."
+    },
+    {
+      "name": "Health",
+      "description": "Service health, readiness, and liveness probes."
+    }
+  ],
+  "paths": {
+    "/api/waitlist-start": {
+      "post": {
+        "tags": ["Waitlist"],
+        "summary": "Initiate double opt-in waitlist verification",
+        "description": "Validates email address format and provider domain, sends a 6-digit verification code via email, and returns an opaque HMAC-signed token. The verification code expires in 10 minutes.",
+        "operationId": "waitlistStart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaitlistStartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification code dispatched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaitlistStartResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email address or unsupported domain",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (5 requests per 15 minutes per IP)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Service configuration error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Email dispatch upstream failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/waitlist-verify": {
+      "post": {
+        "tags": ["Waitlist"],
+        "summary": "Verify 6-digit code and complete waitlist signup",
+        "description": "Validates the 6-digit code against the signed token. On successful verification, the signup is registered and confirmed.",
+        "operationId": "waitlistVerify",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaitlistVerifyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signup successfully verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaitlistVerifyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, incorrect, or expired verification code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Check API health status",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Readiness probe",
+        "operationId": "getReadiness",
+        "responses": {
+          "200": {
+            "description": "Service is ready to handle traffic",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health/live": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Liveness probe",
+        "operationId": "getLiveness",
+        "responses": {
+          "200": {
+            "description": "Service is live",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/create": {
+      "post": {
+        "tags": ["Invoices"],
+        "summary": "Create merchant invoice",
+        "description": "Generates a new private payment invoice with stealth address parameters.",
+        "operationId": "createInvoice",
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "SignatureAuth": [],
+            "TimestampAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invoice created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid invoice parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failure (invalid key or signature)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "List merchant invoices",
+        "operationId": "listInvoices",
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "SignatureAuth": [],
+            "TimestampAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20 }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of invoices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "invoices": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Invoice" }
+                    },
+                    "nextCursor": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/{id}": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "Get invoice details",
+        "operationId": "getInvoice",
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "SignatureAuth": [],
+            "TimestampAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoice/{id}/status": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "Get invoice payment status",
+        "description": "Public or rate-limited status check for checkout interfaces.",
+        "operationId": "getInvoiceStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current payment status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "status": { "type": "string", "enum": ["pending", "confirming", "paid", "expired", "cancelled"] },
+                    "paidAmount": { "type": "string" },
+                    "txHash": { "type": "string" }
+                  },
+                  "required": ["id", "status"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/webhook/test": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Test merchant webhook endpoint",
+        "operationId": "testWebhook",
+        "security": [
+          {
+            "ApiKeyAuth": [],
+            "SignatureAuth": [],
+            "TimestampAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook test event delivered successfully"
+          }
+        }
+      }
+    },
+    "/api/v1/webhook/verify": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Verify webhook signature",
+        "operationId": "verifyWebhook",
+        "responses": {
+          "200": {
+            "description": "Webhook signature is valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": { "type": "boolean" }
+                  },
+                  "required": ["valid"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/onramp/url": {
+      "post": {
+        "tags": ["On-Ramp"],
+        "summary": "Get fiat on-ramp checkout session URL",
+        "operationId": "getOnrampUrl",
+        "responses": {
+          "200": {
+            "description": "Checkout session generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": { "type": "string", "format": "uri" }
+                  },
+                  "required": ["url"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rpc/{chainKey}": {
+      "post": {
+        "tags": ["RPC Proxy"],
+        "summary": "Forward JSON-RPC request to blockchain node",
+        "operationId": "proxyRpc",
+        "parameters": [
+          {
+            "name": "chainKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["ethereum", "solana", "stellar", "base", "arbitrum", "polygon", "monero", "zcash"]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "jsonrpc": { "type": "string", "example": "2.0" },
+                  "method": { "type": "string", "example": "eth_blockNumber" },
+                  "params": { "type": "array", "items": {} },
+                  "id": { "type": "integer", "example": 1 }
+                },
+                "required": ["jsonrpc", "method", "id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JSON-RPC response from blockchain node"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "Merchant API Key"
+      },
+      "SignatureAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-signature",
+        "description": "HMAC-SHA256 request payload signature"
+      },
+      "TimestampAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-timestamp",
+        "description": "Unix timestamp in milliseconds for replay protection"
+      }
+    },
+    "schemas": {
+      "ErrorDetail": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Standardized machine-readable error code",
+            "example": "INVALID_EMAIL_FORMAT"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error description",
+            "example": "Please enter a valid email address."
+          },
+          "hint": {
+            "type": "string",
+            "description": "Actionable resolution steps for agents and API consumers",
+            "example": "Ensure the email format follows standard address syntax (e.g. name@domain.com)."
+          }
+        },
+        "required": ["code", "message"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": ["error"]
+      },
+      "WaitlistStartRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address to register for waitlist access",
+            "example": "alex@gmail.com"
+          }
+        },
+        "required": ["email"]
+      },
+      "WaitlistStartResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "HMAC-signed verification token required for the verification step",
+            "example": "eyJlbWFpbCI6ImFsZXhAZ21haWwuY29tIiwiZXhwIjoxNzI0NTE2NDAwMDAwfQ.dGhpcy1pcy1hLXNpZ25hdHVyZQ"
+          }
+        },
+        "required": ["token"]
+      },
+      "WaitlistVerifyRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "The email address registered in step 1",
+            "example": "alex@gmail.com"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[0-9]{6}$",
+            "description": "6-digit numeric verification code received via email",
+            "example": "481920"
+          },
+          "token": {
+            "type": "string",
+            "description": "Signed token received from /api/waitlist-start",
+            "example": "eyJlbWFpbCI6ImFsZXhAZ21haWwuY29tIiwiZXhwIjoxNzI0NTE2NDAwMDAwfQ.dGhpcy1pcy1hLXNpZ25hdHVyZQ"
+          }
+        },
+        "required": ["email", "code", "token"]
+      },
+      "WaitlistVerifyResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": ["ok"]
+      },
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "ok" },
+          "version": { "type": "string", "example": "1.0.0" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        },
+        "required": ["status"]
+      },
+      "InvoiceCreateRequest": {
+        "type": "object",
+        "properties": {
+          "merchantId": { "type": "string", "format": "uuid" },
+          "chainKey": { "type": "string", "enum": ["ethereum", "solana", "stellar", "base", "arbitrum", "monero", "zcash"] },
+          "tokenSymbol": { "type": "string", "example": "USDC" },
+          "amount": { "type": "string", "example": "100.00" },
+          "memo": { "type": "string", "example": "Order #12345" },
+          "expiresInMinutes": { "type": "integer", "default": 60 },
+          "privacyLevel": { "type": "string", "enum": ["standard", "enhanced", "shielded"], "default": "standard" }
+        },
+        "required": ["chainKey", "tokenSymbol", "amount"]
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "merchantId": { "type": "string" },
+          "stealthAddress": { "type": "string", "description": "Derived one-time EIP-5564 stealth payment address" },
+          "ephemeralPubKey": { "type": "string" },
+          "chainKey": { "type": "string" },
+          "tokenSymbol": { "type": "string" },
+          "amount": { "type": "string" },
+          "status": { "type": "string", "enum": ["pending", "confirming", "paid", "expired", "cancelled"] },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "expiresAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "stealthAddress", "chainKey", "tokenSymbol", "amount", "status"]
+      }
+    }
+  }
+}

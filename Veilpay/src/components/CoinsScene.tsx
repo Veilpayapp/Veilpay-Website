@@ -6,9 +6,19 @@ import Coin3D from './Coin3D';
 
 interface CoinsSceneProps {
   className?: string;
+  onLoaded?: () => void;
 }
 
-const CoinsScene: React.FC<CoinsSceneProps> = ({ className = '' }) => {
+const Reporter = ({ onLoaded }: { onLoaded: () => void }) => {
+  useEffect(() => {
+    // Small delay to ensure WebGL textures have painted to the canvas
+    const timer = setTimeout(() => onLoaded(), 100);
+    return () => clearTimeout(timer);
+  }, [onLoaded]);
+  return null;
+};
+
+const CoinsScene: React.FC<CoinsSceneProps> = ({ className = '', onLoaded }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
   // Only render the WebGL scene while the hero is on screen. The coins live in a
   // pinned hero that GSAP translates away on scroll, so pausing the render loop
@@ -41,6 +51,7 @@ const CoinsScene: React.FC<CoinsSceneProps> = ({ className = '' }) => {
         <ambientLight intensity={0.8} />
         
         <React.Suspense fallback={null}>
+          {onLoaded && <Reporter onLoaded={onLoaded} />}
           {/* High-contrast Studio Environment for realistic silver reflections */}
           <Environment resolution={32}>
             <group rotation={[-Math.PI / 4, 0, 0]}>

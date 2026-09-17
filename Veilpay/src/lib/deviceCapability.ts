@@ -24,6 +24,11 @@ let cachedTier: DeviceTier | null = null;
 export function getDeviceTier(): DeviceTier {
   if (cachedTier) return cachedTier;
 
+  if (typeof navigator === 'undefined') {
+    cachedTier = 'high';
+    return cachedTier;
+  }
+
   // Respect the user's accessibility preference immediately
   if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     cachedTier = 'low';

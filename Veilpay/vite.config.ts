@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { defineConfig, loadEnv } from 'vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
@@ -90,44 +91,47 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       asyncCss(),
       devApi(env),
-  ],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+    ],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
-  },
-  build: {
-    chunkSizeWarningLimit: 1500,
-    // Don't emit a <link rel="modulepreload"> for the heavy Three.js chunk — it
-    // must stay deferred and load only when the lazy CoinsScene mounts, not
-    // warm eagerly during first paint. gsap/motion preloads are kept (eager).
-    modulePreload: {
-      resolveDependencies: (_url: string, deps: string[]) =>
-        deps.filter((d) => !d.includes('three-')),
-    },
-    rollupOptions: {
-      output: {
-        // Split heavy libs into their own cacheable chunks so they are not all
-        // parsed on the critical path. Function form for Rolldown/Vite 8.
-        manualChunks(id: string) {
-          if (!id.includes('node_modules')) return;
-          // React core + scheduler + router MUST get their own eager chunk.
-          // Otherwise the bundler hoists React's shared runtime (scheduler,
-          // react-dom preload helpers) into the heavy `three` chunk, and the
-          // entry then statically imports `three-*.js` — dragging ~940KB of
-          // WebGL code onto the mobile critical path even though the 3D coins
-          // are disabled on phones. Isolating React keeps `three` pure and
-          // fully deferred to the lazy CoinsScene mount.
-          if (
-            /[\\/]node_modules[\\/](react|react-dom|scheduler|react-router|react-router-dom)[\\/]/.test(id)
-          )
-            return 'react';
-          if (id.includes('three') || id.includes('@react-three')) return 'three';
-          if (id.includes('gsap')) return 'gsap';
-          if (id.includes('framer-motion') || id.includes('motion-dom') || id.includes('motion-utils')) return 'motion';
+    build: {
+      chunkSizeWarningLimit: 1500,
+      // Don't emit a <link rel="modulepreload"> for the heavy Three.js chunk — it
+      // must stay deferred and load only when the lazy CoinsScene mounts, not
+      // warm eagerly during first paint. gsap/motion preloads are kept (eager).
+      modulePreload: {
+        resolveDependencies: (_url: string, deps: string[]) =>
+          deps.filter((d) => !d.includes('three-')),
+      },
+      rollupOptions: {
+        output: {
+          // Split heavy libs into their own cacheable chunks so they are not all
+          // parsed on the critical path. Function form for Rolldown/Vite 8.
+          manualChunks(id: string) {
+            if (!id.includes('node_modules')) return;
+            // React core + scheduler + router MUST get their own eager chunk.
+            // Otherwise the bundler hoists React's shared runtime (scheduler,
+            // react-dom preload helpers) into the heavy `three` chunk, and the
+            // entry then statically imports `three-*.js` — dragging ~940KB of
+            // WebGL code onto the mobile critical path even though the 3D coins
+            // are disabled on phones. Isolating React keeps `three` pure and
+            // fully deferred to the lazy CoinsScene mount.
+            if (
+              /[\\/]node_modules[\\/](react|react-dom|scheduler|react-router|react-router-dom)[\\/]/.test(id)
+            )
+              return 'react';
+            if (id.includes('three') || id.includes('@react-three')) return 'three';
+            if (id.includes('gsap')) return 'gsap';
+            if (id.includes('framer-motion') || id.includes('motion-dom') || id.includes('motion-utils')) return 'motion';
+          },
         },
       },
     },
-    },
+    ssr: {
+      noExternal: ['react-helmet-async', 'dompurify'],
+    }
   }
 })

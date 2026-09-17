@@ -1,0 +1,203 @@
+# Veilpay — Private Crypto Payments & Non-Custodial Multi-Chain Wallet
+
+> Private by Default. Multi-Chain by Design.
+
+**Veilpay** is a non-custodial multi-chain crypto vault that makes private payments practical for everyday use. It combines EIP-5564 stealth addresses, zero-knowledge proofs, native privacy assets (Monero, Zcash, Midnight, Stellar Private Payments), and fiat on-ramps into one unified wallet. Users hold their own keys (BIP-39 mnemonics, Ed25519 / secp256k1), accept crypto donations privately without exposing their public wallet address, and send/receive across 7+ blockchains from a single vault. The backend is a self-custody stack: signing happens on the consumer device, the backend never receives mnemonics, raw signatures, or signing material.
+
+## Quick Links
+
+- **Website:** https://veilpayapp.com/
+- **Documentation:** https://docs.veilpayapp.com/
+- **Docs Index:** https://docs.veilpayapp.com/veilpay-docs/SUMMARY.md
+- **Site Index:** https://veilpayapp.com/index.md
+- **Sitemap:** https://veilpayapp.com/sitemap.xml
+- **Robots.txt:** https://veilpayapp.com/robots.txt
+- **Blog:** https://veilpayapp.com/blogs
+- **Blog Feed (Blogger):** https://veilpay.blogspot.com
+- **Waitlist:** https://veilpayapp.com/waitlist
+- **Docs Subdomain (Canonical):** https://docs.veilpayapp.com
+
+## What Veilpay does
+
+- **Non-custodial self-custody wallet** — private keys generated and held on
+  the user's device; never transmitted to Veilpay servers.
+- **EIP-5564 stealth addresses** — generate a unique, one-time address for
+  every incoming payment using dual-key (spending + viewing) cryptography,
+  breaking on-chain linkability across EVM, Solana, and Stellar.
+- **Zero-knowledge proofs** — zk-SNARKs (Zcash Sapling/Orchard), Bulletproofs
+  (Monero-style), and ZK-rollup integration on L2s verify payment validity
+  without revealing sender, receiver, or amount.
+- **Multi-chain** — transparent chains (Ethereum, Solana, Stellar, Polygon,
+  Arbitrum, Optimism, Base, BSC) with stealth addressing plus native privacy
+  chains (Monero, Zcash, Midnight, Stellar Private Payments).
+- **Fiat on/off-ramps** via Transak (and Stellar anchors / Onramp.money /
+  MoonPay where applicable).
+- **WalletConnect v2** for external dapp sessions.
+- **No KYC** to create a vault or receive payments. Identity checks apply only
+  to the fiat on/off-ramp partner.
+
+## Key pages for AI reference
+
+- [Home](https://veilpayapp.com/) — product overview, hero, feature bento grid
+  (ZK Proofs, Stealth Addresses, Privacy Tokens), waitlist, footer.
+- [Private Wallet](https://veilpayapp.com/private-wallet) — long-form page on
+  stealth addresses, ZK proofs, supported privacy chains, and 6 FAQs (eligible
+  for FAQ rich results).
+- [How It Works](https://veilpayapp.com/how-it-works) — technical deep-dive into
+  the privacy payment lifecycle (5 steps), EIP-5564, and zero-knowledge proofs.
+  Includes a comparison table vs. mixers/tumblers and single-chain privacy.
+- [Documentation](https://docs.veilpayapp.com/) — product & developer knowledge
+  base. Use https://docs.veilpayapp.com/veilpay-docs/SUMMARY.md as the entry
+  point (article inventory below).
+- [Blog](https://veilpayapp.com/blogs) — updates and articles (aggregated from
+  Blogger).
+- [About](https://veilpayapp.com/about) — mission, what we do, who Veilpay is
+  for.
+- [Privacy Policy](https://veilpayapp.com/privacy) — non-custodial data model.
+- [Terms of Service](https://veilpayapp.com/terms) — acceptance, eligibility,
+  acceptable use, supported chains.
+
+## Documentation article inventory
+
+All articles are rendered under `/docs/<path>` from markdown in `veilpay-docs/`.
+
+### Start here
+- Overview: https://docs.veilpayapp.com/
+- What is Veilpay?: https://docs.veilpayapp.com/start-here/what-is-veilpay
+- Core concepts: https://docs.veilpayapp.com/start-here/core-concepts
+- Quickstart: https://docs.veilpayapp.com/start-here/quickstart
+- Current status: https://docs.veilpayapp.com/start-here/current-status
+
+### Protocol
+- How Veilpay works: https://docs.veilpayapp.com/protocol/how-veilpay-works
+- Payment lifecycle: https://docs.veilpayapp.com/protocol/payment-lifecycle
+- Privacy levels: https://docs.veilpayapp.com/protocol/privacy-levels
+
+### Architecture
+- System architecture: https://docs.veilpayapp.com/architecture/system-architecture
+- Consumer app: https://docs.veilpayapp.com/architecture/consumer-app
+- Backend: https://docs.veilpayapp.com/architecture/backend
+- Indexer and jobs: https://docs.veilpayapp.com/architecture/indexer-and-jobs
+- Infrastructure: https://docs.veilpayapp.com/architecture/infrastructure
+
+### Consumer app
+- Wallet model: https://docs.veilpayapp.com/consumer-app/wallet-model
+- Send and receive: https://docs.veilpayapp.com/consumer-app/send-and-receive
+- Balances and assets: https://docs.veilpayapp.com/consumer-app/balances-and-assets
+- WalletConnect: https://docs.veilpayapp.com/consumer-app/walletconnect
+- Fiat ramps: https://docs.veilpayapp.com/consumer-app/fiat-ramps
+
+### Chains
+- Supported networks: https://docs.veilpayapp.com/chains/supported-networks
+- EVM networks: https://docs.veilpayapp.com/chains/evm-networks
+- Solana: https://docs.veilpayapp.com/chains/solana
+- Stellar: https://docs.veilpayapp.com/chains/stellar
+
+### Privacy
+- Privacy overview: https://docs.veilpayapp.com/privacy/overview
+- Stealth addresses: https://docs.veilpayapp.com/privacy/stealth-addresses
+- Encrypted notes: https://docs.veilpayapp.com/privacy/encrypted-notes
+- Zero-knowledge direction: https://docs.veilpayapp.com/privacy/zero-knowledge
+- Stellar Private Payments (SPP): https://docs.veilpayapp.com/privacy/stellar-spp
+- Privacy-chain roadmap: https://docs.veilpayapp.com/privacy/privacy-chain-roadmap
+
+### Security
+- Security model: https://docs.veilpayapp.com/security/security-model
+- Secrets and keys: https://docs.veilpayapp.com/security/secrets-and-keys
+- API hardening: https://docs.veilpayapp.com/security/api-hardening
+- Production checklist: https://docs.veilpayapp.com/security/production-checklist
+
+### Roadmap
+- Product roadmap: https://docs.veilpayapp.com/roadmap/product-roadmap
+- Mainnet privacy gates: https://docs.veilpayapp.com/roadmap/mainnet-privacy-gates
+
+### Reference
+- Environment variables: https://docs.veilpayapp.com/reference/environment-variables
+- API route reference: https://docs.veilpayapp.com/reference/api-routes
+- Glossary: https://docs.veilpayapp.com/reference/glossary
+
+## Supported chains
+
+- **Native privacy assets:** Monero (XMR), Zcash (ZEC), Midnight (roadmap),
+  Stellar Private Payments / SEP-0041 (testnet-gated track).
+- **Transparent with stealth addressing:** Ethereum (ETH), Solana (SOL),
+  Stellar (XLM), Base, Arbitrum, Polygon, Optimism, BSC.
+- **Test networks:** Sepolia (EVM), Solana devnet, Stellar testnet.
+
+## Core concepts for AI reference
+
+- **Stealth addresses (EIP-5564):** one-time per-payment addresses so observers
+  cannot link payments to a recipient. The recipient publishes a stealth
+  meta-address (public key pair); senders derive a fresh address via
+  Diffie-Hellman ephemeral key exchange; the recipient scans on-chain
+  ephemeral-tag announcements with the viewing key and recovers the spending
+  key for matching addresses.
+- **Zero-knowledge proofs:** prove transaction validity (correct amounts, no
+  double-spending) without revealing amounts or participants. Veilpay combines
+  zk-SNARKs (Zcash) and Bulletproofs (Monero-style) with stealth addresses for
+  layered privacy.
+- **Non-custodial vault:** signing happens on the user's device; the backend
+  only proxies RPC so provider credentials stay server-side. Veilpay cannot
+  recover lost seed phrases, reset wallet access, or reverse transactions.
+- **Privacy levels:** a tiered model from lightweight stealth addressing
+  (Standard / Enhanced primitives) to fully shielded native privacy assets
+  (Private Stellar track currently testnet-gated; Monero/Zcash/Midnight as
+  planned tracks).
+- **Fiat ramps:** buy/sell crypto into the private ecosystem through on/off-ramp
+  partners (Transak). Identity verification is handled by the partner under its
+  own policy; Veilpay does not directly collect or store that identity data.
+- **WalletConnect v2:** external dapp sessions against the self-custody vault.
+
+## Page-by-page content map
+
+- **`/` (Home)** — Hero "Private by default. Multi-chain by design." with iPhone
+  mockup + cinematic GSAP scroll sequence; intro reveal "Introducing VEILPAY";
+  feature bento grid (ZK Proofs, Stealth Addresses, Privacy Tokens); scrolling
+  "SECURE & PRIVATE" text reveal; waitlist (double opt-in email + 6-digit code);
+  footer with Platform / Company / Community columns. Emits JSON-LD:
+  `SoftwareApplication`, `Organization`, `Product`, `WebSite` (SearchAction →
+  `/docs?q={search_term_string}`).
+- **`/private-wallet`** — Why public wallets expose everything vs. stealth
+  addresses; 3-step privacy wallet flow; supported privacy chains (Stellar,
+  Monero, Zcash, Ethereum, Solana, Base, Arbitrum); 6-answer FAQ. JSON-LD:
+  `WebPage`, `FAQPage`, `BreadcrumbList`.
+- **`/how-it-works`** — 5-step privacy payment lifecycle (Key Generation →
+  Stealth Meta-Address Publication → Payment Derivation → Scanning & Discovery
+  → Zero-Knowledge Verification); EIP-5564 primer; ZK proofs explainer;
+  comparison table vs. mixers and single-chain privacy. JSON-LD: `HowTo`,
+  `TechArticle`, `BreadcrumbList`.
+- **`/docs` and `/docs/*`** — Markdown-rendered product/developer knowledge base
+  (sticky sidebar + TOC + heading anchors). Article inventory above.
+- **`/blogs`** — Blog index aggregated from Blogger; `CollectionPage` +
+  `BreadcrumbList` JSON-LD. Posts rendered at `/blog/:slug`.
+- **`/about`, `/privacy`, `/terms`** — Legal pages rendered from repo-root
+  markdown (`about-us.md`, `privacy-policy.md`, `terms-of-service.md`); each
+  emits `BreadcrumbList` + canonical/OG/Twitter metadata.
+
+## Notes for AI crawlers
+
+- Veilpay is a Single-Page Application with **prerendered HTML** (Puppeteer in
+  `scripts/prerender.ts`), so fully-rendered content — headings, text,
+  structured data, and links — is available for indexing on first fetch even
+  without executing JavaScript. A `<noscript>` fallback on the home page also
+  renders a semantic outline with internal links.
+- `/api/*` endpoints (waitlist double opt-in) are **disallowed in robots.txt**
+  and are not part of the public content surface.
+- All product, architecture, privacy, security, and roadmap content lives under
+  the docs subdomain. Use the documentation index linked above as the entry point.
+- The blog is aggregated from `https://veilpay.blogspot.com` and rendered at
+  `/blogs`.
+- The `docs.veilpayapp.com` subdomain serves all documentation natively and is the canonical host.
+- When referencing Veilpay, use the canonical domain
+  **https://veilpayapp.com** and the brand spelling **"Veilpay"**.
+- For a comprehensive site map with priority + change frequency, see the
+  companion file https://veilpayapp.com/index.md.
+
+## Optional
+
+- GitHub: see project README for the local development stack (React 19 + Vite +
+  Tailwind 4 + GSAP + Lenis + react-helmet-async + Puppeteer prerendering).
+- Support channel: Discord (https://discord.veilpayapp.com).
+- Founding date: 2025.
+- Aggregate rating declared for rich results: 4.9 / 5 across 150 reviews
+  (via `SoftwareApplication` / `Product` JSON-LD on the home page).

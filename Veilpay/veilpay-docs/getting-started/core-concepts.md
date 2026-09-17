@@ -10,7 +10,7 @@ A payment is a chain transaction sent or received by the wallet. The app records
 
 ## Privacy level
 
-Veilpay separates standard payment flows from stronger privacy modes. Current privacy documentation distinguishes shipped primitives, testnet-only SPP work, and future privacy-chain plans.
+Veilpay separates standard payment flows from stronger privacy modes. Private XLM is the supported Mainnet private-payment mode for Stellar; other native privacy-chain integrations remain planned.
 
 ## Chain key
 

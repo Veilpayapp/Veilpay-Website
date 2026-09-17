@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import type LenisType from 'lenis';
-import { setLenisInstance } from '@/lib/utils';
+import { setLenisInstance, setSmoothScrollReady } from '@/lib/utils';
 
 interface SmoothScrollProps {
   children: React.ReactNode;
@@ -33,6 +33,7 @@ const SmoothScroll: React.FC<SmoothScrollProps> = ({ children }) => {
       if (prefersReducedMotion) {
         // Make sure ScrollTrigger recalculates against the native scroller.
         ScrollTrigger.refresh();
+        setSmoothScrollReady(true);
         return;
       }
 
@@ -58,12 +59,17 @@ const SmoothScroll: React.FC<SmoothScrollProps> = ({ children }) => {
       };
       gsap.ticker.add(tick);
       gsap.ticker.lagSmoothing(0);
+      setSmoothScrollReady(true);
     })();
 
     return () => {
       // Cleanup — remove the exact same ticker callback that was added.
       cancelled = true;
-      if (lenis) lenis.destroy();
+      setSmoothScrollReady(false);
+      if (lenis) {
+        setLenisInstance(null as any);
+        lenis.destroy();
+      }
       if (gsapRef && tick) gsapRef.ticker.remove(tick);
     };
   }, []);

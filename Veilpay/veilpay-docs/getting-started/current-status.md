@@ -1,6 +1,6 @@
 # Current status
 
-This page distinguishes implemented, gated, and planned areas so readers do not confuse roadmap items with production-live functionality.
+This page distinguishes generally available, controlled, and planned areas.
 
 ## Implemented core architecture
 
@@ -11,22 +11,25 @@ This page distinguishes implemented, gated, and planned areas so readers do not 
 - Backend RPC proxy for selected networks.
 - Chain indexing and transaction-status detection.
 - EVM, Solana, and Stellar consumer-wallet flows.
+- Private XLM on Stellar Mainnet.
 - Fiat ramp screens and provider integrations.
 - WalletConnect v2 integration.
 - Sentry hooks for observability.
 
-## Implemented privacy primitives
+## Generally available privacy features
 
 - Stealth address utilities.
 - Encrypted notes.
-- ZK-oriented proof and privacy-pool scaffolding.
-- Stellar SPP testnet product shell and native bridge scaffolding.
+- Private XLM on Stellar Mainnet with shield, private send and receive, and unshield flows.
+- Native proof generation and on-device private-state recovery for supported releases.
+- Explicit setup, synchronization, and ready states so private actions do not run against incomplete state.
 
-## Gated or not production-live
+## Controlled availability
 
-- Stellar SPP mainnet is fail-closed until audit and operational gates are met.
-- Full native SPP prove/submit UX depends on device build readiness, native pool operations, and proof benchmarks.
-- Privacy-chain integrations beyond Stellar SPP are roadmap tracks.
+- Private XLM is available in supported Veilpay releases. A release must include a valid Mainnet deployment configuration and the native private-payment module.
+- Private actions pause when account setup, private-history synchronization, or transaction readiness cannot be verified.
+- Operational limits, monitoring, incident controls, and independent security work continue after launch.
+- Availability is not a claim that every privacy component has completed an external audit.
 
 ## Planned privacy-chain tracks
 

@@ -10,7 +10,7 @@ const HeroTitle: React.FC = () => {
         transition={{ duration: 0.55, ease: 'easeOut' }}
         className="mb-8 w-full flex flex-col items-center"
       >
-        <div
+        <h1
           className="flex flex-col items-center text-center text-[clamp(3.4rem,15vw,7.75rem)] leading-normal tracking-tighter mb-4"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
@@ -26,7 +26,7 @@ const HeroTitle: React.FC = () => {
           <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#F9D423] via-[#D4A042] to-[#1a1103] -mt-8 md:-mt-[2.8rem] pb-4 preserve-color">
             by design.
           </span>
-        </div>
+        </h1>
       </motion.div>
     </div>
   );

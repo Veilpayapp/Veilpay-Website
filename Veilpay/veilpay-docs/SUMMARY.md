@@ -11,6 +11,7 @@
 ## Protocol
 
 - [How Veilpay works](protocol/how-veilpay-works.md)
+- [Invoice lifecycle](protocol/invoice-lifecycle.md)
 - [Payment lifecycle](protocol/payment-lifecycle.md)
 - [Privacy levels](protocol/privacy-levels.md)
 
@@ -29,6 +30,19 @@
 - [Balances and assets](consumer-app/balances-and-assets.md)
 - [WalletConnect](consumer-app/walletconnect.md)
 - [Fiat ramps](consumer-app/fiat-ramps.md)
+- [Private XLM on Stellar Mainnet](consumer-app/private-xlm-mainnet.md)
+- [Accessibility (WCAG 2.2 AA)](consumer-app/accessibility.md)
+- [DSAR / account wipe](consumer-app/dsar.md)
+
+## Merchant API
+
+- [Merchant API overview](merchant-api/overview.md)
+- [Authentication](merchant-api/authentication.md)
+- [Merchants](merchant-api/merchants.md)
+- [Invoices](merchant-api/invoices.md)
+- [Payments](merchant-api/payments.md)
+- [Webhooks](merchant-api/webhooks.md)
+- [RPC proxy](merchant-api/rpc-proxy.md)
 
 ## Chains
 
@@ -51,11 +65,14 @@
 - [Security model](security/security-model.md)
 - [Secrets and keys](security/secrets-and-keys.md)
 - [API hardening](security/api-hardening.md)
+- [Webhook security](security/webhook-security.md)
+- [Ceremony and external audit gates (SEC-008 / SEC-011)](security/ceremony-and-audit-gates.md)
 - [Production checklist](security/production-checklist.md)
 
 ## Roadmap
 
 - [Product roadmap](roadmap/product-roadmap.md)
+- [Merchant dashboard](roadmap/merchant-dashboard.md)
 - [Mainnet privacy gates](roadmap/mainnet-privacy-gates.md)
 
 ## Reference

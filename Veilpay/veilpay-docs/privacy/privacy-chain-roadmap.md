@@ -2,11 +2,11 @@
 
 Veilpay’s privacy-chain roadmap is staged. Each chain requires separate engineering, security review, compliance review, UX, operations, and incident response planning.
 
-## Track 1: Stellar SPP
+## Delivered track: Private XLM on Stellar
 
-Stellar SPP is the first native privacy-chain track. It is testnet-first and mainnet-gated.
+Private XLM is generally available on Stellar Mainnet in supported Veilpay releases. Continued work covers independent audit evidence, operational hardening, recovery performance, provider resilience, and incident readiness.
 
-Required before production exposure:
+Ongoing controls:
 
 - native proof generation and device benchmarks
 - audited circuits and contracts
@@ -30,4 +30,4 @@ Midnight would require a separate architecture review when its developer tooling
 
 ## Roadmap rule
 
-No privacy-chain track should be described as production-live until it has passed security, operations, compliance, and user-recovery gates.
+Future privacy-chain tracks must not be described as production-live until their engineering, security, operations, compliance, and user-recovery requirements are met. Availability and external-audit claims are documented separately.

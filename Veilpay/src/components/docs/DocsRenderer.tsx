@@ -1,11 +1,11 @@
 import { useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { parseMarkdown } from '../../lib/docs/markdownParser';
+import { parseMarkdown, type TocEntry } from '../../lib/docs/markdownParser';
 
 interface DocsRendererProps {
   markdownContent: string;
   sourcePath: string;
-  onTocExtracted?: (toc: any[]) => void;
+  onTocExtracted?: (toc: TocEntry[]) => void;
 }
 
 export function DocsRenderer({ markdownContent, sourcePath, onTocExtracted }: DocsRendererProps) {

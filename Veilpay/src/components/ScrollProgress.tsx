@@ -55,8 +55,8 @@ const ScrollProgress = () => {
 
     // Page height changes (lazy sections, font swap, footer reveal) shift the
     // denominator; recompute when <body> resizes.
-    const ro = new ResizeObserver(schedule);
-    ro.observe(document.body);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null;
+    ro?.observe(document.body);
 
     if (reduceMotion) fill.style.transition = 'none';
     paint(); // set initial state immediately
@@ -64,7 +64,7 @@ const ScrollProgress = () => {
     return () => {
       window.removeEventListener('scroll', schedule, { capture: true } as EventListenerOptions);
       window.removeEventListener('resize', schedule);
-      ro.disconnect();
+      ro?.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);

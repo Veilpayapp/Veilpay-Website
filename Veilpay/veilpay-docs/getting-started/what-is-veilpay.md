@@ -21,9 +21,9 @@ Veilpay is not just a wallet UI. It is a self-custody payment stack that combine
 
 - **Self-custody**: user signing happens on the consumer device; the backend never receives signing material.
 - **Multi-chain payments**: EVM, Solana, and Stellar flows in a single wallet.
-- **Privacy primitives**: stealth addresses, encrypted notes, ZK direction, and Stellar Private Payments are part of the protocol roadmap.
+- **Private payments**: Private XLM on Stellar Mainnet adds shield, private send and receive, and unshield flows alongside stealth addresses and encrypted notes.
 - **Operational safety**: server-side RPC credential isolation, rate limiting, Redis-backed infrastructure, and health endpoints.
 
 ## Public chain scope
 
-The public documentation focuses on Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, Solana, and Stellar. Stellar SPP is documented as the first native privacy-chain track and remains gated by testnet, audit, and production-readiness requirements.
+The public documentation focuses on Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, Solana, and Stellar. Private XLM is generally available on Stellar Mainnet in supported Veilpay releases. Other native privacy-chain integrations remain roadmap work.

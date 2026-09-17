@@ -11,15 +11,13 @@ import ThemeToggle from './ThemeToggle';
 // renders on first paint, would drag the whole GSAP runtime onto the critical
 // path even though the tween only ever runs on a user's nav click.
 
-// Smooth quartic ease-out for the cinematic scroll — pure, so hoisted to module scope
+// Smooth cubic ease-in-out for the cinematic scroll — pure, so hoisted to module scope
 // instead of being re-created on every render.
-const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
+const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 // Removed navPanelStyle, migrating sizing to Tailwind for responsive mobile design.
 
 const logoStyle: React.CSSProperties = {
-  width: '40px',
-  height: '40px',
   backgroundImage: 'url(/logo.webp)',
   backgroundColor: 'transparent',
   backgroundSize: 'cover',
@@ -37,19 +35,34 @@ export const handleScroll = async (
 ) => {
   if (e) e.preventDefault();
 
+  // Force a synchronous layout recalculation of all pins before measuring.
+  // GSAP pin-spacers drastically alter the document height, so we must ensure
+  // both GSAP and Lenis are perfectly synced with the DOM before we calculate
+  // ANY target offsets (features, footer, waitlist, etc).
+  const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+  ScrollTrigger.refresh();
+
+  const lenis = getLenisInstance();
+  if (lenis) {
+    lenis.resize();
+  }
+
   let scrollTarget: string | number = target;
   if (target === '#download' || target === '#waitlist-social' || target === '#waitlist') {
-    const anchor = document.getElementById('download-anchor') || document.getElementById('download');
-    if (anchor) {
-      // The DownloadSection pins and scales up for 150% of the section height.
-      // Scroll perfectly to the end of the pin where the box is fully scaled.
-      const rect = anchor.getBoundingClientRect();
-      // By using an unpinned anchor just above the section, absoluteTop is stable
-      // even if we are currently inside the pinned area.
-      const absoluteTop = rect.top + window.scrollY;
-      const section = document.getElementById('download');
-      const pinDistance = section ? section.offsetHeight * 1.5 : window.innerHeight * 1.5;
-      scrollTarget = absoluteTop + pinDistance;
+    const trigger = ScrollTrigger.getById('download-trigger');
+    if (trigger && typeof trigger.end === 'number') {
+      // The DownloadSection pins and scales up. We want to scroll perfectly to the end
+      // of its pin distance so the user sees the fully scaled-up form.
+      scrollTarget = trigger.end;
+    } else {
+      const anchor = document.getElementById('download-anchor') || document.getElementById('download');
+      if (anchor) {
+        const rect = anchor.getBoundingClientRect();
+        const absoluteTop = rect.top + window.scrollY;
+        const section = document.getElementById('download');
+        const pinDistance = section ? section.offsetHeight * 1.5 : window.innerHeight * 1.5;
+        scrollTarget = absoluteTop + pinDistance;
+      }
     }
   } else if (target === '#features') {
     // The Bento Grid is deep inside a GSAP ScrollSequence pinned timeline. It
@@ -62,14 +75,16 @@ export const handleScroll = async (
     scrollTarget = document.documentElement.scrollHeight;
   }
 
-  const lenis = getLenisInstance();
   if (lenis) {
-    // Lenis owns the scroll loop. 4 second super-elegant cinematic scroll on desktop,
-    // 1.6s snappy scroll on mobile so it doesn't feel sluggish.
+    // Lenis owns the scroll loop. 2.5 second elegant cinematic scroll on desktop,
+    // 1.4s snappy scroll on mobile so it doesn't feel sluggish.
     const isMobile = window.innerWidth <= 768;
-    lenis.scrollTo(scrollTarget, {
-      duration: isMobile ? 1.6 : 4,
-      easing: easeOutQuart,
+    // Workaround: Lenis scrollTo(0) can sometimes be ignored or cause GSAP pin conflicts 
+    // at the exact 0px boundary. 1px is visually identical and guarantees the scroll event fires.
+    const safeTarget = scrollTarget === 0 ? 1 : scrollTarget;
+    lenis.scrollTo(safeTarget, {
+      duration: isMobile ? 1.4 : 2.5,
+      easing: easeInOutCubic,
     });
   } else {
     // Phones (no Lenis): drive the scroll with GSAP instead of the browser's
@@ -105,11 +120,21 @@ export const handleScroll = async (
 };
 
 export default function GlassNavbar() {
-  const lowEnd = isLowEnd();
+  const lowEnd = typeof window === 'undefined' ? false : isLowEnd();
   const navigate = useNavigate();
   const location = useLocation();
   const onHome = ['/', '/waitlist', '/features', '/contact'].includes(location.pathname);
 
+  const isDocsDomain = typeof window !== 'undefined' && window.location.hostname.startsWith('docs.');
+  const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  const getNavHref = (path: string) => {
+    if (isLocalhost) return path;
+    if (path.startsWith('/docs')) {
+      return isDocsDomain ? path : `https://docs.veilpayapp.com/`;
+    }
+    return isDocsDomain ? `https://veilpayapp.com${path}` : path;
+  };
 
   // On the home page, anchor clicks drive the Lenis smooth-scroll timeline.
   // On a sub-route (legal pages) there is no scroll timeline, so send the
@@ -119,6 +144,12 @@ export default function GlassNavbar() {
     target: string | number,
     routePath: string
   ) => {
+    const href = getNavHref(routePath);
+    if (href.startsWith('http')) {
+      // Let the browser natively handle the cross-domain navigation
+      return;
+    }
+
     e.preventDefault();
 
     if (!onHome) {
@@ -138,11 +169,12 @@ export default function GlassNavbar() {
   // and use a simple semi-transparent background instead.
   // Tailwind responsive classes: on mobile it takes full width minus margins, on md+ it takes min-w-[550px].
   const glassClass = lowEnd
-    ? 'fixed top-6 left-0 right-0 mx-auto z-50 flex items-center justify-between md:justify-center gap-2 md:gap-12 px-3 md:px-8 bg-black/60 border border-white/10 w-[calc(100%-32px)] md:w-max md:min-w-[550px] h-[56px] rounded-[40px]'
-    : 'fixed top-6 left-0 right-0 mx-auto z-50 flex items-center justify-between md:justify-center gap-2 md:gap-12 px-3 md:px-8 ios-glass w-[calc(100%-32px)] md:w-max md:min-w-[550px] h-[56px] rounded-[40px]';
+    ? 'fixed top-6 left-0 right-0 mx-auto z-50 flex items-center justify-between md:justify-center gap-1 md:gap-12 px-2 md:px-8 bg-black/60 border border-white/10 w-[calc(100%-24px)] md:w-max md:min-w-[550px] h-[56px] rounded-[40px]'
+    : 'fixed top-6 left-0 right-0 mx-auto z-50 flex items-center justify-between md:justify-center gap-1 md:gap-12 px-2 md:px-8 ios-glass w-[calc(100%-24px)] md:w-max md:min-w-[550px] h-[56px] rounded-[40px]';
   return (
     <>
       <motion.nav
+        aria-label="Main navigation"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
@@ -150,34 +182,41 @@ export default function GlassNavbar() {
       >
 
         {/* Left Section (Logo + Links) */}
-        <div className="flex items-center gap-2 md:gap-8 relative z-10">
+        <div className="flex items-center gap-1.5 md:gap-8 relative z-10">
           {/* Logo → home */}
-          <a href="/" onClick={(e) => handleNav(e, 0, '/')} aria-label="Veilpay home" className="preserve-color block flex-shrink-0" style={logoStyle} />
+          <a href={getNavHref('/')} onClick={(e) => handleNav(e, 0, '/')} aria-label="Veilpay home" className="preserve-color block flex-shrink-0 w-[32px] h-[32px] md:w-[40px] md:h-[40px]" style={logoStyle} />
 
           {/* Nav Links — visible on all screen sizes, smaller text on mobile */}
-          <div className="flex items-center gap-2.5 md:gap-10">
-            <a href="/" onClick={(e) => handleNav(e, 0, '/')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Home</a>
-            <a href="/features" onClick={(e) => handleNav(e, '#features', '/features')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Features</a>
-            <a href="/contact" onClick={(e) => handleNav(e, '#footer', '/contact')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Contact</a>
+          <div className="flex items-center gap-1.5 md:gap-10">
+            <a href={getNavHref('/')} onClick={(e) => handleNav(e, 0, '/')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Home</a>
+            <a href={getNavHref('/features')} onClick={(e) => handleNav(e, '#features', '/features')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Features</a>
+            <a href={getNavHref('/contact')} onClick={(e) => handleNav(e, '#footer', '/contact')} className="text-[9px] md:text-[13px] font-semibold text-white/70 hover:text-white transition-colors tracking-wide uppercase">Contact</a>
+            {/* Hidden links for SEO crawlers to distribute PageRank */}
+            <a href={getNavHref('/private-wallet')} className="sr-only">Private Wallet</a>
           </div>
         </div>
 
         {/* Right Section (Action Buttons) */}
-        <div className="flex items-center gap-1.5 md:gap-3 relative z-10 md:pr-14">
-          <button
-            type="button"
-            onClick={() => navigate('/docs')}
-            className="ios-glass text-[10px] md:text-[12px] font-bold text-white hover:text-amber-400 transition-colors tracking-wide uppercase px-2.5 md:px-4 py-1.5 md:py-2 rounded-full"
+        <div className="flex items-center gap-1 md:gap-3 relative z-10 md:pr-14">
+          <a
+            href={getNavHref('/docs')}
+            onClick={(e) => {
+              const href = getNavHref('/docs');
+              if (href.startsWith('http')) return;
+              e.preventDefault();
+              navigate('/docs');
+            }}
+            className="ios-glass text-[9px] md:text-[12px] font-bold text-white hover:text-amber-400 transition-colors tracking-wide uppercase px-2 md:px-4 py-1.5 md:py-2 rounded-full inline-block"
           >
             DOCS
-          </button>
-          <button
-            type="button"
+          </a>
+          <a
+            href={getNavHref('/waitlist')}
             onClick={(e) => handleNav(e, '#waitlist', '/waitlist')}
-            className="ios-glass-gold text-[10px] md:text-[12px] font-bold text-black hover:brightness-110 transition-all tracking-wide uppercase px-2.5 md:px-4 py-1.5 md:py-2 rounded-full preserve-color"
+            className="ios-glass-gold text-[9px] md:text-[12px] font-bold text-black hover:brightness-110 transition-all tracking-wide uppercase px-2 md:px-4 py-1.5 md:py-2 rounded-full preserve-color flex-shrink-0 inline-block"
           >
             WAITLIST
-          </button>
+          </a>
         </div>
 
         {/* Theme Toggle (PC - Navbar End) */}
