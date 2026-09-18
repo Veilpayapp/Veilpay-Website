@@ -66,7 +66,7 @@ const BrutalistFooter: React.FC = () => {
   };
 
   return (
-    <footer id="footer" className="relative w-full min-h-screen flex flex-col justify-between bg-black text-white overflow-y-auto overflow-x-hidden pt-20 border-t border-white/10">
+    <footer id="footer" className="relative w-full min-h-screen h-full flex flex-col justify-between bg-black text-white overflow-hidden no-scrollbar pt-8 md:pt-14 border-t border-white/10">
       {/* Background Sparkles — scaled down density for mobile devices */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none">
         <SparklesCore
@@ -85,7 +85,7 @@ const BrutalistFooter: React.FC = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 mx-auto flex max-w-7xl flex-col gap-8 md:gap-16 px-4 md:px-6 pt-24 pb-8 md:py-24 lg:flex-row md:px-12"
+        className="relative z-10 mx-auto flex max-w-7xl flex-col gap-6 md:gap-12 px-4 md:px-6 pt-8 pb-4 md:py-12 lg:flex-row md:px-12 w-full"
       >
         <div className="flex flex-col justify-start gap-6 md:gap-12 lg:flex-1">
           <h2 className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tighter leading-[0.9]">
@@ -149,14 +149,14 @@ const BrutalistFooter: React.FC = () => {
         </div>
       </motion.div>
 
-      <div className="relative z-10 w-full mt-2 md:mt-10 flex justify-center">
+      <div className="relative z-10 w-full mt-2 md:mt-6 flex justify-center">
         <a
           href="#"
           className="group flex w-full justify-center items-center text-center"
           aria-label="Veilpay"
         >
           <span
-            className="footer-wordmark flex justify-center items-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] from-[15%] via-[#5E3B09] via-[50%] to-[#3A2408] to-[90%] uppercase pb-4"
+            className="footer-wordmark flex justify-center items-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-[#F2C572] from-[15%] via-[#5E3B09] via-[50%] to-[#3A2408] to-[90%] uppercase pb-2 md:pb-4"
             style={{
               lineHeight: 0.85,
               WebkitTextFillColor: 'transparent',
@@ -167,7 +167,7 @@ const BrutalistFooter: React.FC = () => {
         </a>
       </div>
 
-      <div className="mx-auto mt-8 md:mt-16 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/10 px-4 md:px-6 py-6 md:py-8 sm:flex-row md:px-12 relative z-10">
+      <div className="mx-auto mt-4 md:mt-8 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/10 px-4 md:px-6 py-4 md:py-6 sm:flex-row md:px-12 relative z-10 w-full">
         <span className="text-[10px] md:text-xs text-neutral-500">
           &copy; 2026 Veilpay. All rights reserved.
         </span>

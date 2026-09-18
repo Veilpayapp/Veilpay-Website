@@ -432,11 +432,33 @@ html.light-mode .screen-scrim {
 /* ─── Slim right-edge scroll indicator ─────────────────────────────────────
    Hide the native scrollbar (the custom indicator below replaces its
    wayfinding job) while keeping the page fully scrollable. */
-html {
+html, body {
   scrollbar-width: none;        /* Firefox */
   -ms-overflow-style: none;     /* legacy Edge/IE */
 }
-html::-webkit-scrollbar {       /* Chrome/Safari/Edge */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {       /* Chrome/Safari/Edge */
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+#footer, footer {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#footer::-webkit-scrollbar,
+footer::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
   width: 0;
   height: 0;
   display: none;

@@ -9,7 +9,7 @@ const SqueezeFooterReveal: React.FC<Props> = ({ children, footer }) => {
   return (
     <div className="relative w-full bg-black">
       {/* Fixed Footer (Hidden behind main content) */}
-      <div className="fixed bottom-0 left-0 w-full h-screen z-0">
+      <div className="fixed bottom-0 left-0 w-full h-screen z-0 overflow-hidden">
         {footer}
       </div>
 
