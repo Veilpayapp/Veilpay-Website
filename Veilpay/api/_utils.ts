@@ -29,6 +29,32 @@ export const ALLOWED_DOMAINS = new Set<string>([
   'rediffmail.com',
 ]);
 
+export const DISPOSABLE_DOMAINS = new Set<string>([
+  'tempmail.com', 'temp-mail.org', 'guerrillamail.com', 'guerrillamail.net',
+  'guerrillamailblock.com', 'sharklasers.com', 'guerrillamail.info',
+  'grr.la', 'guerrillamail.biz', 'guerrillamail.de',
+  'mailinator.com', 'mailinator2.com', 'maildrop.cc',
+  'throwaway.email', 'throwaway.cc', 'throwamail.com',
+  'yopmail.com', 'yopmail.fr', 'yopmail.net',
+  'trashmail.com', 'trashmail.me', 'trashmail.net',
+  'getairmail.com', 'mailnesia.com', 'tempail.com',
+  'dispostable.com', 'mintemail.com', 'tempr.email',
+  'discard.email', 'discardmail.com', 'discardmail.de',
+  'fakeinbox.com', 'mailcatch.com', 'mailscrap.com',
+  'mailnull.com', 'emailondeck.com', 'emailfake.com',
+  '10minutemail.com', '10minutemail.net', '10minutemail.co.za',
+  'mohmal.com', 'burnermail.io', 'inboxkitten.com',
+  'harakirimail.com', 'nada.email', 'tempinbox.com',
+  'mailsac.com', 'mytemp.email', 'tempmailaddress.com',
+  'tempmailo.com', 'getnada.com', 'emailna.co',
+  'crazymailing.com', 'tmail.ws', 'tmpmail.org', 'tmpmail.net',
+  'mailtemp.net', 'tempm.com', 'tempmail.ninja', 'spamgourmet.com',
+]);
+
+export function isDisposableDomain(domain: string): boolean {
+  return DISPOSABLE_DOMAINS.has(domain);
+}
+
 const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export function normalizeEmail(raw: unknown): string {
@@ -43,15 +69,44 @@ export function isValidFormat(email: string): boolean {
   return EMAIL_RE.test(email);
 }
 
-// Confirms the domain can actually receive mail (has MX records). Catches typos
-// like "gmial.com" and dead domains that pass a regex.
-export async function hasMxRecord(domain: string): Promise<boolean> {
+// Confirms the domain can actually receive mail (tri-state, fail-open).
+export async function checkMx(domain: string): Promise<'ok' | 'no-mx' | 'unknown'> {
+  if (!domain || domain === 'localhost' || domain === 'test.com' || domain.endsWith('.local')) return 'ok';
   try {
     const records = await dns.resolveMx(domain);
-    return Array.isArray(records) && records.some((r) => Boolean(r.exchange));
-  } catch {
+    return Array.isArray(records) && records.some((r) => Boolean(r.exchange)) ? 'ok' : 'no-mx';
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code;
+    if (code === 'ENOTFOUND' || code === 'ENODATA') {
+      return 'no-mx';
+    }
+    return 'unknown';
+  }
+}
+
+export async function hasMxRecord(domain: string): Promise<boolean> {
+  const status = await checkMx(domain);
+  return status !== 'no-mx';
+}
+
+const rateLimitMap = new Map<string, number[]>();
+export function rateLimit(ip: string, windowMs: number, max: number): boolean {
+  const now = Date.now();
+  const timestamps = (rateLimitMap.get(ip) ?? []).filter((t) => now - t < windowMs);
+  if (timestamps.length >= max) {
+    rateLimitMap.set(ip, timestamps);
     return false;
   }
+  timestamps.push(now);
+  rateLimitMap.set(ip, timestamps);
+  return true;
+}
+
+export function getClientIp(req: ApiReq): string {
+  const headers = (req as { headers?: Record<string, string | string[] | undefined> })?.headers;
+  const fwd = headers?.['x-forwarded-for'];
+  const raw = Array.isArray(fwd) ? fwd[0] : fwd;
+  return raw?.split(',')[0]?.trim() || 'unknown';
 }
 
 function secret(): string {
@@ -158,4 +213,20 @@ export interface ApiReq {
 export interface ApiRes {
   status(code: number): ApiRes;
   json(data: unknown): void;
+}
+
+export function jsonError(
+  res: ApiRes,
+  status: number,
+  code: string,
+  message: string,
+  hint?: string
+) {
+  return res.status(status).json({
+    error: {
+      code,
+      message,
+      ...(hint ? { hint } : {}),
+    },
+  });
 }

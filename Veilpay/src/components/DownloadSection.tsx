@@ -67,20 +67,6 @@ const DownloadSection: React.FC = () => {
     'mailtemp.net', 'tempm.com', 'tempmail.ninja', 'spamgourmet.com',
   ]);
 
-  // ── Allowed domains allowlist (must match backend) ──
-  const ALLOWED_DOMAINS = new Set([
-    'gmail.com', 'googlemail.com',
-    'outlook.com', 'hotmail.com', 'live.com', 'msn.com', 'outlook.in',
-    'yahoo.com', 'yahoo.co.in', 'yahoo.co.uk', 'yahoo.ca', 'yahoo.com.au',
-    'ymail.com', 'rocketmail.com',
-    'icloud.com', 'me.com', 'mac.com',
-    'protonmail.com', 'proton.me', 'pm.me',
-    'aol.com',
-    'zoho.com', 'zohomail.com', 'zohomail.in',
-    'email.com', 'mail.com', 'gmx.com', 'gmx.net',
-    'rediffmail.com',
-  ]);
-
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,14 +85,7 @@ const DownloadSection: React.FC = () => {
 
     // 2) Block disposable / temp emails
     if (DISPOSABLE_DOMAINS.has(emailDomain)) {
-      setErrorMessage('Temporary or disposable emails are not allowed. Please use your real email (Gmail, Outlook, Yahoo, etc.).');
-      setShowInvalidEmailPopup(true);
-      return;
-    }
-
-    // 3) Check allowlist
-    if (!ALLOWED_DOMAINS.has(emailDomain)) {
-      setErrorMessage('Please use an email from a major provider (Gmail, Outlook, Yahoo, iCloud, ProtonMail, etc.). Custom or unknown domains are not accepted.');
+      setErrorMessage('Temporary or disposable emails are not allowed. Please use your real personal or work email.');
       setShowInvalidEmailPopup(true);
       return;
     }
@@ -114,11 +93,7 @@ const DownloadSection: React.FC = () => {
     setStatus('loading');
     
     try {
-      // Step 1 of double opt-in: ask the server to email a 6-digit code to this
-      // address. The server re-validates (allowlist + live MX record), sends the
-      // code via Resend, and returns an opaque signed token. The code itself is
-      // never sent to the browser, so a typed-but-unowned address can't proceed.
-      const response = await fetch('/api/waitlist-start', {
+      const response = await fetch('/api/waitlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,18 +104,25 @@ const DownloadSection: React.FC = () => {
       if (response.ok) {
         setStatus('success');
       } else {
-        const errorJson = await response.json().catch(() => ({} as Record<string, string>));
-        console.error('Waitlist start error:', response.status, errorJson);
+        const errorJson = await response.json().catch(() => ({} as Record<string, unknown>));
+        console.error('Waitlist error:', response.status, errorJson);
 
-        // Show the server's specific error to the user (e.g. "MX check failed").
-        if (errorJson.error) {
-          setErrorMessage(errorJson.error);
-          setShowInvalidEmailPopup(true);
+        const rawError = errorJson.error;
+        let msg = 'Unable to join the waitlist right now. Please try again shortly.';
+        if (typeof rawError === 'string') {
+          msg = rawError;
+        } else if (rawError && typeof rawError === 'object' && 'message' in rawError && typeof (rawError as { message?: unknown }).message === 'string') {
+          msg = (rawError as { message: string }).message;
         }
+
+        setErrorMessage(msg);
+        setShowInvalidEmailPopup(true);
         setStatus('error');
       }
     } catch (error) {
-      console.error("Fetch/Network Error (Check Adblockers or CORS):", error);
+      console.error("Fetch/Network Error:", error);
+      setErrorMessage('Network error. Please check your connection and try again.');
+      setShowInvalidEmailPopup(true);
       setStatus('error');
     }
   };
@@ -197,7 +179,7 @@ const DownloadSection: React.FC = () => {
               </svg>
             </div>
             <p className="text-green-400 text-sm font-semibold">You're on the waitlist!</p>
-            <p className="text-white/60 text-xs mt-1 max-w-xs mx-auto">Please check your email for a verification link to confirm your spot.</p>
+            <p className="text-white/60 text-xs mt-1 max-w-xs mx-auto">Thanks for joining! We'll notify you as soon as early access is available.</p>
           </div>
 
           {/* SEO-Accessible Forms */}
@@ -303,7 +285,7 @@ const DownloadSection: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-white tracking-tight">Invalid Email</h3>
               <p className="text-sm text-white/70 leading-relaxed">
-                {errorMessage || 'Please enter an official email ID (e.g. @gmail.com, @yahoo.com). Temp or custom domains are not allowed.'}
+                {errorMessage || 'Please enter a valid personal or work email address. Temporary or disposable emails are not allowed.'}
               </p>
               <button
                 onClick={() => setShowInvalidEmailPopup(false)}

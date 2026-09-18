@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
+import '@/test/setup';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import DownloadSection from '../DownloadSection';
 
 // The section wires GSAP pins in a layout effect and renders a canvas-based
@@ -25,11 +26,8 @@ let fetchMock: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   fetchMock = vi.fn(async (url: string) => {
-    if (url.includes('/api/waitlist-start')) {
-      return { ok: true, status: 200, json: async () => ({ token: 'test-token' }) };
-    }
-    if (url.includes('/api/waitlist-verify')) {
-      return { ok: true, status: 200, json: async () => ({ ok: true }) };
+    if (url.includes('/api/waitlist')) {
+      return { ok: true, status: 200, json: async () => ({ ok: true, success: true }) };
     }
     return { ok: false, status: 404, json: async () => ({}) };
   });
@@ -37,6 +35,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  cleanup();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -62,9 +61,6 @@ describe('DownloadSection waitlist form', () => {
 
   it('rejects a malformed email', async () => {
     render(<DownloadSection />);
-    // 'a@b' passes the native type="email" constraint (so the form submits)
-    // but fails the app's stricter TLD-required regex — exercising the
-    // handleSubmit format check rather than the browser's validation.
     await submitEmail('a@b');
     expect(await screen.findByText('Please enter a valid email address.')).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
@@ -79,64 +75,47 @@ describe('DownloadSection waitlist form', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('rejects custom domains outside the allowlist', async () => {
+  it('accepts personal and custom domains and submits to API', async () => {
     render(<DownloadSection />);
-    await submitEmail('user@customdomain.io');
-    expect(
-      await screen.findByText(/Please use an email from a major provider/i),
-    ).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    await submitEmail('user@mypersonaldomain.com');
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/waitlist',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ email: 'user@mypersonaldomain.com' }),
+        }),
+      );
+    });
+    expect(await screen.findByText("You're on the waitlist!")).toBeInTheDocument();
   });
 
-  it('calls the API and advances to the code step on success', async () => {
+  it('submits consumer email to API and shows success card', async () => {
     render(<DownloadSection />);
     await submitEmail('user@gmail.com');
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        '/api/waitlist-start',
+        '/api/waitlist',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ email: 'user@gmail.com' }),
         }),
       );
     });
-    expect(
-      await screen.findByText(/Enter the 6-digit code we emailed you/i),
-    ).toBeInTheDocument();
-  });
-
-  it('verifies the code and shows the success card', async () => {
-    render(<DownloadSection />);
-    await submitEmail('user@gmail.com');
-    await screen.findByText(/Enter the 6-digit code we emailed you/i);
-
-    const codeInput = screen.getByLabelText('6-digit verification code');
-    fireEvent.change(codeInput, { target: { value: '123456' } });
-    fireEvent.click(screen.getByRole('button', { name: /confirm/i }));
-
     expect(await screen.findByText("You're on the waitlist!")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/waitlist-verify',
-      expect.objectContaining({
-        method: 'POST',
-        body: expect.stringContaining('"code":"123456"'),
-      }),
-    );
   });
 
-  it('rejects a non-6-digit code client-side', async () => {
+  it('handles API error response gracefully', async () => {
+    fetchMock.mockImplementationOnce(async () => ({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: "That email domain can't receive mail. Please check the spelling." }),
+    }));
+
     render(<DownloadSection />);
-    await submitEmail('user@gmail.com');
-    await screen.findByText(/Enter the 6-digit code we emailed you/i);
-
-    fireEvent.change(screen.getByLabelText('6-digit verification code'), { target: { value: '12' } });
-    // The input's pattern="\d{6}" would block a native submit, so dispatch the
-    // form's submit event directly to exercise handleVerify's guard.
-    const form = screen.getByRole('button', { name: /confirm/i }).closest('form');
-    fireEvent.submit(form!);
-
-    expect(
-      await screen.findByText('Enter the 6-digit code from your email.'),
-    ).toBeInTheDocument();
+    await submitEmail('typo@gmialll.com');
+    const matches = await screen.findAllByText("That email domain can't receive mail. Please check the spelling.");
+    expect(matches.length).toBeGreaterThan(0);
   });
 });
+

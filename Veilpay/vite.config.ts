@@ -14,6 +14,7 @@ import path from "path"
 // shape, so dev matches production: same validation, Resend send, Discord ping.
 function devApi(env: Record<string, string>) {
   const routes: Record<string, string> = {
+    '/api/waitlist': '/api/waitlist.ts',
     '/api/waitlist-start': '/api/waitlist-start.ts',
     '/api/waitlist-verify': '/api/waitlist-verify.ts',
   };
