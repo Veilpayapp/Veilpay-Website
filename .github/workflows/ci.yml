@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npx tsc -b
+
+      - name: Tests
+        run: npm test
+
+      - name: Dependency audit (production deps)
+        # Scoped to production dependencies: the remaining high advisories are
+        # transitive dev tooling under @vercel/node whose only fix is a breaking
+        # downgrade (npm audit fix --force → @vercel/node@4). Production deps
+        # must stay clean; the dev-tooling set is tracked separately.
+        run: npm audit --omit=dev --audit-level=high
