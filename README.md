@@ -1,6 +1,6 @@
 <div align="center">
   <img src="public/logo.webp" alt="Veilpay logo" width="120" />
-  <h1>Veilpay Launch Site</h1>
+  <h1>Veilpay</h1>
   <p><strong>Private by Default. Multi-Chain by Design.</strong></p>
   <p>Marketing site, public documentation, blog, and double opt-in waitlist for Veilpay.</p>
   <p>
